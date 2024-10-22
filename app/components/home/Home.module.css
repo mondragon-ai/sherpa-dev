@@ -1,0 +1,52 @@
+/* ? ================================================================================================ */
+/* ! HOME PAGE - PARENT */
+/* ? ================================================================================================ */
+
+.homeCardWrapper {
+  height: 85vh;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background: var(--p-color-bg-surface);
+  border-radius: var(--p-border-radius-300);
+  box-shadow: var(--p-shadow-100);
+}
+
+/* ! Chat list: left */
+/* ? ================================================================================================ */
+
+.homeCardWrapper > header,
+.homeCardWrapper > footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 10px;
+}
+
+.listWrapper {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0.5rem 10px;
+}
+
+.chatItem {
+  min-height: 75px;
+  height: auto;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: var(--p-border-radius-300);
+  background: var(--p-color-bg-surface-tertiary-hover);
+}
+
+/* ! Chat: Middle */
+/* ? ================================================================================================ */

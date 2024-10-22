@@ -3,15 +3,23 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://example.com/"
+application_url = "https://organisation-toll-poor-war.trycloudflare.com"
 embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "dummy-store-usa.myshopify.com"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = ""
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://organisation-toll-poor-war.trycloudflare.com/auth/callback",
+  "https://organisation-toll-poor-war.trycloudflare.com/auth/shopify/callback",
+  "https://organisation-toll-poor-war.trycloudflare.com/api/auth/callback"
+]
 
 [webhooks]
 api_version = "2024-10"
