@@ -1,4 +1,9 @@
-import { ChatDocument, Conversation, OrderData } from "../types/chats";
+import {
+  ChatDocument,
+  Conversation,
+  CustomerData,
+  OrderData,
+} from "../types/chats";
 
 export const order: OrderData = {
   id: "order-1234",
@@ -11,13 +16,18 @@ export const order: OrderData = {
   line_items: [
     {
       quantity: 2,
-      options: "Size: M, Color: Blue",
-      title: "T-Shirt",
+      options: "M / BLK",
+      title: "T-Shirt iuhf oiuh oiqwuhef ",
+    },
+    {
+      quantity: 2,
+      options: "M / WHT",
+      title: "T-Shirt iuhf oiuh oiqwuhef ",
     },
   ],
 };
 
-export const customer = {
+export const customer: CustomerData = {
   id: "cust-001",
   email: "customer@example.com",
   first_name: "John",
@@ -25,6 +35,7 @@ export const customer = {
   tags: "VIP",
   total_spent: 500,
   total_orders: 5,
+  address: "249 Saddlebrook Dr SE, Calhoun, United States 30701",
 };
 
 export const conversation: Conversation[] = [

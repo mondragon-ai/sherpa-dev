@@ -35,6 +35,7 @@ export type CustomerData = {
   tags: string;
   total_spent: number;
   total_orders: number;
+  address: string;
 };
 
 export type Conversation = {

@@ -1,15 +1,21 @@
-import { Badge, Icon, Text } from "@shopify/polaris";
-import { capitalizeWords } from "app/lib/utils/converters/text";
+import { capitalizeWords, truncateString } from "app/lib/utils/converters/text";
 import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
+import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
-import { useState } from "react";
 import { copyToClipboard } from "app/lib/utils/shared";
+import { Badge, Icon, Text } from "@shopify/polaris";
 import { ChatDocument } from "app/lib/types/chats";
+import { useState } from "react";
 
-export const ChatDetail = ({ chat }: { chat: ChatDocument }) => {
+interface ChatProps {
+  chat: ChatDocument;
+}
+
+export const ChatDetail = ({ chat }: ChatProps) => {
   return (
     <>
-      <style>{`
+      <style>
+        {`
         .detailWrapper {
             display: flex;
             flex-direction: column;
@@ -108,7 +114,8 @@ export const ChatDetail = ({ chat }: { chat: ChatDocument }) => {
             width: 50%
         }
 
-    `}</style>
+        `}
+      </style>
       <div className={"detailWrapper"}>
         <header>
           <Text variant="headingLg" as={"strong"}>
@@ -116,16 +123,16 @@ export const ChatDetail = ({ chat }: { chat: ChatDocument }) => {
           </Text>
         </header>
         <div className="detailMain">
-          <ChatDetails />
-          <CustomerDetail />
-          <OrderDetail />
+          <ChatDetails chat={chat} />
+          <CustomerDetail chat={chat} />
+          <OrderDetail chat={chat} />
         </div>
       </div>
     </>
   );
 };
 
-const ChatDetails = () => {
+const ChatDetails = ({ chat }: ChatProps) => {
   return (
     <section>
       <div className="row">
@@ -133,7 +140,7 @@ const ChatDetails = () => {
           Inquiry
         </Text>
         <Text variant="bodySm" as={"p"} tone="base">
-          Status
+          {capitalizeWords(chat.issue)}
         </Text>
       </div>
 
@@ -141,8 +148,12 @@ const ChatDetails = () => {
         <Text variant="bodySm" as={"p"} tone="subdued">
           Status
         </Text>
-        <Badge tone={"warning"} size="small" progress={"partiallyComplete"}>
-          {capitalizeWords("open")}
+        <Badge
+          tone={chat.status == "open" ? "warning" : "success"}
+          size="small"
+          progress={chat.status == "open" ? "partiallyComplete" : "complete"}
+        >
+          {capitalizeWords(chat.status)}
         </Badge>
       </div>
 
@@ -151,7 +162,7 @@ const ChatDetails = () => {
           Suggested Action
         </Text>
         <Text variant="bodySm" as={"p"} tone="base">
-          Resolve
+          {capitalizeWords(chat.suggested_action)}
         </Text>
       </div>
 
@@ -160,15 +171,44 @@ const ChatDetails = () => {
           Rating
         </Text>
         <Text variant="bodySm" as={"p"} tone="base">
-          Positive
+          {capitalizeWords(chat.rating)}
         </Text>
       </div>
     </section>
   );
 };
 
-const CustomerDetail = () => {
+const CustomerDetail = ({ chat }: ChatProps) => {
   const [open, toggle] = useState(false);
+
+  if (!chat.customer) {
+    return (
+      <section>
+        <div
+          onClick={() => toggle(!open)}
+          className="row"
+          style={{ justifyContent: "space-between", marginBottom: "15px" }}
+        >
+          <Text variant="headingMd" as={"strong"} tone="base">
+            Customer Summary
+          </Text>
+          <Icon source={open ? CaretDownIcon : CaretUpIcon} />
+        </div>
+      </section>
+    );
+  }
+
+  const {
+    first_name,
+    last_name,
+    email,
+    id,
+    total_orders,
+    total_spent,
+    tags,
+    address,
+  } = chat.customer;
+
   return (
     <section>
       <div
@@ -182,27 +222,27 @@ const CustomerDetail = () => {
         <Icon source={open ? CaretDownIcon : CaretUpIcon} />
       </div>
 
-      {open ? (
+      {open && chat.customer ? (
         <div className="detail">
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
               Name
             </Text>
             <Text variant="bodySm" as={"p"} tone="base">
-              First & Last Name
+              {`${capitalizeWords(first_name)} ${capitalizeWords(last_name)}`}
             </Text>
           </div>
 
           <div
             className="row"
             style={{ cursor: "pointer" }}
-            onClick={() => copyToClipboard("email@email.com")}
+            onClick={() => copyToClipboard(email)}
           >
             <Text variant="bodySm" as={"p"} tone="subdued">
               Email
             </Text>
             <Text variant="bodySm" as={"p"} tone="magic-subdued">
-              email@email.com
+              {email}
             </Text>
           </div>
 
@@ -211,7 +251,7 @@ const CustomerDetail = () => {
               ID
             </Text>
             <Text variant="bodySm" as={"p"} tone="base">
-              12345
+              {id}
             </Text>
           </div>
 
@@ -220,7 +260,7 @@ const CustomerDetail = () => {
               Address
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" breakWord>
-              249 Saddlebrook Dr SE, Calhoun, United States 30701
+              {address}
             </Text>
           </div>
 
@@ -229,7 +269,7 @@ const CustomerDetail = () => {
               Tags
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" breakWord>
-              Active Subscriber, Login with Shop, PS-Accepts-SMS, Shop
+              {tags}
             </Text>
           </div>
 
@@ -238,7 +278,7 @@ const CustomerDetail = () => {
               Total Spent
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" truncate>
-              $999.99
+              {`$${formatNumber(total_spent)}`}
             </Text>
           </div>
 
@@ -247,7 +287,7 @@ const CustomerDetail = () => {
               Total Orders
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" truncate>
-              99
+              {total_orders}
             </Text>
           </div>
         </div>
@@ -256,8 +296,36 @@ const CustomerDetail = () => {
   );
 };
 
-const OrderDetail = () => {
+const OrderDetail = ({ chat }: ChatProps) => {
   const [open, toggle] = useState(false);
+
+  if (!chat.order) {
+    return (
+      <section>
+        <div
+          onClick={() => toggle(!open)}
+          className="row"
+          style={{ justifyContent: "space-between", marginBottom: "15px" }}
+        >
+          <Text variant="headingMd" as={"strong"} tone="base">
+            Customer Summary
+          </Text>
+          <Icon source={open ? CaretDownIcon : CaretUpIcon} />
+        </div>
+      </section>
+    );
+  }
+
+  const {
+    id,
+    order_number,
+    payment_status,
+    fulfillment_status,
+    total_price,
+    created_at,
+    line_items,
+  } = chat.order;
+
   return (
     <section>
       <div
@@ -278,7 +346,7 @@ const OrderDetail = () => {
               ID
             </Text>
             <Text variant="bodySm" as={"p"} tone="base">
-              12345
+              {id}
             </Text>
           </div>
 
@@ -287,7 +355,7 @@ const OrderDetail = () => {
               Order Number
             </Text>
             <Text variant="bodySm" as={"p"} tone="base">
-              #1234
+              #{order_number}
             </Text>
           </div>
 
@@ -296,7 +364,7 @@ const OrderDetail = () => {
               Paid Status
             </Text>
             <Badge tone={"success"} size="small" progress={"complete"}>
-              {capitalizeWords("Paid")}
+              {capitalizeWords(payment_status)}
             </Badge>
           </div>
 
@@ -305,7 +373,7 @@ const OrderDetail = () => {
               Order Price
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" truncate>
-              $42.00
+              {`$${formatNumber(Number(total_price))}`}
             </Text>
           </div>
 
@@ -314,7 +382,7 @@ const OrderDetail = () => {
               Fulfillment Status
             </Text>
             <Badge tone={"warning"} size="small" progress={"partiallyComplete"}>
-              {capitalizeWords("hold")}
+              {capitalizeWords(fulfillment_status)}
             </Badge>
           </div>
 
@@ -323,7 +391,7 @@ const OrderDetail = () => {
               Placed At
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" truncate>
-              {formatTimestamp(1729606409)}
+              {formatTimestamp(created_at)}
             </Text>
           </div>
 
@@ -332,9 +400,16 @@ const OrderDetail = () => {
               Line Items
             </Text>
             <Text variant="bodySm" as={"p"} tone="base" breakWord>
-              - VIP Club x 1 <br />
-              - VIP Club x 1 <br />
-              - VIP Club x 1 <br />
+              {line_items &&
+                line_items.map((l) => {
+                  return (
+                    <>
+                      {`${truncateString(l.title, 5)} x ${l.quantity} - ${l.options} 
+                      `}{" "}
+                      <br />
+                    </>
+                  );
+                })}
             </Text>
           </div>
         </div>
