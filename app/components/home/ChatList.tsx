@@ -1,7 +1,8 @@
+import styles from "./Home.module.css";
 import { useCallback, useRef, useState } from "react";
 import { ArrowDownIcon } from "@shopify/polaris-icons";
-import { Avatar, Badge, Icon, Text, TextField } from "@shopify/polaris";
 import { getHoursDifference } from "app/lib/utils/converters/time";
+import { Avatar, Badge, Icon, Text, TextField } from "@shopify/polaris";
 import { capitalizeWords, getInitials } from "app/lib/utils/converters/text";
 
 const initialChats = [
@@ -146,198 +147,50 @@ export const ChatList = () => {
   );
 
   return (
-    <>
-      <style>{`
-
-        .listContainer {
-            height: 85vh;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0.5rem 10px;
-        }
-
-        .listWrapperHdr {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 10px;
-            z-index: 5;
-            background: white;
-        }
-        
-        .chatTopHdr {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
-            margin-bottom: 10px;
-        }
-        .chatTopHdr > div {
-            width: 100% !important;
-        }
-        
-        .chatBtmHdr {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
-            padding-bottom: 10px;
-        }
-        
-        .chatsHdrRight {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            height: auto;
-            width: auto;
-            position: relative;
-            margin: 0;
-            padding: 0;
-            cursor: pointer;
-        }
-
-        .chatsHdrRight:hover {
-            color: var(--p-color-bg-surface-tertiary-hover);
-        }
-
-
-        .listWrapper {
-            height: calc(100% - 80px);
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0;
-            overflow-y: scroll;
-        }
-
-        .chatItem {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: flex-start;
-            min-height: 75px;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: var(--p-border-radius-300);
-            cursor: pointer;
-            background: #eef1f140;
-        }
-
-        .chatItem:hover {
-            background: var(--p-color-bg-surface-tertiary-hover);
-        }
-        
-        .chatItem .chatTxt {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
-            padding-left: 10px
-        }
-
-        .chatItem .chatTxt > header {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
-            margin-bottom: 5px
-        }
-
-        .chatItem .chatTxt > header > div {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
-        }
-
-        .chatItem .chatTxt > header > div > span {
-            margin-right: 5px;
-        }
-
-        .chatItem .chatTxt > p:first-of-type {
-            margin: 5px 0;
-        }
-
-        `}</style>
-      <div className={"listContainer"}>
-        <header className={"listWrapperHdr"}>
-          <div className="chatTopHdr">
-            <TextField
-              size="medium"
-              label=""
-              prefix="🔎"
-              type="search"
-              value={"1123123"}
-              onChange={() => {}}
-              clearButton
-              loading
-              selectTextOnFocus={false}
-              autoComplete="off"
-              //   connectedRight={<Button>Search</Button>}
-            />
-          </div>
-          <div className="chatBtmHdr">
+    <div className={styles.listContainer}>
+      <header className={styles.listWrapperHdr}>
+        <div className={styles.chatTopHdr}>
+          <TextField
+            size="medium"
+            label=""
+            prefix="🔎"
+            type="search"
+            value={"1123123"}
+            onChange={() => {}}
+            clearButton
+            loading
+            selectTextOnFocus={false}
+            autoComplete="off"
+          />
+        </div>
+        <div className={styles.chatBtmHdr}>
+          <Text variant="bodyLg" as={"strong"}>
+            Open
+          </Text>
+          <div className={styles.chatsHdrRight}>
             <Text variant="bodyLg" as={"strong"}>
               Open
             </Text>
-            <div className={"chatsHdrRight"}>
-              <Text variant="bodyLg" as={"strong"}>
-                Open
-              </Text>
-              <Icon source={ArrowDownIcon} />
-            </div>
+            <Icon source={ArrowDownIcon} />
           </div>
-        </header>
-
-        <div className={"listWrapper"}>
-          {chats.map((chat, index) => {
-            if (index === chats.length - 1) {
-              return (
-                <div key={index} ref={lastChatRef}>
-                  <ChatItem chat={chat} />
-                </div>
-              );
-            } else {
-              return <ChatItem key={index} chat={chat} />;
-            }
-          })}
-          {loading && <div>Loading more chats...</div>}
         </div>
+      </header>
+
+      <div className={styles.listWrapper}>
+        {chats.map((chat, index) => {
+          if (index === chats.length - 1) {
+            return (
+              <div key={index} ref={lastChatRef}>
+                <ChatItem chat={chat} />
+              </div>
+            );
+          } else {
+            return <ChatItem key={index} chat={chat} />;
+          }
+        })}
+        {loading && <div>Loading more chats...</div>}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -348,9 +201,9 @@ const ChatItem: React.FC<{ chat: Chat }> = ({ chat }) => {
   const initials = getInitials(name);
 
   return (
-    <div className={"chatItem"}>
+    <div className={styles.chatItem}>
       <Avatar initials={initials} name={name} />
-      <div className="chatTxt">
+      <div className={styles.chatTxt}>
         <header>
           <div>
             <Badge

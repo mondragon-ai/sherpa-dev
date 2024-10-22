@@ -2,6 +2,7 @@ import { Page, Grid, Text } from "@shopify/polaris";
 import styles from "../components/home/Home.module.css";
 import { ChatList } from "app/components/home/ChatList";
 import { Chat } from "app/components/home/Chat";
+import { ChatDetail } from "app/components/home/ChatDetail";
 
 // export const loader = async ({ request }: LoaderFunctionArgs) => {
 //   await authenticate.admin(request);
@@ -116,9 +117,7 @@ export default function Index() {
         </Grid.Cell>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
-            <Text as={"dt"} variant="bodyLg">
-              Test
-            </Text>
+            <ChatDetail />
           </Placeholder>
         </Grid.Cell>
       </Grid>
