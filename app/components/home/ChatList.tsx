@@ -1,70 +1,104 @@
 import { useCallback, useRef, useState } from "react";
 import { ArrowDownIcon } from "@shopify/polaris-icons";
-import { Icon, Text, TextField } from "@shopify/polaris";
+import { Avatar, Badge, Icon, Text, TextField } from "@shopify/polaris";
+import { getHoursDifference } from "app/lib/utils/converters/time";
+import { capitalizeWords, getInitials } from "app/lib/utils/converters/text";
 
 const initialChats = [
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-  { id: 1, message: "Hello!", sender: "User1" },
-  { id: 2, message: "Hi there!", sender: "User2" },
-];
+  {
+    time: 1729605409 + 60 * 60 * 2,
+    issue: "refund",
+    status: "open",
+    suggested_action: "resolve",
+    customer: {
+      email: "jane.doe@example.com",
+      first_name: "Jane",
+      last_name: "Doe",
+    },
+    email: "jane.doe@example.com",
+  },
+  {
+    time: 1729604409 + 60 * 60 * 1,
+    issue: "status",
+    status: "resolved",
+    suggested_action: "cancel_order",
+    customer: {
+      email: "john.smith@example.com",
+      first_name: "John",
+      last_name: "Smith",
+    },
+    email: "john.smith@example.com",
+  },
+  {
+    time: 1729603409,
+    issue: "address",
+    status: "open",
+    suggested_action: "exchange",
+    customer: {
+      email: "anna.jones@example.com",
+      first_name: "Anna",
+      last_name: "Jones",
+    },
+    email: "anna.jones@example.com",
+  },
+  {
+    time: 1729603409 - 60 * 60 * 4,
+    issue: "exchange",
+    status: "resolved",
+    suggested_action: "refund",
+    customer: {
+      email: "michael.lee@example.com",
+      first_name: "Michael",
+      last_name: "Lee",
+    },
+    email: "michael.lee@example.com",
+  },
+  {
+    time: 1729603409 - 60 * 60 * 5,
+    issue: "refund",
+    status: "open",
+    suggested_action: "cancel_subscription",
+    customer: {
+      email: "susan.martin@example.com",
+      first_name: "Susan",
+      last_name: "Martin",
+    },
+    email: "susan.martin@example.com",
+  },
+  {
+    time: 1729603409 - 60 * 60 * 6,
+    issue: "refund",
+    status: "open",
+    suggested_action: "cancel_subscription",
+    customer: null,
+    email: "susan.martin@example.com",
+  },
+  {
+    time: 1729603409 - 60 * 60 * 7,
+    issue: "exchange",
+    status: "open",
+    suggested_action: "cancel_subscription",
+    customer: null,
+    email: null,
+  },
+] as Chat[];
 
 interface Chat {
-  id: number;
-  message: string;
-  sender: string;
+  time: number;
+  issue: "refund" | "status" | "address" | "exchange";
+  status: "open" | "resolved";
+  suggested_action:
+    | "resolve"
+    | "refund"
+    | "exchange"
+    | "cancel_order"
+    | "cancel_subscription";
+  customer: null | {
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
+  email: null | string;
 }
 
 export const ChatList = () => {
@@ -115,6 +149,13 @@ export const ChatList = () => {
     <>
       <style>{`
 
+        .listContainer {
+            height: 85vh;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            padding: 0.5rem 10px;
+        }
 
         .listWrapperHdr {
             display: flex;
@@ -173,16 +214,9 @@ export const ChatList = () => {
             color: var(--p-color-bg-surface-tertiary-hover);
         }
 
-        .listContainer {
-            height: 85vh;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0.5rem 10px;
-        }
 
         .listWrapper {
-            height: 87%;
+            height: calc(100% - 80px);
             width: 100%;
             position: relative;
             margin: 0;
@@ -190,20 +224,11 @@ export const ChatList = () => {
             overflow-y: scroll;
         }
 
-
-        .footerWrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            height: 8%;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 10px;
-        }
-
         .chatItem {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
             min-height: 75px;
             height: auto;
             width: 100%;
@@ -212,9 +237,60 @@ export const ChatList = () => {
             margin-bottom: 10px;
             padding: 10px;
             border-radius: var(--p-border-radius-300);
-            background: var(--p-color-bg-surface-tertiary-hover);
             cursor: pointer;
+            background: #eef1f140;
         }
+
+        .chatItem:hover {
+            background: var(--p-color-bg-surface-tertiary-hover);
+        }
+        
+        .chatItem .chatTxt {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: auto;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            padding: 0px;
+            padding-left: 10px
+        }
+
+        .chatItem .chatTxt > header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: auto;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            padding: 0px;
+            margin-bottom: 5px
+        }
+
+        .chatItem .chatTxt > header > div {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            height: auto;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            padding: 0px;
+        }
+
+        .chatItem .chatTxt > header > div > span {
+            margin-right: 5px;
+        }
+
+        .chatItem .chatTxt > p:first-of-type {
+            margin: 5px 0;
+        }
+
         `}</style>
       <div className={"listContainer"}>
         <header className={"listWrapperHdr"}>
@@ -260,17 +336,51 @@ export const ChatList = () => {
           })}
           {loading && <div>Loading more chats...</div>}
         </div>
-
-        {/* {<footer className="footerWrapper">Footer</footer>} */}
       </div>
     </>
   );
 };
 
 const ChatItem: React.FC<{ chat: Chat }> = ({ chat }) => {
+  const name = chat.customer
+    ? `${chat.customer.first_name} ${chat.customer.last_name}`
+    : "AC";
+  const initials = getInitials(name);
+
   return (
     <div className={"chatItem"}>
-      <strong>{chat.sender}:</strong> {chat.message}
+      <Avatar initials={initials} name={name} />
+      <div className="chatTxt">
+        <header>
+          <div>
+            <Badge
+              tone={chat.status == "open" ? "warning" : "success"}
+              size="small"
+              progress={
+                chat.status == "open" ? "partiallyComplete" : "complete"
+              }
+            >
+              {capitalizeWords(chat.status)}
+            </Badge>
+
+            <Text variant="bodySm" as={"p"} tone="base" truncate>
+              {capitalizeWords(chat.issue)}
+            </Text>
+          </div>
+
+          <Text variant="bodySm" as={"p"} tone="subdued">
+            {getHoursDifference(chat.time)}
+          </Text>
+        </header>
+
+        <Text variant="bodySm" as={"p"} tone="base" truncate>
+          {chat.email ? chat.email : "Anonymous"}
+        </Text>
+
+        <Text variant="bodySm" as={"p"} tone="subdued" truncate>
+          {capitalizeWords(chat.suggested_action)}
+        </Text>
+      </div>
     </div>
   );
 };

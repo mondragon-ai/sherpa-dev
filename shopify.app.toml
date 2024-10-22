@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://organisation-toll-poor-war.trycloudflare.com"
+application_url = "https://homework-alarm-boy-kilometers.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = ""
 
 [auth]
 redirect_urls = [
-  "https://organisation-toll-poor-war.trycloudflare.com/auth/callback",
-  "https://organisation-toll-poor-war.trycloudflare.com/auth/shopify/callback",
-  "https://organisation-toll-poor-war.trycloudflare.com/api/auth/callback"
+  "https://homework-alarm-boy-kilometers.trycloudflare.com/auth/callback",
+  "https://homework-alarm-boy-kilometers.trycloudflare.com/auth/shopify/callback",
+  "https://homework-alarm-boy-kilometers.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

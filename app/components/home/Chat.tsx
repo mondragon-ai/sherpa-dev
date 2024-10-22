@@ -3,6 +3,7 @@ import {
   OrderFulfilledIcon,
   ReceiptRefundIcon,
   NoteAddIcon,
+  SendIcon,
 } from "@shopify/polaris-icons";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 import { useCallback, useState } from "react";
@@ -320,7 +321,7 @@ export const Chat = () => {
               />
             </div>
             <div className="txtContainerFooter">
-              <Button icon={OrderFulfilledIcon} variant="primary" disabled>
+              <Button icon={SendIcon} variant="primary" disabled>
                 Submit
               </Button>
             </div>
