@@ -1,0 +1,238 @@
+import { ChatDocument, Conversation, OrderData } from "../types/chats";
+
+export const order: OrderData = {
+  id: "order-1234",
+  total_price: "150.00",
+  fulfillment_status: "hold",
+  payment_status: "paid",
+  tracking_url: "http://tracking.example.com/track1234",
+  order_number: 1234,
+  created_at: 1698090000, // Oct 23, 2024, 12:00 AM
+  line_items: [
+    {
+      quantity: 2,
+      options: "Size: M, Color: Blue",
+      title: "T-Shirt",
+    },
+  ],
+};
+
+export const customer = {
+  id: "cust-001",
+  email: "customer@example.com",
+  first_name: "John",
+  last_name: "Doe",
+  tags: "VIP",
+  total_spent: 500,
+  total_orders: 5,
+};
+
+export const conversation: Conversation[] = [
+  {
+    time: 1698097400, // Oct 23, 2024, 02:00 AM
+    is_note: false,
+    message: "",
+    sender: "agent",
+    action: "opened",
+  },
+  {
+    time: 1698097400, // Oct 23, 2024, 02:00 AM
+    is_note: false,
+    message: "Hello, I want to check the status of my order.",
+    sender: "customer",
+    action: null,
+  },
+  {
+    time: 1698097500, // Oct 23, 2024, 02:02 AM
+    is_note: false,
+    message: "Sure, let me check that for you.",
+    sender: "agent",
+    action: null,
+  },
+  {
+    time: 1698097600, // Oct 23, 2024, 02:03 AM
+    is_note: false,
+    message: "Your order is currently being processed and will ship soon.",
+    sender: "agent",
+    action: null,
+  },
+  {
+    time: 1698097700, // Oct 23, 2024, 02:05 AM
+    is_note: false,
+    message: "Great! Can I also update the delivery address?",
+    sender: "customer",
+    action: null,
+  },
+  {
+    time: 1698097800, // Oct 23, 2024, 02:07 AM
+    is_note: false,
+    message: "Sure! Please provide the new address.",
+    sender: "agent",
+    action: null,
+  },
+  {
+    time: 1698097900, // Oct 23, 2024, 02:10 AM
+    is_note: false,
+    message: "123 New Street, Cityville, ZIP 12345.",
+    sender: "customer",
+    action: null,
+  },
+  {
+    time: 1698098000, // Oct 23, 2024, 02:12 AM
+    is_note: false,
+    message: "Address updated successfully!",
+    sender: "agent",
+    action: null,
+  },
+  {
+    time: 1698097400, // Oct 23, 2024, 02:00 AM
+    is_note: false,
+    message: "",
+    sender: "agent",
+    action: "closed",
+  },
+  {
+    time: 1698097400,
+    is_note: true,
+    message: "The customers address was updated succesffully",
+    sender: "agent",
+    action: null,
+  },
+];
+
+export const chat_list: ChatDocument[] = [
+  {
+    classification: "general",
+    email_to_send: "support@example.com",
+    email_sent: false,
+    domain: "example.com",
+    id: "chat-001",
+    conversation: conversation,
+    time: 1698091400,
+    issue: "refund",
+    status: "open",
+    suggested_action: "resolve",
+    customer: customer,
+    email: "customer1@example.com",
+    rating: "positive",
+    updated_at: 1698091400,
+    created_at: 1698091400,
+    summary: "Refund requested for order #1234",
+    order: null,
+  },
+  {
+    classification: "order inquiry",
+    email_to_send: "order@example.com",
+    email_sent: true,
+    domain: "example.com",
+    id: "chat-002",
+    conversation: conversation,
+    time: 1698092400,
+    issue: "status",
+    status: "resolved",
+    suggested_action: "cancel_order",
+    customer: customer,
+    email: "customer2@example.com",
+    rating: "neutral",
+    updated_at: 1698092400,
+    created_at: 1698092400,
+    summary: "Order status update requested",
+    order: null,
+  },
+  {
+    classification: "support",
+    email_to_send: "support@example.com",
+    email_sent: false,
+    domain: "example.com",
+    id: "chat-003",
+    conversation: conversation,
+    time: 1698093400,
+    issue: "address",
+    status: "open",
+    suggested_action: "exchange",
+    customer: customer,
+    email: "customer3@example.com",
+    rating: "negative",
+    updated_at: 1698093400,
+    created_at: 1698093400,
+    summary: "Address change request for order #5678",
+    order: null,
+  },
+  {
+    classification: "exchange inquiry",
+    email_to_send: "support@example.com",
+    email_sent: true,
+    domain: "example.com",
+    id: "chat-004",
+    conversation: conversation,
+    time: 1698094400,
+    issue: "exchange",
+    status: "resolved",
+    suggested_action: "refund",
+    customer: null,
+    email: null,
+    rating: "positive",
+    updated_at: 1698094400,
+    created_at: 1698094400,
+    summary: "Exchange request for order #9101",
+    order: null,
+  },
+  {
+    classification: "billing inquiry",
+    email_to_send: "billing@example.com",
+    email_sent: false,
+    domain: "example.com",
+    id: "chat-005",
+    conversation: conversation,
+    time: 1698095400,
+    issue: "refund",
+    status: "open",
+    suggested_action: "cancel_subscription",
+    customer: customer,
+    email: "customer5@example.com",
+    rating: "neutral",
+    updated_at: 1698095400,
+    created_at: 1698095400,
+    summary: "Subscription cancellation and refund requested",
+    order: order,
+  },
+  {
+    classification: "general",
+    email_to_send: "support@example.com",
+    email_sent: true,
+    domain: "example.com",
+    id: "chat-006",
+    conversation: conversation,
+    time: 1698096400,
+    issue: "status",
+    status: "resolved",
+    suggested_action: "resolve",
+    customer: customer,
+    email: "customer6@example.com",
+    rating: "positive",
+    updated_at: 1698096400,
+    created_at: 1698096400,
+    summary: "Order status update",
+    order: order,
+  },
+];
+
+export const chatDocument: ChatDocument = {
+  classification: "order inquiry",
+  email_to_send: "support@example.com",
+  email_sent: true,
+  domain: "example.com",
+  id: "chat-007",
+  conversation: conversation,
+  time: 1698097400,
+  issue: "status",
+  status: "open",
+  suggested_action: "resolve",
+  customer: customer,
+  email: "customer@example.com",
+  rating: "positive",
+  updated_at: 1698098000, // Oct 23, 2024, 02:12 AM
+  created_at: 1698097400, // Oct 23, 2024, 02:00 AM
+  summary: "Customer inquired about order status and updated delivery address.",
+  order: order,
+};

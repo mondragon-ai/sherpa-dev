@@ -8,8 +8,8 @@ export function getHoursDifference(timeString: number): string {
 
   const diffMilliseconds = currentTime.getTime() - inputTime.getTime();
 
-  const diffHours = diffMilliseconds / (1000 * 60 * 60);
-  const diffMin = diffMilliseconds / (1000 * 60);
+  const diffHours = Math.round(diffMilliseconds / (1000 * 60 * 60));
+  const diffMin = Math.round(diffMilliseconds / (1000 * 60));
 
   if (diffHours >= 720) {
     return `${(diffHours / 720).toFixed(0)}M`;
@@ -23,8 +23,9 @@ export function getHoursDifference(timeString: number): string {
     return `${(diffHours / 24).toFixed(0)}d`;
   }
 
+  console.log({ diffMin });
   if (diffMin < 60) {
-    return `${diffMin.toFixed(0)}m`;
+    return `${Math.abs(diffMin).toFixed(0)}m`;
   }
 
   return `${diffHours.toFixed(0)}h`;

@@ -3,6 +3,9 @@ import styles from "../components/home/Home.module.css";
 import { ChatList } from "app/components/home/ChatList";
 import { Chat } from "app/components/home/Chat";
 import { ChatDetail } from "app/components/home/ChatDetail";
+import { chat_list, chatDocument } from "app/lib/data/chat";
+import { useCallback, useState } from "react";
+import { ChatDocument } from "app/lib/types/chats";
 
 // export const loader = async ({ request }: LoaderFunctionArgs) => {
 //   await authenticate.admin(request);
@@ -80,6 +83,8 @@ import { ChatDetail } from "app/components/home/ChatDetail";
 // };
 
 export default function Index() {
+  const [chat, setChat] = useState(chatDocument);
+  const [chats, setChats] = useState<ChatDocument[]>(chat_list);
   // const fetcher = useFetcher<typeof action>();
 
   // const shopify = useAppBridge();
@@ -98,6 +103,11 @@ export default function Index() {
   // }, [productId, shopify]);
   // const generateProduct = () => fetcher.submit({}, { method: "POST" });
 
+  const handleFetchChat = useCallback((id: string) => {
+    const selected = chats.find((c) => c.id == id);
+    if (selected) setChat(selected);
+  }, []);
+
   return (
     <Page
       fullWidth
@@ -107,17 +117,17 @@ export default function Index() {
       <Grid columns={{ sm: 3 }}>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
-            <ChatList />
+            <ChatList chat_list={chats} handleFetchChat={handleFetchChat} />
           </Placeholder>
         </Grid.Cell>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
           <Placeholder>
-            <Chat />
+            <Chat chat={chat} setChat={setChat} />
           </Placeholder>
         </Grid.Cell>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
-            <ChatDetail />
+            <ChatDetail chat={chat} />
           </Placeholder>
         </Grid.Cell>
       </Grid>

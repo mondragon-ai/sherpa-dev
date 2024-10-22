@@ -4,8 +4,9 @@ import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { useState } from "react";
 import { copyToClipboard } from "app/lib/utils/shared";
+import { ChatDocument } from "app/lib/types/chats";
 
-export const ChatDetail = () => {
+export const ChatDetail = ({ chat }: { chat: ChatDocument }) => {
   return (
     <>
       <style>{`

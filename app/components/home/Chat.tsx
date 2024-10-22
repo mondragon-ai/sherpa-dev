@@ -5,99 +5,81 @@ import {
   NoteAddIcon,
   SendIcon,
 } from "@shopify/polaris-icons";
-import { getHoursDifference } from "app/lib/utils/converters/time";
-import { useCallback, useState } from "react";
+import { ChatDocument, Conversation } from "app/lib/types/chats";
+import {
+  createCurrentSeconds,
+  getHoursDifference,
+} from "app/lib/utils/converters/time";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
-const initialChats = [
-  {
-    time: 1729606409,
-    message: "",
-    sender: "customer",
-    is_note: false,
-    action: "opened",
-  },
-  {
-    time: 1729599209,
-    message: "Hi, First Name, how can I help you?",
-    sender: "agent",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729602809,
-    message: "Yea my shit is FUCKED",
-    sender: "customer",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729606409,
-    message: "Fuck dude, what happened?",
-    sender: "agent",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729602809,
-    message: "Yea my shit is FUCKED",
-    sender: "customer",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729606409,
-    message: "Fuck dude, what happened?",
-    sender: "agent",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729602809,
-    message: "Yea my shit is FUCKED",
-    sender: "customer",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729606409,
-    message: "Fuck dude, what happened?",
-    sender: "agent",
-    is_note: false,
-    action: null,
-  },
-  {
-    time: 1729606409,
-    message: "",
-    sender: "agent",
-    is_note: false,
-    action: "closed",
-  },
-  {
-    time: 1729606409,
-    message: "Homie rly just needed a friend",
-    sender: "agent",
-    is_note: true,
-    action: null,
-  },
-] as Chat[];
-
-interface Chat {
-  time: number;
-  is_note: boolean;
-  message: string;
-  sender: "agent" | "customer";
-  action: null | "closed" | "opened";
-}
-
-export const Chat = () => {
+export const Chat = ({
+  chat,
+  setChat,
+}: {
+  chat: ChatDocument;
+  setChat: Dispatch<SetStateAction<ChatDocument>>;
+}) => {
   const [loading, setLoading] = useState(false);
-  const [chats, setChats] = useState<Chat[]>(initialChats);
-  const [value, setValue] = useState("1776 Barnes Street\nOrlando, FL 32801");
+  const [note, setNote] = useState("add note here....");
 
-  const handleChange = useCallback(
-    (newValue: string) => setValue(newValue),
-    [],
-  );
+  const handleChange = useCallback((newValue: string) => setNote(newValue), []);
+
+  const handleNoteSubmit = useCallback(() => {
+    setChat((p) => ({
+      ...p,
+      status: "resolved",
+      conversation: [
+        ...p.conversation,
+        {
+          time: createCurrentSeconds(),
+          is_note: false,
+          message: "",
+          sender: "agent",
+          action: "closed",
+        } as Conversation,
+      ],
+    }));
+  }, []);
+
+  const handleResolve = useCallback(() => {
+    // TODO: Auto Resolve & Push Result to close/resolve
+
+    // Update State
+    setChat((p) => ({
+      ...p,
+      status: "resolved",
+      conversation: [
+        ...p.conversation,
+        {
+          time: createCurrentSeconds(),
+          is_note: false,
+          message: "",
+          sender: "agent",
+          action: "closed",
+        } as Conversation,
+      ],
+    }));
+  }, []);
+
+  const handleClose = useCallback(() => {
+    // TODO: Push Result to close/resolve
+
+    // Update State
+    setChat((p) => ({
+      ...p,
+      status: "resolved",
+      conversation: [
+        ...p.conversation,
+        {
+          time: createCurrentSeconds(),
+          is_note: false,
+          message: "",
+          sender: "agent",
+          action: "closed",
+        } as Conversation,
+      ],
+    }));
+  }, []);
 
   return (
     <>
@@ -271,36 +253,52 @@ export const Chat = () => {
       <div className={"chatWrapper"}>
         <header>
           <Text variant="headingLg" as={"strong"}>
-            {true ? "First Last Name" : "email@gmail"}
+            {chat.customer
+              ? `${chat.customer.first_name} ${chat.customer.last_name}`
+              : chat.email
+                ? chat.email
+                : "Anonymous"}
           </Text>
           <div className="hdrRigt">
-            <Button icon={ReceiptRefundIcon} variant="tertiary" disabled>
-              Resolve
-            </Button>
-            <Button icon={OrderFulfilledIcon} variant="primary" disabled>
+            {chat.status == "open" ? (
+              <Button
+                icon={ReceiptRefundIcon}
+                variant="tertiary"
+                onClick={() => handleResolve()}
+              >
+                Resolve
+              </Button>
+            ) : null}
+            <Button
+              icon={OrderFulfilledIcon}
+              variant="primary"
+              disabled={chat.status !== "open"}
+              onClick={() => handleClose()}
+            >
               Close
             </Button>
           </div>
         </header>
 
         <div className={"convoWrapper"}>
-          {chats.map((chat, index) => {
-            if (chat.sender == "agent" && !chat.action && !chat.is_note) {
-              return <AgentChat chat={chat} />;
-            }
+          {chat.conversation &&
+            chat.conversation.map((chat, index) => {
+              if (chat.sender == "agent" && !chat.action && !chat.is_note) {
+                return <AgentChat chat={chat} />;
+              }
 
-            if (chat.sender == "customer" && !chat.action && !chat.is_note) {
-              return <CustomerChat chat={chat} />;
-            }
+              if (chat.sender == "customer" && !chat.action && !chat.is_note) {
+                return <CustomerChat chat={chat} />;
+              }
 
-            if (chat.action) {
-              return <Action chat={chat} />;
-            }
+              if (chat.action) {
+                return <Action chat={chat} />;
+              }
 
-            if (chat.is_note) {
-              return <Note chat={chat} />;
-            }
-          })}
+              if (chat.is_note) {
+                return <Note chat={chat} />;
+              }
+            })}
           {loading && <div>Loading more chats...</div>}
         </div>
         <footer className="chatFooterWrapper">
@@ -314,14 +312,18 @@ export const Chat = () => {
             <div className="txtField">
               <TextField
                 label=""
-                value={value}
+                value={note}
                 onChange={handleChange}
                 multiline={4}
                 autoComplete="off"
               />
             </div>
             <div className="txtContainerFooter">
-              <Button icon={SendIcon} variant="primary" disabled>
+              <Button
+                icon={SendIcon}
+                variant="primary"
+                onClick={() => handleNoteSubmit()}
+              >
                 Submit
               </Button>
             </div>
@@ -332,7 +334,7 @@ export const Chat = () => {
   );
 };
 
-const Action = ({ chat }: { chat: Chat }) => {
+const Action = ({ chat }: { chat: Conversation }) => {
   return (
     <div className="actionText">
       {chat.action == "closed" ? (
@@ -348,7 +350,7 @@ const Action = ({ chat }: { chat: Chat }) => {
   );
 };
 
-const Note = ({ chat }: { chat: Chat }) => {
+const Note = ({ chat }: { chat: Conversation }) => {
   return (
     <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
       <div className="msg" style={{ background: "#F5E6A9" }}>
@@ -361,7 +363,7 @@ const Note = ({ chat }: { chat: Chat }) => {
   );
 };
 
-const AgentChat = ({ chat }: { chat: Chat }) => {
+const AgentChat = ({ chat }: { chat: Conversation }) => {
   return (
     <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
       <div className="msg" style={{ background: "#D9E3F9" }}>
@@ -374,7 +376,7 @@ const AgentChat = ({ chat }: { chat: Chat }) => {
   );
 };
 
-const CustomerChat = ({ chat }: { chat: Chat }) => {
+const CustomerChat = ({ chat }: { chat: Conversation }) => {
   return (
     <div className="msgWrapper">
       <div className="msg">{chat.message}</div>

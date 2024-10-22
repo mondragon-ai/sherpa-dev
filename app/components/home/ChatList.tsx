@@ -1,109 +1,19 @@
 import styles from "./Home.module.css";
+import { ChatDocument } from "app/lib/types/chats";
 import { useCallback, useRef, useState } from "react";
 import { ArrowDownIcon } from "@shopify/polaris-icons";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 import { Avatar, Badge, Icon, Text, TextField } from "@shopify/polaris";
 import { capitalizeWords, getInitials } from "app/lib/utils/converters/text";
 
-const initialChats = [
-  {
-    time: 1729605409 + 60 * 60 * 2,
-    issue: "refund",
-    status: "open",
-    suggested_action: "resolve",
-    customer: {
-      email: "jane.doe@example.com",
-      first_name: "Jane",
-      last_name: "Doe",
-    },
-    email: "jane.doe@example.com",
-  },
-  {
-    time: 1729604409 + 60 * 60 * 1,
-    issue: "status",
-    status: "resolved",
-    suggested_action: "cancel_order",
-    customer: {
-      email: "john.smith@example.com",
-      first_name: "John",
-      last_name: "Smith",
-    },
-    email: "john.smith@example.com",
-  },
-  {
-    time: 1729603409,
-    issue: "address",
-    status: "open",
-    suggested_action: "exchange",
-    customer: {
-      email: "anna.jones@example.com",
-      first_name: "Anna",
-      last_name: "Jones",
-    },
-    email: "anna.jones@example.com",
-  },
-  {
-    time: 1729603409 - 60 * 60 * 4,
-    issue: "exchange",
-    status: "resolved",
-    suggested_action: "refund",
-    customer: {
-      email: "michael.lee@example.com",
-      first_name: "Michael",
-      last_name: "Lee",
-    },
-    email: "michael.lee@example.com",
-  },
-  {
-    time: 1729603409 - 60 * 60 * 5,
-    issue: "refund",
-    status: "open",
-    suggested_action: "cancel_subscription",
-    customer: {
-      email: "susan.martin@example.com",
-      first_name: "Susan",
-      last_name: "Martin",
-    },
-    email: "susan.martin@example.com",
-  },
-  {
-    time: 1729603409 - 60 * 60 * 6,
-    issue: "refund",
-    status: "open",
-    suggested_action: "cancel_subscription",
-    customer: null,
-    email: "susan.martin@example.com",
-  },
-  {
-    time: 1729603409 - 60 * 60 * 7,
-    issue: "exchange",
-    status: "open",
-    suggested_action: "cancel_subscription",
-    customer: null,
-    email: null,
-  },
-] as Chat[];
-
-interface Chat {
-  time: number;
-  issue: "refund" | "status" | "address" | "exchange";
-  status: "open" | "resolved";
-  suggested_action:
-    | "resolve"
-    | "refund"
-    | "exchange"
-    | "cancel_order"
-    | "cancel_subscription";
-  customer: null | {
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
-  email: null | string;
-}
-
-export const ChatList = () => {
-  const [chats, setChats] = useState<Chat[]>(initialChats);
+export const ChatList = ({
+  chat_list,
+  handleFetchChat,
+}: {
+  chat_list: ChatDocument[];
+  handleFetchChat: (id: string) => void;
+}) => {
+  const [chats, setChats] = useState<ChatDocument[]>(chat_list);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
@@ -180,12 +90,20 @@ export const ChatList = () => {
         {chats.map((chat, index) => {
           if (index === chats.length - 1) {
             return (
-              <div key={index} ref={lastChatRef}>
+              <div
+                key={index}
+                ref={lastChatRef}
+                onClick={() => handleFetchChat(chat.id)}
+              >
                 <ChatItem chat={chat} />
               </div>
             );
           } else {
-            return <ChatItem key={index} chat={chat} />;
+            return (
+              <div key={index} onClick={() => handleFetchChat(chat.id)}>
+                <ChatItem chat={chat} />
+              </div>
+            );
           }
         })}
         {loading && <div>Loading more chats...</div>}
@@ -194,7 +112,7 @@ export const ChatList = () => {
   );
 };
 
-const ChatItem: React.FC<{ chat: Chat }> = ({ chat }) => {
+const ChatItem: React.FC<{ chat: ChatDocument }> = ({ chat }) => {
   const name = chat.customer
     ? `${chat.customer.first_name} ${chat.customer.last_name}`
     : "AC";
