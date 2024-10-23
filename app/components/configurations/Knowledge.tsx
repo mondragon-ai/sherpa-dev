@@ -9,11 +9,11 @@ import {
   Text,
   TextField,
 } from "@shopify/polaris";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { Accordion } from "../shared/Accordion";
 import { CodeAddIcon } from "@shopify/polaris-icons";
 import { capitalizeWords } from "app/lib/utils/converters/text";
 import { ConfigurationsType, FAQTypeNames } from "app/lib/types/config";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
 const tabs = [
   {

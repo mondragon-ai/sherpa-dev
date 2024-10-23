@@ -39,5 +39,5 @@ export const config_state: ConfigurationsType = {
     value_type: "percentage",
   },
   tone: "custom",
-  custom_tone: "be funny",
+  custom_tone: "",
 };

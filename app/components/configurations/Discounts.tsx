@@ -1,14 +1,15 @@
 import {
   BlockStack,
   Box,
+  Button,
   Card,
-  Checkbox,
   Grid,
   Text,
   TextField,
 } from "@shopify/polaris";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import { ConfigurationsType } from "app/lib/types/config";
+import { DiscountIcon } from "@shopify/polaris-icons";
 
 export const Discounts = ({
   config,
@@ -41,12 +42,12 @@ export const Discounts = ({
       <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 8, xl: 8 }}>
         <Card roundedAbove="sm">
           <Text as="h2" variant="headingSm">
-            Automation
+            Price Rule
           </Text>
           <BlockStack gap="200">
             <Box paddingBlockStart="200">
               <TextField
-                label="Discount Off (next order)"
+                label="Discount Off (percentage)"
                 value={String(config.price_rules.value)}
                 onChange={handleTextChange}
                 error=""
@@ -57,6 +58,17 @@ export const Discounts = ({
                 This %-value is used to create a discount for customers' next
                 order.
               </Text>
+            </Box>
+
+            <Box paddingBlockStart="200">
+              <Button
+                fullWidth
+                variant="primary"
+                icon={DiscountIcon}
+                onClick={() => {}}
+              >
+                Add
+              </Button>
             </Box>
           </BlockStack>
         </Card>
