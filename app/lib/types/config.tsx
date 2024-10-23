@@ -21,6 +21,8 @@ export type ConfigurationsType = {
     value: string;
     value_type: "percentage" | "fixed";
   };
+  tone: "standard" | "playful" | "custom";
+  custom_tone: string;
 };
 
 export type FAQType = {

@@ -5,8 +5,8 @@ import { formatTimestamp } from "app/lib/utils/converters/time";
 import { copyToClipboard } from "app/lib/utils/shared";
 import { Badge, Icon, Text } from "@shopify/polaris";
 import { ChatDocument } from "app/lib/types/chats";
-import { useState } from "react";
 import { SkeletonDetail } from "./Skeleton";
+import { useState } from "react";
 
 interface ChatProps {
   chat: null | ChatDocument;

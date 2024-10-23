@@ -85,7 +85,7 @@ export const Knowledge = ({
           <Box as="section">
             <BlockStack gap="400">
               <Text as="h3" variant="headingMd">
-                FAQs
+                Knowledge Base
               </Text>
               <Text as="p" variant="bodyMd">
                 The FAQ section provides answers to common questions and
