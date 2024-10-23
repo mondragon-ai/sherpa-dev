@@ -1,11 +1,12 @@
 import { capitalizeWords, truncateString } from "app/lib/utils/converters/text";
-import { Badge, Icon, SkeletonBodyText, Text } from "@shopify/polaris";
 import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { copyToClipboard } from "app/lib/utils/shared";
+import { Badge, Icon, Text } from "@shopify/polaris";
 import { ChatDocument } from "app/lib/types/chats";
 import { useState } from "react";
+import { SkeletonDetail } from "./Skeleton";
 
 interface ChatProps {
   chat: null | ChatDocument;
@@ -123,16 +124,16 @@ export const ChatDetail = ({ chat }: ChatProps) => {
           </Text>
         </header>
         <div className="detailMain">
-          {chat ? <ChatDetails chat={chat} /> : <SkeletonDetail />}
           {chat ? (
-            <CustomerDetail chat={chat} />
+            <>
+              <ChatDetails chat={chat} />
+              <CustomerDetail chat={chat} />
+              <OrderDetail chat={chat} />
+            </>
           ) : (
-            <SkeletonDetail title="Customer Summary" />
-          )}
-          {chat ? (
-            <OrderDetail chat={chat} />
-          ) : (
-            <SkeletonDetail title="Order Summary" />
+            <>
+              <SkeletonDetail />
+            </>
           )}
         </div>
       </div>
@@ -140,78 +141,12 @@ export const ChatDetail = ({ chat }: ChatProps) => {
   );
 };
 
-const SkeletonDetail = ({ title }: { title?: string }) => {
-  return (
-    <section>
-      {title && (
-        <div
-          className="row"
-          style={{ justifyContent: "space-between", marginBottom: "15px" }}
-        >
-          <Text variant="headingMd" as={"strong"} tone="base">
-            {title}
-          </Text>
-          <Icon source={CaretUpIcon} />
-        </div>
-      )}
-
-      <div className="row" style={{ marginBottom: "15px" }}>
-        <div style={{ width: "100%", padding: "0 5px 0 0" }}>
-          <Text variant="bodySm" as={"p"} tone="subdued">
-            <SkeletonBodyText lines={1} />
-          </Text>
-        </div>
-
-        <div style={{ width: "100%", padding: "0 0px 0 5px" }}>
-          <Text variant="bodySm" as={"p"} tone="base">
-            <SkeletonBodyText lines={1} />
-          </Text>
-        </div>
-      </div>
-
-      <div className="row" style={{ marginBottom: "15px" }}>
-        <div style={{ width: "100%", padding: "0 5px 0 0" }}>
-          <Text variant="bodySm" as={"p"} tone="subdued">
-            <SkeletonBodyText lines={1} />
-          </Text>
-        </div>
-
-        <div style={{ width: "100%", padding: "0 0px 0 5px" }}>
-          <Text variant="bodySm" as={"p"} tone="base">
-            <SkeletonBodyText />
-          </Text>
-        </div>
-      </div>
-
-      <div className="row" style={{ marginBottom: "15px" }}>
-        <div style={{ width: "100%", padding: "0 5px 0 0" }}>
-          <Text variant="bodySm" as={"p"} tone="subdued">
-            <SkeletonBodyText lines={1} />
-          </Text>
-        </div>
-
-        <div style={{ width: "100%", padding: "0 0px 0 5px" }}>
-          <Text variant="bodySm" as={"p"} tone="base">
-            <SkeletonBodyText lines={1} />
-          </Text>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 const ChatDetails = ({ chat }: ChatProps) => {
-  if (!chat) return;
+  if (!chat) return null;
+
   return (
     <section>
-      <div className="row">
-        <Text variant="bodySm" as={"p"} tone="subdued">
-          Inquiry
-        </Text>
-        <Text variant="bodySm" as={"p"} tone="base">
-          {capitalizeWords(chat.issue)}
-        </Text>
-      </div>
+      <DetailRow label="Inquiry" value={capitalizeWords(chat.issue)} />
 
       <div className="row">
         <Text variant="bodySm" as={"p"} tone="subdued">
@@ -225,44 +160,30 @@ const ChatDetails = ({ chat }: ChatProps) => {
           {capitalizeWords(chat.status)}
         </Badge>
       </div>
-
-      <div className="row">
-        <Text variant="bodySm" as={"p"} tone="subdued">
-          Suggested Action
-        </Text>
-        <Text variant="bodySm" as={"p"} tone="base">
-          {capitalizeWords(chat.suggested_action)}
-        </Text>
-      </div>
-
-      <div className="row">
-        <Text variant="bodySm" as={"p"} tone="subdued">
-          Rating
-        </Text>
-        <Text variant="bodySm" as={"p"} tone="base">
-          {capitalizeWords(chat.rating)}
-        </Text>
-      </div>
+      <DetailRow
+        label="Suggested Action"
+        value={capitalizeWords(chat.suggested_action)}
+      />
+      <DetailRow label="Rating" value={capitalizeWords(chat.rating)} />
     </section>
   );
 };
 
 const CustomerDetail = ({ chat }: ChatProps) => {
-  if (!chat) return;
-  const [open, toggle] = useState(false);
+  if (!chat) return null;
 
   if (!chat.customer) {
     return (
       <section>
         <div
-          onClick={() => toggle(!open)}
+          onClick={() => {}}
           className="row"
           style={{ justifyContent: "space-between", marginBottom: "15px" }}
         >
           <Text variant="headingMd" as={"strong"} tone="base">
             Customer Summary
           </Text>
-          <Icon source={open ? CaretDownIcon : CaretUpIcon} />
+          <Icon source={CaretUpIcon} />
         </div>
       </section>
     );
@@ -275,113 +196,53 @@ const CustomerDetail = ({ chat }: ChatProps) => {
     id,
     total_orders,
     total_spent,
-    tags,
     address,
   } = chat.customer;
+  const [open, toggleOpen] = useState(false);
 
   return (
     <section>
-      <div
-        onClick={() => toggle(!open)}
-        className="row"
-        style={{ justifyContent: "space-between", marginBottom: "15px" }}
-      >
-        <Text variant="headingMd" as={"strong"} tone="base">
-          Customer Summary
-        </Text>
-        <Icon source={open ? CaretDownIcon : CaretUpIcon} />
-      </div>
-
-      {open && chat.customer ? (
+      <ToggleHeader
+        title="Customer Summary"
+        open={open}
+        onClick={() => toggleOpen(!open)}
+      />
+      {open && (
         <div className="detail">
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Name
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base">
-              {`${capitalizeWords(first_name)} ${capitalizeWords(last_name)}`}
-            </Text>
-          </div>
-
-          <div
-            className="row"
-            style={{ cursor: "pointer" }}
+          <DetailRow label="Name" value={`${first_name} ${last_name}`} />
+          <DetailRow
+            label="Email"
+            value={email}
             onClick={() => copyToClipboard(email)}
-          >
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Email
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="magic-subdued">
-              {email}
-            </Text>
-          </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              ID
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base">
-              {id}
-            </Text>
-          </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Address
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base" breakWord>
-              {address}
-            </Text>
-          </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Tags
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base" breakWord>
-              {tags}
-            </Text>
-          </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Total Spent
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base" truncate>
-              {`$${formatNumber(total_spent)}`}
-            </Text>
-          </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Total Orders
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base" truncate>
-              {total_orders}
-            </Text>
-          </div>
+          />
+          <DetailRow label="ID" value={id} />
+          <DetailRow label="Address" value={address} />
+          <DetailRow
+            label="Total Spent"
+            value={`$${formatNumber(total_spent)}`}
+          />
+          <DetailRow label="Total Orders" value={total_orders.toString()} />
         </div>
-      ) : null}
+      )}
     </section>
   );
 };
 
 const OrderDetail = ({ chat }: ChatProps) => {
-  if (!chat) return;
-  const [open, toggle] = useState(false);
+  if (!chat) return null;
 
   if (!chat.order) {
     return (
       <section>
         <div
-          onClick={() => toggle(!open)}
+          onClick={() => {}}
           className="row"
           style={{ justifyContent: "space-between", marginBottom: "15px" }}
         >
           <Text variant="headingMd" as={"strong"} tone="base">
-            Customer Summary
+            Order Summary
           </Text>
-          <Icon source={open ? CaretDownIcon : CaretUpIcon} />
+          <Icon source={CaretUpIcon} />
         </div>
       </section>
     );
@@ -396,40 +257,19 @@ const OrderDetail = ({ chat }: ChatProps) => {
     created_at,
     line_items,
   } = chat.order;
+  const [open, toggleOpen] = useState(false);
 
   return (
     <section>
-      <div
-        onClick={() => toggle(!open)}
-        className="row"
-        style={{ justifyContent: "space-between", marginBottom: "15px" }}
-      >
-        <Text variant="headingMd" as={"strong"} tone="base">
-          Order Summary
-        </Text>
-        <Icon source={open ? CaretDownIcon : CaretUpIcon} />
-      </div>
-
-      {open ? (
+      <ToggleHeader
+        title="Order Summary"
+        open={open}
+        onClick={() => toggleOpen(!open)}
+      />
+      {open && (
         <div className="detail">
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              ID
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base">
-              {id}
-            </Text>
-          </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Order Number
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base">
-              #{order_number}
-            </Text>
-          </div>
-
+          <DetailRow label="Order ID" value={id} />
+          <DetailRow label="Order Number" value={`#${order_number}`} />
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
               Paid Status
@@ -438,16 +278,10 @@ const OrderDetail = ({ chat }: ChatProps) => {
               {capitalizeWords(payment_status)}
             </Badge>
           </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Order Price
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base" truncate>
-              {`$${formatNumber(Number(total_price))}`}
-            </Text>
-          </div>
-
+          <DetailRow
+            label="Total Price"
+            value={`$${formatNumber(Number(total_price))}`}
+          />
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
               Fulfillment Status
@@ -456,16 +290,7 @@ const OrderDetail = ({ chat }: ChatProps) => {
               {capitalizeWords(fulfillment_status)}
             </Badge>
           </div>
-
-          <div className="row">
-            <Text variant="bodySm" as={"p"} tone="subdued">
-              Placed At
-            </Text>
-            <Text variant="bodySm" as={"p"} tone="base" truncate>
-              {formatTimestamp(created_at)}
-            </Text>
-          </div>
-
+          <DetailRow label="Placed At" value={formatTimestamp(created_at)} />
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
               Line Items
@@ -475,8 +300,7 @@ const OrderDetail = ({ chat }: ChatProps) => {
                 line_items.map((l) => {
                   return (
                     <>
-                      {`${truncateString(l.title, 5)} x ${l.quantity} - ${l.options} 
-                      `}{" "}
+                      {`${truncateString(l.title, 5)} x ${l.quantity} - ${l.options}`}
                       <br />
                     </>
                   );
@@ -484,7 +308,47 @@ const OrderDetail = ({ chat }: ChatProps) => {
             </Text>
           </div>
         </div>
-      ) : null}
+      )}
     </section>
   );
 };
+
+const DetailRow = ({
+  label,
+  value,
+  onClick,
+}: {
+  label: string;
+  value: string | JSX.Element;
+  onClick?: () => void;
+}) => (
+  <div className="row" onClick={onClick}>
+    <Text variant="bodySm" as={"p"} tone="subdued">
+      {label}
+    </Text>
+    <Text variant="bodySm" as={"p"} tone="base" breakWord>
+      {value}
+    </Text>
+  </div>
+);
+
+const ToggleHeader = ({
+  title,
+  open,
+  onClick,
+}: {
+  title: string;
+  open: boolean;
+  onClick: () => void;
+}) => (
+  <div
+    onClick={onClick}
+    className="row"
+    style={{ justifyContent: "space-between", marginBottom: "15px" }}
+  >
+    <Text variant="headingMd" as={"strong"} tone="base">
+      {title}
+    </Text>
+    <Icon source={open ? CaretDownIcon : CaretUpIcon} />
+  </div>
+);

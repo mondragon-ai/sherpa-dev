@@ -117,7 +117,11 @@ export default function Index() {
       <Grid columns={{ sm: 3 }}>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
-            <ChatList chat_list={chats} handleFetchChat={handleFetchChat} />
+            <ChatList
+              chat_list={chats}
+              id={chat ? chat.id : ""}
+              handleFetchChat={handleFetchChat}
+            />
           </Placeholder>
         </Grid.Cell>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>

@@ -1,14 +1,6 @@
+import { Button, Icon, Text, TextField } from "@shopify/polaris";
 import {
-  Button,
-  Icon,
-  SkeletonBodyText,
-  SkeletonDisplayText,
-  SkeletonTabs,
-  Text,
-  TextField,
-} from "@shopify/polaris";
-import {
-  OrderFulfilledIcon,
+  DeleteIcon,
   ReceiptRefundIcon,
   NoteAddIcon,
   SendIcon,
@@ -19,6 +11,8 @@ import {
   getHoursDifference,
 } from "app/lib/utils/converters/time";
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
+import { Action, AgentChat, CustomerChat, Note } from "./Conversation";
 
 export const Chat = ({
   chat,
@@ -37,20 +31,20 @@ export const Chat = ({
       (p) =>
         p && {
           ...p,
-          status: "resolved",
           conversation: [
             ...p.conversation,
             {
               time: createCurrentSeconds(),
-              is_note: false,
-              message: "",
+              is_note: true,
+              message: note,
               sender: "agent",
-              action: "closed",
+              action: null,
             } as Conversation,
           ],
         },
     );
-  }, []);
+    setNote("");
+  }, [note]);
 
   const handleResolve = useCallback(() => {
     // TODO: Auto Resolve & Push Result to close/resolve
@@ -100,7 +94,8 @@ export const Chat = ({
 
   return (
     <>
-      <style>{`
+      <style>
+        {`
             .chatWrapper {
                 display: flex;
                 flex-direction: column;
@@ -265,7 +260,8 @@ export const Chat = ({
                 margin-top: 10px
             }
 
-            `}</style>
+        `}
+      </style>
 
       <div className={"chatWrapper"}>
         {chat ? (
@@ -278,22 +274,21 @@ export const Chat = ({
                   : "Anonymous"}
             </Text>
             <div className="hdrRigt">
-              {chat.status == "open" ? (
-                <Button
-                  icon={ReceiptRefundIcon}
-                  variant="tertiary"
-                  onClick={() => handleResolve()}
-                >
-                  Resolve
-                </Button>
-              ) : null}
               <Button
-                icon={OrderFulfilledIcon}
+                icon={DeleteIcon}
+                variant="tertiary"
+                onClick={() => handleResolve()}
+                tone="critical"
+              >
+                Delete
+              </Button>
+              <Button
+                icon={ReceiptRefundIcon}
                 variant="primary"
                 disabled={chat.status !== "open"}
                 onClick={() => handleClose()}
               >
-                Close
+                Resolve{`${chat.status == "open" ? "" : "d"}`}
               </Button>
             </div>
           </header>
@@ -330,6 +325,7 @@ export const Chat = ({
         ) : (
           <SkeletonConvo />
         )}
+
         <footer className="chatFooterWrapper">
           <div className="txtContainer">
             <div className="txtContainerHdr">
@@ -360,100 +356,5 @@ export const Chat = ({
         </footer>
       </div>
     </>
-  );
-};
-
-const Action = ({ chat }: { chat: Conversation }) => {
-  return (
-    <div className="actionText">
-      {chat.action == "closed" ? (
-        <Text variant="bodySm" as={"p"} tone="magic">
-          Chat {chat.action} {getHoursDifference(chat.time)} ago.{" "}
-        </Text>
-      ) : (
-        <Text variant="bodySm" as={"p"} tone="magic">
-          Customer {chat.action} a chat {getHoursDifference(chat.time)} ago.{" "}
-        </Text>
-      )}
-    </div>
-  );
-};
-
-const Note = ({ chat }: { chat: Conversation }) => {
-  return (
-    <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
-      <div className="msg" style={{ background: "#F5E6A9" }}>
-        {chat.message}
-      </div>
-      <Text variant="bodySm" as={"p"} tone="subdued">
-        {chat.is_note ? "Note" : chat.sender} - {getHoursDifference(chat.time)}
-      </Text>
-    </div>
-  );
-};
-
-const AgentChat = ({ chat }: { chat: Conversation }) => {
-  return (
-    <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
-      <div className="msg" style={{ background: "#D9E3F9" }}>
-        {chat.message}
-      </div>
-      <Text variant="bodySm" as={"p"} tone="subdued">
-        {chat.is_note ? "Note" : chat.sender} - {getHoursDifference(chat.time)}
-      </Text>
-    </div>
-  );
-};
-
-const CustomerChat = ({ chat }: { chat: Conversation }) => {
-  return (
-    <div className="msgWrapper">
-      <div className="msg">{chat.message}</div>
-      <Text variant="bodySm" as={"p"} tone="subdued">
-        {chat.sender} - {getHoursDifference(chat.time)}
-      </Text>
-    </div>
-  );
-};
-
-const SkeletonConvo = () => {
-  const agent_convo = {
-    time: 0,
-    is_note: false,
-    message: "",
-    sender: "agent",
-    action: "opened",
-  } as Conversation;
-
-  return (
-    <div className={"convoWrapper"}>
-      <div className="actionText">
-        <Text variant="bodySm" as={"p"} tone="magic">
-          Customer opened a chat today
-        </Text>
-      </div>
-
-      <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
-        <div className="msg" style={{ width: "50%" }}>
-          <SkeletonBodyText />
-        </div>
-        <div style={{ width: "10%", marginTop: "10px" }}>
-          <SkeletonBodyText lines={1} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const SkeletonHdr = () => {
-  return (
-    <header>
-      <div style={{ width: "30%" }}>
-        <SkeletonDisplayText />
-      </div>
-      <div className="hdrRigt">
-        <SkeletonTabs count={2} />
-      </div>
-    </header>
   );
 };

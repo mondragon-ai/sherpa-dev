@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://douglas-nebraska-forecasts-barely.trycloudflare.com"
+application_url = "https://atlantic-learn-initiated-hard.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = ""
 
 [auth]
 redirect_urls = [
-  "https://douglas-nebraska-forecasts-barely.trycloudflare.com/auth/callback",
-  "https://douglas-nebraska-forecasts-barely.trycloudflare.com/auth/shopify/callback",
-  "https://douglas-nebraska-forecasts-barely.trycloudflare.com/api/auth/callback"
+  "https://atlantic-learn-initiated-hard.trycloudflare.com/auth/callback",
+  "https://atlantic-learn-initiated-hard.trycloudflare.com/auth/shopify/callback",
+  "https://atlantic-learn-initiated-hard.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

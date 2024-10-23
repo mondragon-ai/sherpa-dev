@@ -1,4 +1,3 @@
-// import styles from "./Home.module.css";
 import { ChatDocument } from "app/lib/types/chats";
 import { useCallback, useRef, useState } from "react";
 import { getHoursDifference } from "app/lib/utils/converters/time";
@@ -7,9 +6,11 @@ import { capitalizeWords, getInitials } from "app/lib/utils/converters/text";
 
 export const ChatList = ({
   chat_list,
+  id,
   handleFetchChat,
 }: {
   chat_list: ChatDocument[];
+  id: string;
   handleFetchChat: (id: string) => void;
 }) => {
   const [chats, setChats] = useState<ChatDocument[]>(chat_list);
@@ -22,7 +23,7 @@ export const ChatList = ({
   const handleSelectChange = useCallback((value: string) => {
     console.log(value);
 
-    // fetch filtered chats
+    // TODO: fetch filtered chats
 
     // set chats
     setSelected(value);
@@ -241,7 +242,6 @@ export const ChatList = ({
               onChange={(v) => handleQuery(v)}
               clearButton
               onClearButtonClick={handleClearButtonClick}
-              //   loading
               selectTextOnFocus={false}
               autoComplete="off"
             />
@@ -271,13 +271,13 @@ export const ChatList = ({
                   ref={lastChatRef}
                   onClick={() => handleFetchChat(chat.id)}
                 >
-                  <ChatItem chat={chat} />
+                  <ChatItem chat={chat} is_selected={id == chat.id} />
                 </div>
               );
             } else {
               return (
                 <div key={index} onClick={() => handleFetchChat(chat.id)}>
-                  <ChatItem chat={chat} />
+                  <ChatItem chat={chat} is_selected={id == chat.id} />
                 </div>
               );
             }
@@ -289,14 +289,24 @@ export const ChatList = ({
   );
 };
 
-const ChatItem: React.FC<{ chat: ChatDocument }> = ({ chat }) => {
+const ChatItem: React.FC<{ chat: ChatDocument; is_selected: boolean }> = ({
+  chat,
+  is_selected,
+}) => {
   const name = chat.customer
     ? `${chat.customer.first_name} ${chat.customer.last_name}`
-    : "AC";
+    : "A C";
   const initials = getInitials(name);
 
   return (
-    <div className={"chatItem"}>
+    <div
+      className={"chatItem"}
+      style={{
+        background: is_selected
+          ? "var(--p-color-bg-surface-tertiary-hover)"
+          : "",
+      }}
+    >
       <Avatar initials={initials} name={name} />
       <div className={"chatTxt"}>
         <header>
