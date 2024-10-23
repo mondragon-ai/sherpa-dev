@@ -7,22 +7,34 @@ import {
   Text,
   TextField,
 } from "@shopify/polaris";
-import { useCallback, useState } from "react";
-import { CodeAddIcon, DeleteIcon } from "@shopify/polaris-icons";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { ConfigurationsType } from "app/lib/types/config";
+import { CodeAddIcon } from "@shopify/polaris-icons";
 import { Accordion } from "../shared/Accordion";
 
-export const SpecialCases = () => {
-  const [textFieldValue, setTextFieldValue] = useState("");
-  const [checked, setChecked] = useState(false);
+export const SpecialCases = ({
+  config,
+  setConfig,
+}: {
+  config: ConfigurationsType;
+  setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
+}) => {
+  const [special, setSpecial] = useState({ title: "", description: "" });
 
-  const handleTextFieldChange = useCallback(
-    (value: string) => setTextFieldValue(value),
-    [],
-  );
+  const handleAddSpecialCase = useCallback(() => {
+    setConfig((p) => ({ ...p, special_cases: [...p.special_cases, special] }));
+    setSpecial({ title: "", description: "" });
+  }, [special]);
 
-  const handleChange = useCallback(
-    (newChecked: boolean) => setChecked(newChecked),
-    [],
+  const handleDeleteSpecialCase = useCallback(
+    (title: string) => {
+      const cases = config.special_cases.filter((s) => s.title !== title);
+      setConfig((p) => ({
+        ...p,
+        special_cases: cases,
+      }));
+    },
+    [special],
   );
 
   return (
@@ -51,8 +63,8 @@ export const SpecialCases = () => {
               <Box paddingBlockStart="200">
                 <TextField
                   label="Special Case Title"
-                  value={textFieldValue}
-                  onChange={handleTextFieldChange}
+                  value={special.title}
+                  onChange={(v) => setSpecial((p) => ({ ...p, title: v }))}
                   error=""
                   type="text"
                   autoComplete="off"
@@ -61,8 +73,10 @@ export const SpecialCases = () => {
               <Box paddingBlockStart="200">
                 <TextField
                   label="Special Case Description"
-                  value={textFieldValue}
-                  onChange={handleTextFieldChange}
+                  value={special.description}
+                  onChange={(v) =>
+                    setSpecial((p) => ({ ...p, description: v }))
+                  }
                   error=""
                   type="text"
                   autoComplete="off"
@@ -70,11 +84,27 @@ export const SpecialCases = () => {
               </Box>
 
               <Box paddingBlockStart="200">
-                <Button fullWidth variant="primary" icon={CodeAddIcon}>
+                <Button
+                  fullWidth
+                  variant="primary"
+                  icon={CodeAddIcon}
+                  onClick={handleAddSpecialCase}
+                >
                   Add
                 </Button>
               </Box>
-              <Box paddingBlockStart="500"></Box>
+              <Box paddingBlockStart="500">
+                {config.special_cases &&
+                  config.special_cases.map((s) => {
+                    return (
+                      <Accordion
+                        title={s.title}
+                        description={s.description}
+                        deleteRow={handleDeleteSpecialCase}
+                      />
+                    );
+                  })}
+              </Box>
             </BlockStack>
           </Card>
         </Grid.Cell>

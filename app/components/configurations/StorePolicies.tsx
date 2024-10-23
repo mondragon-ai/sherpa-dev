@@ -8,19 +8,27 @@ import {
   Text,
   TextField,
 } from "@shopify/polaris";
-import { useCallback, useState } from "react";
+import { ConfigurationsType } from "app/lib/types/config";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
-export const StorePolicies = () => {
-  const [textFieldValue, setTextFieldValue] = useState("");
-  const [checked, setChecked] = useState(false);
-
-  const handleChange = useCallback(
-    (newChecked: boolean) => setChecked(newChecked),
+export const StorePolicies = ({
+  config,
+  setConfig,
+}: {
+  config: ConfigurationsType;
+  setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
+}) => {
+  const handleTextChange = useCallback(
+    (
+      v: string,
+      t: "contact_email" | "return" | "exception" | "shipping" | "store",
+    ) => setConfig((p) => ({ ...p, [t]: v })),
     [],
   );
 
-  const handleTextFieldChange = useCallback(
-    (value: string) => setTextFieldValue(value),
+  const handleChange = useCallback(
+    (v: boolean, t: "refund" | "damged_items" | "exchanges") =>
+      setConfig((p) => ({ ...p, [t]: v })),
     [],
   );
 
@@ -48,8 +56,8 @@ export const StorePolicies = () => {
             <Box paddingBlockStart="200">
               <Checkbox
                 label="Enable Eligible Refunds"
-                checked={checked}
-                onChange={handleChange}
+                checked={config.refund}
+                onChange={(v) => handleChange(v, "refund")}
               />
               <Text as="p" variant="bodyXs" tone="magic-subdued">
                 Items returned can receive a refund (must be returned)
@@ -58,8 +66,8 @@ export const StorePolicies = () => {
             <Box paddingBlockStart="200">
               <Checkbox
                 label="Accept Refund on Damaged Items"
-                checked={checked}
-                onChange={handleChange}
+                checked={config.damged_items}
+                onChange={(v) => handleChange(v, "damged_items")}
               />
               <Text as="p" variant="bodyXs" tone="magic-subdued">
                 Accept items returned that are damaged, incorrect, or otherwise
@@ -69,8 +77,8 @@ export const StorePolicies = () => {
             <Box paddingBlockStart="200">
               <Checkbox
                 label="Accept Exchanges"
-                checked={checked}
-                onChange={handleChange}
+                checked={config.exchanges}
+                onChange={(v) => handleChange(v, "exchanges")}
               />
               <Text as="p" variant="bodyXs" tone="magic-subdued">
                 Accept exchanges for incorrect items (must be returned)
@@ -84,8 +92,8 @@ export const StorePolicies = () => {
                 <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
                   <TextField
                     label="Customer Support Email"
-                    value={textFieldValue}
-                    onChange={handleTextFieldChange}
+                    value={config.contact_email}
+                    onChange={(v) => handleTextChange(v, "contact_email")}
                     error=""
                     autoComplete="off"
                   />
@@ -94,8 +102,8 @@ export const StorePolicies = () => {
                 <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
                   <TextField
                     label="Max Days to Accept Returned Order"
-                    value={textFieldValue}
-                    onChange={handleTextFieldChange}
+                    value={String(config.return)}
+                    onChange={(v) => handleTextChange(v, "return")}
                     error=""
                     type="number"
                     autoComplete="off"
@@ -107,8 +115,8 @@ export const StorePolicies = () => {
             <Box paddingBlockStart="200">
               <TextField
                 label="Refund Exception. (single sentence please)"
-                value={textFieldValue}
-                onChange={handleTextFieldChange}
+                value={config.exception}
+                onChange={(v) => handleTextChange(v, "exception")}
                 error=""
                 type="text"
                 autoComplete="off"
@@ -117,8 +125,8 @@ export const StorePolicies = () => {
             <Box paddingBlockStart="200">
               <TextField
                 label="Shipping Policy. (single sentence please)"
-                value={textFieldValue}
-                onChange={handleTextFieldChange}
+                value={config.shipping}
+                onChange={(v) => handleTextChange(v, "shipping")}
                 error=""
                 type="text"
                 autoComplete="off"
@@ -132,8 +140,8 @@ export const StorePolicies = () => {
             <Box paddingBlockStart="200">
               <TextField
                 label="Store Summary"
-                value={textFieldValue}
-                onChange={handleTextFieldChange}
+                value={String(config.store)}
+                onChange={(v) => handleTextChange(v, "store")}
                 error=""
                 type="text"
                 autoComplete="off"

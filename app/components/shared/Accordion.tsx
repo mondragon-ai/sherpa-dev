@@ -5,9 +5,11 @@ import { useState } from "react";
 export const Accordion = ({
   title,
   description,
+  deleteRow,
 }: {
   title: string;
   description: string;
+  deleteRow: (title: string) => void;
 }) => {
   const [open, toggle] = useState(false);
 
@@ -25,8 +27,9 @@ export const Accordion = ({
                 position: relative;
                 margin: 0;
                 padding: 0px;
-                box-shadow: var(--p-shadow-100);
-                border-radius: var(--p-border-radius-300);
+                margin-bottom: 5px;
+                border: 1px solid var(--p-color-bg-surface-tertiary-hover);
+                border-radius: 5px
             }
             
             .accordian > header {
@@ -44,7 +47,6 @@ export const Accordion = ({
 
             .accordian > header:hover {
                 background: var(--p-color-bg-surface-tertiary-hover);
-                border-radius: var(--p-border-radius-300);
             }
 
             .accordian > main {
@@ -66,7 +68,12 @@ export const Accordion = ({
           <Text as="p" variant="bodyLg">
             {title}
           </Text>
-          <Button variant="primary" tone="critical" icon={DeleteIcon}>
+          <Button
+            variant="primary"
+            tone="critical"
+            icon={DeleteIcon}
+            onClick={() => deleteRow(title)}
+          >
             Delete
           </Button>
         </header>

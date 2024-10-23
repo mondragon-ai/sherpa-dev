@@ -9,40 +9,11 @@ import {
   Text,
   TextField,
 } from "@shopify/polaris";
-import { useCallback, useState } from "react";
-import { CodeAddIcon, DeleteIcon } from "@shopify/polaris-icons";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { Accordion } from "../shared/Accordion";
+import { CodeAddIcon } from "@shopify/polaris-icons";
 import { capitalizeWords } from "app/lib/utils/converters/text";
-
-type FaqType =
-  | "cancelation"
-  | "products"
-  | "subscriptions"
-  | "discounts"
-  | "giveaway";
-
-type ConfigType = {
-  cancelation: {
-    overview: string;
-    faqs: { q: string; a: string }[];
-  };
-  products: {
-    overview: string;
-    faqs: { q: string; a: string }[];
-  };
-  subscriptions: {
-    overview: string;
-    faqs: { q: string; a: string }[];
-  };
-  discounts: {
-    overview: string;
-    faqs: { q: string; a: string }[];
-  };
-  giveaway: {
-    overview: string;
-    faqs: { q: string; a: string }[];
-  };
-};
+import { ConfigurationsType, FAQTypeNames } from "app/lib/types/config";
 
 const tabs = [
   {
@@ -73,45 +44,16 @@ const tabs = [
   },
 ];
 
-export const Knowledge = () => {
-  const [textFieldValue, setTextFieldValue] = useState("");
-  const [config, setConfig] = useState<ConfigType>({
-    cancelation: {
-      overview: "",
-      faqs: [],
-    },
-    products: {
-      overview: "",
-      faqs: [],
-    },
-    subscriptions: {
-      overview: "",
-      faqs: [],
-    },
-    discounts: {
-      overview: "",
-      faqs: [],
-    },
-    giveaway: {
-      overview: "",
-      faqs: [],
-    },
-  });
-  const [checked, setChecked] = useState(false);
+export const Knowledge = ({
+  config,
+  setConfig,
+}: {
+  config: ConfigurationsType;
+  setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
+}) => {
   const [selected, setSelected] = useState(0);
-
   const handleTabChange = useCallback(
     (selectedTabIndex: number) => setSelected(selectedTabIndex),
-    [],
-  );
-
-  const handleChange = useCallback(
-    (newChecked: boolean) => setChecked(newChecked),
-    [],
-  );
-
-  const handleTextFieldChange = useCallback(
-    (value: string) => setTextFieldValue(value),
     [],
   );
 
@@ -161,7 +103,11 @@ export const Knowledge = () => {
             </Text>
             <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
               <Box paddingBlockStart="200">
-                <FaqTabs type={tabs[selected].id as FaqType} configs={config} />
+                <FaqTabs
+                  type={tabs[selected].id as FAQTypeNames}
+                  configs={config}
+                  setConfig={setConfig}
+                />
               </Box>
             </Tabs>
           </Card>
@@ -171,13 +117,38 @@ export const Knowledge = () => {
   );
 };
 
-const FaqTabs = ({ type, configs }: { type: FaqType; configs: ConfigType }) => {
-  const { overview, faqs } = configs[type];
-  const [textFieldValue, setTextFieldValue] = useState(overview);
-
-  const handleTextFieldChange = useCallback(
-    (value: string) => setTextFieldValue(value),
+const FaqTabs = ({
+  type,
+  configs,
+  setConfig,
+}: {
+  type: FAQTypeNames;
+  configs: ConfigurationsType;
+  setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
+}) => {
+  const [faq, setFaq] = useState({ q: "", a: "" });
+  const handleOverviewTxt = useCallback(
+    (v: string) =>
+      setConfig((p) => ({ ...p, [type]: { ...p[type], overview: v } })),
     [],
+  );
+
+  console.log({ type, config_type: configs[type] });
+
+  const handleAddSpecialCase = useCallback(() => {
+    setConfig((p) => ({
+      ...p,
+      [type]: { ...p[type], faqs: [...p[type].faqs, faq] },
+    }));
+    setFaq({ q: "", a: "" });
+  }, [faq, configs]);
+
+  const handleDeleteSpecialCase = useCallback(
+    (a: string) => {
+      const faqs = configs[type].faqs.filter((s) => s.a !== a);
+      setConfig((p) => ({ ...p, [type]: { ...p[type], faqs: faqs } }));
+    },
+    [faq, configs],
   );
 
   return (
@@ -185,8 +156,8 @@ const FaqTabs = ({ type, configs }: { type: FaqType; configs: ConfigType }) => {
       <Box paddingBlockStart="500">
         <TextField
           label={`${capitalizeWords(type)} Overview`}
-          value={textFieldValue}
-          onChange={handleTextFieldChange}
+          value={configs[type].overview}
+          onChange={handleOverviewTxt}
           error=""
           type="text"
           multiline={4}
@@ -198,9 +169,9 @@ const FaqTabs = ({ type, configs }: { type: FaqType; configs: ConfigType }) => {
       </Box>
       <Box paddingBlockStart="200">
         <TextField
-          label="FAQ Title"
-          value={textFieldValue}
-          onChange={handleTextFieldChange}
+          label={`${capitalizeWords(type)} FAQ Question`}
+          value={faq.q}
+          onChange={(v) => setFaq((p) => ({ ...p, q: v }))}
           error=""
           type="text"
           autoComplete="off"
@@ -208,9 +179,9 @@ const FaqTabs = ({ type, configs }: { type: FaqType; configs: ConfigType }) => {
       </Box>
       <Box paddingBlockStart="200">
         <TextField
-          label="FAQ Description"
-          value={textFieldValue}
-          onChange={handleTextFieldChange}
+          label={`${capitalizeWords(type)} FAQ Answer`}
+          value={faq.a}
+          onChange={(v) => setFaq((p) => ({ ...p, a: v }))}
           error=""
           type="text"
           autoComplete="off"
@@ -218,15 +189,26 @@ const FaqTabs = ({ type, configs }: { type: FaqType; configs: ConfigType }) => {
       </Box>
 
       <Box paddingBlockStart="200">
-        <Button fullWidth variant="primary" icon={CodeAddIcon}>
+        <Button
+          fullWidth
+          variant="primary"
+          icon={CodeAddIcon}
+          onClick={handleAddSpecialCase}
+        >
           Add
         </Button>
       </Box>
 
       <Box paddingBlockStart="500">
-        {faqs &&
-          faqs.map((faq) => {
-            return <Accordion title={faq.q} description={faq.a} />;
+        {configs[type].faqs &&
+          configs[type].faqs.map((faq) => {
+            return (
+              <Accordion
+                title={faq.q}
+                description={faq.a}
+                deleteRow={handleDeleteSpecialCase}
+              />
+            );
           })}
       </Box>
     </BlockStack>

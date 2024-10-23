@@ -1,10 +1,17 @@
 import { BlockStack, Box, Card, Checkbox, Grid, Text } from "@shopify/polaris";
-import { useCallback, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { ConfigurationsType } from "app/lib/types/config";
 
-export const Automation = () => {
-  const [checked, setChecked] = useState(false);
+export const Automation = ({
+  config,
+  setConfig,
+}: {
+  config: ConfigurationsType;
+  setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
+}) => {
   const handleChange = useCallback(
-    (newChecked: boolean) => setChecked(newChecked),
+    (v: boolean, t: "automate_actions" | "automate_emails") =>
+      setConfig((p) => ({ ...p, [t]: v })),
     [],
   );
 
@@ -32,8 +39,8 @@ export const Automation = () => {
             <Box paddingBlockStart="200">
               <Checkbox
                 label="Automate Actions"
-                checked={checked}
-                onChange={handleChange}
+                checked={config.automate_actions}
+                onChange={(v) => handleChange(v, "automate_actions")}
               />
               <Text as="p" variant="bodyXs" tone="magic-subdued">
                 Allow Sherpa to perform actions automatically: Cancel Orders,
@@ -43,8 +50,8 @@ export const Automation = () => {
             <Box paddingBlockStart="200">
               <Checkbox
                 label="Automate Emails"
-                checked={checked}
-                onChange={handleChange}
+                checked={config.automate_emails}
+                onChange={(v) => handleChange(v, "automate_emails")}
               />
               <Text as="p" variant="bodyXs" tone="magic-subdued">
                 Allow Sherpa Automatically send emails once resolved (must have
