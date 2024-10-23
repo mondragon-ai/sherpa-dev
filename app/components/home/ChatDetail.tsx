@@ -1,9 +1,9 @@
 import { capitalizeWords, truncateString } from "app/lib/utils/converters/text";
+import { Badge, Icon, SkeletonBodyText, Text } from "@shopify/polaris";
 import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { copyToClipboard } from "app/lib/utils/shared";
-import { Badge, Icon, SkeletonBodyText, Text } from "@shopify/polaris";
 import { ChatDocument } from "app/lib/types/chats";
 import { useState } from "react";
 
@@ -154,31 +154,47 @@ const SkeletonDetail = ({ title }: { title?: string }) => {
           <Icon source={CaretUpIcon} />
         </div>
       )}
-      <div className="row">
-        <Text variant="bodySm" as={"p"} tone="subdued">
-          <SkeletonBodyText lines={1} />
-        </Text>
-        <Text variant="bodySm" as={"p"} tone="base">
-          <SkeletonBodyText lines={1} />
-        </Text>
+
+      <div className="row" style={{ marginBottom: "15px" }}>
+        <div style={{ width: "100%", padding: "0 5px 0 0" }}>
+          <Text variant="bodySm" as={"p"} tone="subdued">
+            <SkeletonBodyText lines={1} />
+          </Text>
+        </div>
+
+        <div style={{ width: "100%", padding: "0 0px 0 5px" }}>
+          <Text variant="bodySm" as={"p"} tone="base">
+            <SkeletonBodyText lines={1} />
+          </Text>
+        </div>
       </div>
 
-      <div className="row">
-        <Text variant="bodySm" as={"p"} tone="subdued">
-          <SkeletonBodyText lines={1} />
-        </Text>
-        <Text variant="bodySm" as={"p"} tone="base">
-          <SkeletonBodyText />
-        </Text>
+      <div className="row" style={{ marginBottom: "15px" }}>
+        <div style={{ width: "100%", padding: "0 5px 0 0" }}>
+          <Text variant="bodySm" as={"p"} tone="subdued">
+            <SkeletonBodyText lines={1} />
+          </Text>
+        </div>
+
+        <div style={{ width: "100%", padding: "0 0px 0 5px" }}>
+          <Text variant="bodySm" as={"p"} tone="base">
+            <SkeletonBodyText />
+          </Text>
+        </div>
       </div>
 
-      <div className="row">
-        <Text variant="bodySm" as={"p"} tone="subdued">
-          <SkeletonBodyText lines={1} />
-        </Text>
-        <Text variant="bodySm" as={"p"} tone="base">
-          <SkeletonBodyText lines={1} />
-        </Text>
+      <div className="row" style={{ marginBottom: "15px" }}>
+        <div style={{ width: "100%", padding: "0 5px 0 0" }}>
+          <Text variant="bodySm" as={"p"} tone="subdued">
+            <SkeletonBodyText lines={1} />
+          </Text>
+        </div>
+
+        <div style={{ width: "100%", padding: "0 0px 0 5px" }}>
+          <Text variant="bodySm" as={"p"} tone="base">
+            <SkeletonBodyText lines={1} />
+          </Text>
+        </div>
       </div>
     </section>
   );

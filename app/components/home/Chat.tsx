@@ -427,10 +427,14 @@ const SkeletonConvo = () => {
 
   return (
     <div className={"convoWrapper"}>
-      <Action chat={agent_convo} />
+      <div className="actionText">
+        <Text variant="bodySm" as={"p"} tone="magic">
+          Customer opened a chat today
+        </Text>
+      </div>
 
       <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
-        <div className="msg" style={{ background: "#D9E3F9", width: "50%" }}>
+        <div className="msg" style={{ width: "50%" }}>
           <SkeletonBodyText />
         </div>
         <div style={{ width: "10%", marginTop: "10px" }}>

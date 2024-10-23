@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://dimensional-thomas-gorgeous-currency.trycloudflare.com"
+application_url = "https://douglas-nebraska-forecasts-barely.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = ""
 
 [auth]
 redirect_urls = [
-  "https://dimensional-thomas-gorgeous-currency.trycloudflare.com/auth/callback",
-  "https://dimensional-thomas-gorgeous-currency.trycloudflare.com/auth/shopify/callback",
-  "https://dimensional-thomas-gorgeous-currency.trycloudflare.com/api/auth/callback"
+  "https://douglas-nebraska-forecasts-barely.trycloudflare.com/auth/callback",
+  "https://douglas-nebraska-forecasts-barely.trycloudflare.com/auth/shopify/callback",
+  "https://douglas-nebraska-forecasts-barely.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

@@ -1,6 +1,8 @@
-import { Page, BlockStack } from "@shopify/polaris";
+import { Page, BlockStack, Box } from "@shopify/polaris";
 import { SaveIcon } from "@shopify/polaris-icons";
 import { Automation } from "app/components/configurations/Automation";
+import { Knowledge } from "app/components/configurations/Knowledge";
+import { SpecialCases } from "app/components/configurations/SpecialCases";
 import { StorePolicies } from "app/components/configurations/StorePolicies";
 
 export default function AdditionalPage() {
@@ -16,9 +18,13 @@ export default function AdditionalPage() {
         {/* STORE POLICIES */}
         <StorePolicies />
 
-        {/* AUTOMATION SETTINGS */}
+        {/* SPECIAL CASES */}
+        <SpecialCases />
 
         {/* AUTOMATION SETTINGS */}
+        <Knowledge />
+
+        <Box paddingBlockStart="200"></Box>
       </BlockStack>
     </Page>
   );
