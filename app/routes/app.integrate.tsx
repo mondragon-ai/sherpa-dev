@@ -9,39 +9,71 @@ import {
   Button,
   Image,
 } from "@shopify/polaris";
-import { useCallback } from "react";
+import { app_list, connected_apps } from "app/lib/data/integrate";
+import { useCallback, useEffect, useState } from "react";
 
-const app_list = [
-  {
-    title: "Gmail",
-    text: "Connect your customer service inbox to Sherpa for auto-completion",
-    img: "https://static.vecteezy.com/system/resources/previews/020/964/377/non_2x/gmail-mail-icon-for-web-design-free-png.png",
-    pending: false,
-  },
-  {
-    title: "Stripe",
-    text: "Subscription can be searched and modified via Sherpa",
-    img: "https://cdn.iconscout.com/icon/free/png-256/free-stripe-logo-icon-download-in-svg-png-gif-file-formats--flat-social-media-branding-pack-logos-icons-498440.png?f=webp&w=256",
-    pending: true,
-  },
-  {
-    title: "Recharge",
-    text: "Subscription can be searched and modified via Sherpa",
-    img: "https://d3fmzy9bmh9dam.cloudfront.net/wp-content/uploads/2022/02/11.svg",
-    pending: true,
-  },
-  {
-    title: "Outlook",
-    text: "Connect your customer service inbox to Sherpa for auto-completion",
-    img: "https://cdn3.iconfinder.com/data/icons/social-media-logos-flat-colorful-1/2048/5382_-_Outlook-512.png",
-    pending: true,
-  },
-];
-
+type ConnectedApps = {
+  title: string;
+  text: string;
+  img: string;
+  pending: boolean;
+  connected: boolean;
+};
 export default function Integrate() {
+  const [app, setApps] = useState<ConnectedApps[]>([]);
   const handleIntegrate = useCallback((app: string) => {
     console.log(app);
   }, []);
+
+  useEffect(() => {
+    setApps([]);
+
+    const newApps: ConnectedApps[] = [];
+
+    for (let a of app_list) {
+      const matchingConnectedApp = connected_apps.find(
+        (c) => c.title.toLocaleLowerCase() === a.title.toLocaleLowerCase(),
+      );
+
+      if (matchingConnectedApp) {
+        const exists = newApps.some(
+          (app) =>
+            app.title.toLocaleLowerCase() ===
+            matchingConnectedApp.title.toLocaleLowerCase(),
+        );
+
+        if (!exists) {
+          newApps.push({
+            title: matchingConnectedApp.title,
+            text: a.text,
+            img: a.img,
+            pending: false,
+            connected: matchingConnectedApp.connected,
+          });
+        }
+      } else {
+        const exists = newApps.some(
+          (app) =>
+            app.title.toLocaleLowerCase() === a.title.toLocaleLowerCase(),
+        );
+
+        if (!exists) {
+          newApps.push({
+            title: a.title,
+            text: a.text,
+            img: a.img,
+            pending: false,
+            connected: false,
+          });
+        }
+      }
+    }
+
+    setApps((prev) => [...prev, ...newApps]);
+  }, []);
+
+  console.log(app);
+
   return (
     <Page title="Integration">
       <BlockStack gap={"300"}>
@@ -67,15 +99,15 @@ export default function Integrate() {
                   3rd Party Apps
                 </Text>
                 <Grid columns={{ sm: 3 }}>
-                  {app_list &&
-                    app_list.map((a) => {
+                  {app &&
+                    app.map((a) => {
                       return (
                         <App
                           title={a.title}
                           text={a.text}
                           img={a.img}
                           pending={a.pending}
-                          connected={false}
+                          connected={a.connected}
                           connect={handleIntegrate}
                         />
                       );
