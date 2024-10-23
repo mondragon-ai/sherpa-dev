@@ -83,7 +83,7 @@ import { ChatDocument } from "app/lib/types/chats";
 // };
 
 export default function Index() {
-  const [chat, setChat] = useState(chatDocument);
+  const [chat, setChat] = useState<null | ChatDocument>(null);
   const [chats, setChats] = useState<ChatDocument[]>(chat_list);
   // const fetcher = useFetcher<typeof action>();
 

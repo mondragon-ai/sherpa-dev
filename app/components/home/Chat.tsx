@@ -1,4 +1,12 @@
-import { Button, Icon, Text, TextField } from "@shopify/polaris";
+import {
+  Button,
+  Icon,
+  SkeletonBodyText,
+  SkeletonDisplayText,
+  SkeletonTabs,
+  Text,
+  TextField,
+} from "@shopify/polaris";
 import {
   OrderFulfilledIcon,
   ReceiptRefundIcon,
@@ -16,8 +24,8 @@ export const Chat = ({
   chat,
   setChat,
 }: {
-  chat: ChatDocument;
-  setChat: Dispatch<SetStateAction<ChatDocument>>;
+  chat: null | ChatDocument;
+  setChat: Dispatch<SetStateAction<null | ChatDocument>>;
 }) => {
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("add note here....");
@@ -25,60 +33,69 @@ export const Chat = ({
   const handleChange = useCallback((newValue: string) => setNote(newValue), []);
 
   const handleNoteSubmit = useCallback(() => {
-    setChat((p) => ({
-      ...p,
-      status: "resolved",
-      conversation: [
-        ...p.conversation,
-        {
-          time: createCurrentSeconds(),
-          is_note: false,
-          message: "",
-          sender: "agent",
-          action: "closed",
-        } as Conversation,
-      ],
-    }));
+    setChat(
+      (p) =>
+        p && {
+          ...p,
+          status: "resolved",
+          conversation: [
+            ...p.conversation,
+            {
+              time: createCurrentSeconds(),
+              is_note: false,
+              message: "",
+              sender: "agent",
+              action: "closed",
+            } as Conversation,
+          ],
+        },
+    );
   }, []);
 
   const handleResolve = useCallback(() => {
     // TODO: Auto Resolve & Push Result to close/resolve
 
     // Update State
-    setChat((p) => ({
-      ...p,
-      status: "resolved",
-      conversation: [
-        ...p.conversation,
-        {
-          time: createCurrentSeconds(),
-          is_note: false,
-          message: "",
-          sender: "agent",
-          action: "closed",
-        } as Conversation,
-      ],
-    }));
+    setChat(
+      (p) =>
+        p && {
+          ...p,
+          status: "resolved",
+          conversation: [
+            ...p.conversation,
+            {
+              time: createCurrentSeconds(),
+              is_note: false,
+              message: "",
+              sender: "agent",
+              action: "closed",
+            } as Conversation,
+          ],
+        },
+    );
   }, []);
 
   const handleClose = useCallback(() => {
     // TODO: Push Result to close/resolve
 
     // Update State
-    setChat((p) => ({
-      ...p,
-      status: "resolved",
-      conversation: [
-        ...p.conversation,
-        {
-          time: createCurrentSeconds(),
-          is_note: false,
-          message: "",
-          sender: "agent",
-          action: "closed",
-        } as Conversation,
-      ],
-    }));
+    setChat(
+      (p) =>
+        p && {
+          ...p,
+          status: "resolved",
+          conversation: [
+            ...p.conversation,
+            {
+              time: createCurrentSeconds(),
+              is_note: false,
+              message: "",
+              sender: "agent",
+              action: "closed",
+            } as Conversation,
+          ],
+        },
+    );
   }, []);
 
   return (
@@ -251,56 +268,68 @@ export const Chat = ({
             `}</style>
 
       <div className={"chatWrapper"}>
-        <header>
-          <Text variant="headingLg" as={"strong"}>
-            {chat.customer
-              ? `${chat.customer.first_name} ${chat.customer.last_name}`
-              : chat.email
-                ? chat.email
-                : "Anonymous"}
-          </Text>
-          <div className="hdrRigt">
-            {chat.status == "open" ? (
+        {chat ? (
+          <header>
+            <Text variant="headingLg" as={"strong"}>
+              {chat.customer
+                ? `${chat.customer.first_name} ${chat.customer.last_name}`
+                : chat.email
+                  ? chat.email
+                  : "Anonymous"}
+            </Text>
+            <div className="hdrRigt">
+              {chat.status == "open" ? (
+                <Button
+                  icon={ReceiptRefundIcon}
+                  variant="tertiary"
+                  onClick={() => handleResolve()}
+                >
+                  Resolve
+                </Button>
+              ) : null}
               <Button
-                icon={ReceiptRefundIcon}
-                variant="tertiary"
-                onClick={() => handleResolve()}
+                icon={OrderFulfilledIcon}
+                variant="primary"
+                disabled={chat.status !== "open"}
+                onClick={() => handleClose()}
               >
-                Resolve
+                Close
               </Button>
-            ) : null}
-            <Button
-              icon={OrderFulfilledIcon}
-              variant="primary"
-              disabled={chat.status !== "open"}
-              onClick={() => handleClose()}
-            >
-              Close
-            </Button>
+            </div>
+          </header>
+        ) : (
+          <SkeletonHdr />
+        )}
+
+        {chat ? (
+          <div className={"convoWrapper"}>
+            {chat.conversation &&
+              chat.conversation.map((chat, index) => {
+                if (chat.sender == "agent" && !chat.action && !chat.is_note) {
+                  return <AgentChat chat={chat} />;
+                }
+
+                if (
+                  chat.sender == "customer" &&
+                  !chat.action &&
+                  !chat.is_note
+                ) {
+                  return <CustomerChat chat={chat} />;
+                }
+
+                if (chat.action) {
+                  return <Action chat={chat} />;
+                }
+
+                if (chat.is_note) {
+                  return <Note chat={chat} />;
+                }
+              })}
+            {loading && <div>Loading more chats...</div>}
           </div>
-        </header>
-
-        <div className={"convoWrapper"}>
-          {chat.conversation &&
-            chat.conversation.map((chat, index) => {
-              if (chat.sender == "agent" && !chat.action && !chat.is_note) {
-                return <AgentChat chat={chat} />;
-              }
-
-              if (chat.sender == "customer" && !chat.action && !chat.is_note) {
-                return <CustomerChat chat={chat} />;
-              }
-
-              if (chat.action) {
-                return <Action chat={chat} />;
-              }
-
-              if (chat.is_note) {
-                return <Note chat={chat} />;
-              }
-            })}
-          {loading && <div>Loading more chats...</div>}
-        </div>
+        ) : (
+          <SkeletonConvo />
+        )}
         <footer className="chatFooterWrapper">
           <div className="txtContainer">
             <div className="txtContainerHdr">
@@ -384,5 +413,43 @@ const CustomerChat = ({ chat }: { chat: Conversation }) => {
         {chat.sender} - {getHoursDifference(chat.time)}
       </Text>
     </div>
+  );
+};
+
+const SkeletonConvo = () => {
+  const agent_convo = {
+    time: 0,
+    is_note: false,
+    message: "",
+    sender: "agent",
+    action: "opened",
+  } as Conversation;
+
+  return (
+    <div className={"convoWrapper"}>
+      <Action chat={agent_convo} />
+
+      <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
+        <div className="msg" style={{ background: "#D9E3F9", width: "50%" }}>
+          <SkeletonBodyText />
+        </div>
+        <div style={{ width: "10%", marginTop: "10px" }}>
+          <SkeletonBodyText lines={1} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SkeletonHdr = () => {
+  return (
+    <header>
+      <div style={{ width: "30%" }}>
+        <SkeletonDisplayText />
+      </div>
+      <div className="hdrRigt">
+        <SkeletonTabs count={2} />
+      </div>
+    </header>
   );
 };

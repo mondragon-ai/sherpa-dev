@@ -3,12 +3,12 @@ import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { copyToClipboard } from "app/lib/utils/shared";
-import { Badge, Icon, Text } from "@shopify/polaris";
+import { Badge, Icon, SkeletonBodyText, Text } from "@shopify/polaris";
 import { ChatDocument } from "app/lib/types/chats";
 import { useState } from "react";
 
 interface ChatProps {
-  chat: ChatDocument;
+  chat: null | ChatDocument;
 }
 
 export const ChatDetail = ({ chat }: ChatProps) => {
@@ -123,16 +123,69 @@ export const ChatDetail = ({ chat }: ChatProps) => {
           </Text>
         </header>
         <div className="detailMain">
-          <ChatDetails chat={chat} />
-          <CustomerDetail chat={chat} />
-          <OrderDetail chat={chat} />
+          {chat ? <ChatDetails chat={chat} /> : <SkeletonDetail />}
+          {chat ? (
+            <CustomerDetail chat={chat} />
+          ) : (
+            <SkeletonDetail title="Customer Summary" />
+          )}
+          {chat ? (
+            <OrderDetail chat={chat} />
+          ) : (
+            <SkeletonDetail title="Order Summary" />
+          )}
         </div>
       </div>
     </>
   );
 };
 
+const SkeletonDetail = ({ title }: { title?: string }) => {
+  return (
+    <section>
+      {title && (
+        <div
+          className="row"
+          style={{ justifyContent: "space-between", marginBottom: "15px" }}
+        >
+          <Text variant="headingMd" as={"strong"} tone="base">
+            {title}
+          </Text>
+          <Icon source={CaretUpIcon} />
+        </div>
+      )}
+      <div className="row">
+        <Text variant="bodySm" as={"p"} tone="subdued">
+          <SkeletonBodyText lines={1} />
+        </Text>
+        <Text variant="bodySm" as={"p"} tone="base">
+          <SkeletonBodyText lines={1} />
+        </Text>
+      </div>
+
+      <div className="row">
+        <Text variant="bodySm" as={"p"} tone="subdued">
+          <SkeletonBodyText lines={1} />
+        </Text>
+        <Text variant="bodySm" as={"p"} tone="base">
+          <SkeletonBodyText />
+        </Text>
+      </div>
+
+      <div className="row">
+        <Text variant="bodySm" as={"p"} tone="subdued">
+          <SkeletonBodyText lines={1} />
+        </Text>
+        <Text variant="bodySm" as={"p"} tone="base">
+          <SkeletonBodyText lines={1} />
+        </Text>
+      </div>
+    </section>
+  );
+};
+
 const ChatDetails = ({ chat }: ChatProps) => {
+  if (!chat) return;
   return (
     <section>
       <div className="row">
@@ -179,6 +232,7 @@ const ChatDetails = ({ chat }: ChatProps) => {
 };
 
 const CustomerDetail = ({ chat }: ChatProps) => {
+  if (!chat) return;
   const [open, toggle] = useState(false);
 
   if (!chat.customer) {
@@ -297,6 +351,7 @@ const CustomerDetail = ({ chat }: ChatProps) => {
 };
 
 const OrderDetail = ({ chat }: ChatProps) => {
+  if (!chat) return;
   const [open, toggle] = useState(false);
 
   if (!chat.order) {
