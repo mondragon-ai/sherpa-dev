@@ -103,7 +103,6 @@ export default function Index() {
       setFetch(false);
     }
   }, [data, shopify]);
-  console.log(data);
 
   const handleFetchChat = useCallback((id: string) => {
     const selected = chats.find((c) => c.id == id);

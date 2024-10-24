@@ -1,3 +1,5 @@
+import { FetcherWithComponents } from "@remix-run/react";
+
 export type Status =
   | 500
   | 422
@@ -16,6 +18,14 @@ export type ServicesReponseType = {
   status: Status;
   data: any;
   message: string;
+};
+
+export type FetcherProp = FetcherWithComponents<ActionFetcherType>;
+export type ActionFetcherType = {
+  status: Status;
+  data: any;
+  message: string;
+  type: string;
 };
 
 export interface Address {

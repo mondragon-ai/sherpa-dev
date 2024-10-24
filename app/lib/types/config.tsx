@@ -23,6 +23,12 @@ export type ConfigurationsType = {
   };
   tone: "standard" | "playful" | "custom";
   custom_tone: string;
+  links: LinkType[] | [];
+};
+
+export type LinkType = {
+  name: string;
+  url: string;
 };
 
 export type FAQType = {

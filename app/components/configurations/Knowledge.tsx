@@ -133,8 +133,6 @@ const FaqTabs = ({
     [],
   );
 
-  console.log({ type, config_type: configs[type] });
-
   const handleAddSpecialCase = useCallback(() => {
     setConfig((p) => ({
       ...p,

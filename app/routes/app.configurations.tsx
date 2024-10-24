@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { SaveIcon } from "@shopify/polaris-icons";
-import { config_state } from "app/lib/data/config";
-import { Page, BlockStack, Box } from "@shopify/polaris";
+import { configAction } from "./actions/configurations";
+import { Page, BlockStack, Box, Banner, Text } from "@shopify/polaris";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { ConfigurationsType } from "app/lib/types/config";
 import { configurationsLoader } from "./loaders/configurations";
+import { useConfigurations } from "app/lib/hooks/configurations";
 import { Discounts } from "app/components/configurations/Discounts";
 import { Knowledge } from "app/components/configurations/Knowledge";
 import { Automation } from "app/components/configurations/Automation";
@@ -13,27 +15,45 @@ import { SpecialCases } from "app/components/configurations/SpecialCases";
 import { StorePolicies } from "app/components/configurations/StorePolicies";
 
 export const loader = configurationsLoader;
+export const action = configAction;
 
 export default function AdditionalPage() {
+  const shopify = useAppBridge();
   const data = useLoaderData<typeof loader>();
   const [fetching, setFetch] = useState(true);
-  const [config, setConfig] = useState<ConfigurationsType>(config_state);
+  const { config, error, isLoading, setConfig, setError, handleSaveConfig } =
+    useConfigurations(data.configs as ConfigurationsType);
 
   useEffect(() => {
-    if (data) {
-      shopify.toast.show(data.message);
+    if (data && fetching) {
       setConfig(data.configs as ConfigurationsType);
+      shopify.toast.show(data.message);
       setFetch(false);
     }
   }, [data, shopify]);
-  console.log(data);
 
   return (
     <Page
       title="Configurations"
-      primaryAction={{ content: "Save", disabled: true, icon: SaveIcon }}
+      primaryAction={{
+        content: "Save",
+        disabled: false,
+        icon: SaveIcon,
+        loading: isLoading,
+        onAction: handleSaveConfig,
+      }}
     >
       <BlockStack gap={"300"}>
+        {error.message && (
+          <Banner
+            onDismiss={() => setError({ message: "", type: "" })}
+            tone="critical"
+          >
+            <Text as="p" variant="bodyMd">
+              {error.message}
+            </Text>
+          </Banner>
+        )}
         {/* STORE POLICIES */}
         <StorePolicies config={config} setConfig={setConfig} />
 

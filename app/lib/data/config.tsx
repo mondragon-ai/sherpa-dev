@@ -40,4 +40,5 @@ export const config_state: ConfigurationsType = {
   },
   tone: "custom",
   custom_tone: "",
+  links: [],
 };

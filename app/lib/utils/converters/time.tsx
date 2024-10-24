@@ -23,7 +23,6 @@ export function getHoursDifference(timeString: number): string {
     return `${(diffHours / 24).toFixed(0)}d`;
   }
 
-  console.log({ diffMin });
   if (diffMin < 60) {
     return `${Math.abs(diffMin).toFixed(0)}m`;
   }

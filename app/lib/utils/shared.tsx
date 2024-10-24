@@ -1,5 +1,6 @@
-import { useAppBridge } from "@shopify/app-bridge-react";
+import { ShopifyGlobal, useAppBridge } from "@shopify/app-bridge-react";
 import { Dispatch, SetStateAction } from "react";
+import { ActionFetcherType } from "../types/shared";
 
 export const copyToClipboard = async (text: string): Promise<boolean> => {
   const shopify = useAppBridge();
@@ -19,42 +20,32 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
   }
 };
 
-// export const handleHttpError = (
-//     status: number,
-//     message: string,
-//     setError: Dispatch<SetStateAction<string | null>>,
+export const delay = async (s: number) => {
+  new Promise((resolve) => setTimeout(resolve, s));
+};
 
-//   ): void => {
-//     switch (status) {
-//       case 400:
-//         toast.error(message);
-//         setError(message);
-//         return;
-//       case 401:
-//         console.log({401: message});
-//         toast.error(message);
-//         setError(message);
-//         return;
-//       case 403:
-//         console.log({403: message});
-//         toast.error(message);
-//         setError(message);
-//         return;
-//       case 409:
-//         toast.error(message);
-//         setError(message);
-//         return;
-//       case 422:
-//         toast.error(message);
-//         setError(message);
-//         return;
-//       case 500:
-//         toast.error(message);
-//         setError(message);
-//         return;
-//       default:
-//         toast.error("Uncaught Error");
-//         setError("Uncaught Error");
-//         return;
-//     }
-//   };
+/**
+ * Handle the response from the Action API.
+ * @param {ActionFetcherType} response - The response from the API.
+ * @param {ShopifyGlobal} shopify - The Shopify app bridge instance.
+ * @param {Dispatch<SetStateAction<{ message: string, type: string}>>} setError - The function to set the error state.
+ */
+export const handleResponse = (
+  response: ActionFetcherType,
+  shopify: ShopifyGlobal,
+  setError: Dispatch<
+    SetStateAction<{
+      message: string;
+      type: string;
+    }>
+  >,
+) => {
+  if (response.status > 300) {
+    setError({
+      message: response.message,
+      type: response.type,
+    });
+  } else {
+    shopify.toast.show(response.message);
+  }
+};
