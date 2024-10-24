@@ -7,9 +7,9 @@ import {
   Text,
   TextField,
 } from "@shopify/polaris";
+import { DiscountIcon, DeleteIcon } from "@shopify/polaris-icons";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { ConfigurationsType } from "app/lib/types/config";
-import { DiscountIcon } from "@shopify/polaris-icons";
 
 export const Discounts = ({
   config,
@@ -44,33 +44,64 @@ export const Discounts = ({
           <Text as="h2" variant="headingSm">
             Price Rule
           </Text>
-          <BlockStack gap="200">
-            <Box paddingBlockStart="200">
-              <TextField
-                label="Discount Off (percentage)"
-                value={String(config.price_rules.value)}
-                onChange={handleTextChange}
-                error=""
-                type="number"
-                autoComplete="off"
-              />
-              <Text as="p" variant="bodyXs" tone="magic-subdued">
-                This %-value is used to create a discount for customers' next
-                order.
-              </Text>
-            </Box>
+          {!config.price_rules.id ? (
+            <BlockStack gap="200">
+              <Box paddingBlockStart="200">
+                <TextField
+                  label="Discount Off (percentage)"
+                  value={String(config.price_rules.value)}
+                  onChange={handleTextChange}
+                  error=""
+                  type="number"
+                  autoComplete="off"
+                />
+                <Text as="p" variant="bodyXs" tone="magic-subdued">
+                  This %-value is used to create a discount for customers' next
+                  order.
+                </Text>
+              </Box>
 
-            <Box paddingBlockStart="200">
-              <Button
-                fullWidth
-                variant="primary"
-                icon={DiscountIcon}
-                onClick={() => {}}
-              >
-                Add
-              </Button>
-            </Box>
-          </BlockStack>
+              <Box paddingBlockStart="200">
+                <Button
+                  fullWidth
+                  variant="primary"
+                  icon={DiscountIcon}
+                  onClick={() => {}}
+                >
+                  Add
+                </Button>
+              </Box>
+            </BlockStack>
+          ) : (
+            <BlockStack gap="200">
+              <Box paddingBlockStart="300">
+                <Text as="h3" variant="bodyLg" tone="base">
+                  Price Rule Created: {config.price_rules.value}
+                </Text>
+                <Box paddingBlockStart="200">
+                  <Text as="h3" variant="bodyMd" tone="base">
+                    {config.price_rules.id}
+                  </Text>
+                </Box>
+                <Text as="p" variant="bodyXs" tone="magic-subdued">
+                  This %-value is used to create a discount for customers' next
+                  order.
+                </Text>
+              </Box>
+
+              <Box paddingBlockStart="300">
+                <Button
+                  fullWidth
+                  variant="primary"
+                  tone="critical"
+                  icon={DeleteIcon}
+                  onClick={() => {}}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </BlockStack>
+          )}
         </Card>
       </Grid.Cell>
     </Grid>

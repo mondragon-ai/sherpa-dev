@@ -23,7 +23,9 @@ export const Personalize = ({
   config: ConfigurationsType;
   setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
 }) => {
-  const [tone, setTone] = useState<"custom" | "playful" | "standard">("custom");
+  const [tone, setTone] = useState<"custom" | "playful" | "standard">(
+    config.tone,
+  );
   const handleChange = useCallback(
     (v: string) => setConfig((p) => ({ ...p, custom_tone: v })),
     [tone],

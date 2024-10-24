@@ -1,6 +1,7 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { SERVER_BASE_URL } from "app/lib/constants";
 import { ChatDocument } from "app/lib/types/chats";
+import { EmailDocument } from "app/lib/types/emails";
 import { ServicesReponseType } from "app/lib/types/shared";
 import { authenticate } from "app/shopify.server";
 
@@ -28,7 +29,7 @@ export async function emailsLoader({ request }: LoaderFunctionArgs) {
 
     return json({
       shop: session.shop,
-      emails: data.emails as ChatDocument,
+      emails: data.emails as EmailDocument[],
       message: message,
     });
   } catch (error) {

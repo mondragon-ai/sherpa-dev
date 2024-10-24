@@ -1,5 +1,5 @@
-import { Conversation } from "app/lib/types/chats";
 import { Text } from "@shopify/polaris";
+import { Conversation } from "app/lib/types/shared";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 
 export const AgentChat = ({ chat }: { chat: Conversation }) => (

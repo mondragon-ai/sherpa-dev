@@ -1,28 +1,21 @@
 import {
-  ClassificationTypes,
+  SuggestedActions,
   Conversation,
   CustomerData,
   IssueTypes,
-  OrderData,
   RatingTypes,
-  SuggestedActions,
+  ClassificationTypes,
+  OrderData,
 } from "./shared";
 
-export type ChatDocument = {
-  edited: boolean;
-  suggested_email: string;
-  email_sent: boolean;
-  manual: boolean;
-  initial_message: string;
-  convo_trained: boolean;
-  action_trained: boolean;
-
-  // chat
+export type EmailDocument = {
   rating: RatingTypes;
   classification: ClassificationTypes;
   issue: IssueTypes;
   suggested_action_done: boolean;
-  summary: string;
+  source: "gmail" | "outlook";
+  history_id: string;
+  thread: EmailMessage[];
   error_info: string;
   timezone: string;
   domain: string;
@@ -35,5 +28,20 @@ export type ChatDocument = {
   email: null | string;
   updated_at: number;
   created_at: number;
+  summary: string;
   order: null | OrderData;
+  //
+  email_sent: boolean;
+};
+
+export type EmailMessage = {
+  id: string;
+  threadId: string;
+  internalDate: string;
+  sender: "agent" | "customer";
+  from: string;
+  to: string;
+  subject: string;
+  message: string;
+  image: any[];
 };

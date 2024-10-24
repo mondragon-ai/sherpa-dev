@@ -28,7 +28,7 @@ export async function chatsLoader({ request }: LoaderFunctionArgs) {
 
     return json({
       shop: session.shop,
-      chats: data.chats as ChatDocument,
+      chats: data.chats as ChatDocument[],
       message: message,
     });
   } catch (error) {

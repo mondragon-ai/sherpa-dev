@@ -6,7 +6,7 @@ import {
   Text,
 } from "@shopify/polaris";
 import { CaretUpIcon } from "@shopify/polaris-icons";
-import { Conversation } from "app/lib/types/chats";
+import { Conversation } from "app/lib/types/shared";
 
 export const SkeletonDetail = () => (
   <section>

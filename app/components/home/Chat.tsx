@@ -5,7 +5,6 @@ import {
   NoteAddIcon,
   SendIcon,
 } from "@shopify/polaris-icons";
-import { ChatDocument, Conversation } from "app/lib/types/chats";
 import {
   createCurrentSeconds,
   getHoursDifference,
@@ -13,6 +12,8 @@ import {
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
 import { Action, AgentChat, CustomerChat, Note } from "./Conversation";
+import { ChatDocument } from "app/lib/types/chats";
+import { Conversation } from "app/lib/types/shared";
 
 export const Chat = ({
   chat,
