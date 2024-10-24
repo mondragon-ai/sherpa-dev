@@ -1,17 +1,14 @@
-import { Page, Grid, Text } from "@shopify/polaris";
-import styles from "../components/home/Home.module.css";
-import { ChatList } from "app/components/home/ChatList";
+import { chatsLoader } from "./loaders/chats";
+import { Page, Grid } from "@shopify/polaris";
 import { Chat } from "app/components/home/Chat";
-import { ChatDetail } from "app/components/home/ChatDetail";
-import { chat_list, chatDocument } from "app/lib/data/chat";
-import { useCallback, useState } from "react";
+import { useLoaderData } from "@remix-run/react";
 import { ChatDocument } from "app/lib/types/chats";
+import { ChatList } from "app/components/home/ChatList";
+import { useCallback, useEffect, useState } from "react";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { ChatDetail } from "app/components/home/ChatDetail";
 
-// export const loader = async ({ request }: LoaderFunctionArgs) => {
-//   await authenticate.admin(request);
-
-//   return null;
-// };
+export const loader = chatsLoader;
 
 // export const action = async ({ request }: ActionFunctionArgs) => {
 //   const { admin } = await authenticate.admin(request);
@@ -83,11 +80,13 @@ import { ChatDocument } from "app/lib/types/chats";
 // };
 
 export default function Index() {
+  const data = useLoaderData<typeof loader>();
+  const [fetching, setFetch] = useState(true);
   const [chat, setChat] = useState<null | ChatDocument>(null);
-  const [chats, setChats] = useState<ChatDocument[]>(chat_list);
+  const [chats, setChats] = useState<ChatDocument[]>([]);
   // const fetcher = useFetcher<typeof action>();
 
-  // const shopify = useAppBridge();
+  const shopify = useAppBridge();
   // const isLoading =
   //   ["loading", "submitting"].includes(fetcher.state) &&
   //   fetcher.formMethod === "POST";
@@ -95,13 +94,16 @@ export default function Index() {
   //   "gid://shopify/Product/",
   //   "",
   // );
-
-  // useEffect(() => {
-  //   if (productId) {
-  //     shopify.toast.show("Product created");
-  //   }
-  // }, [productId, shopify]);
   // const generateProduct = () => fetcher.submit({}, { method: "POST" });
+
+  useEffect(() => {
+    if (data) {
+      setChats(data.chats as unknown as ChatDocument[]);
+      shopify.toast.show(data.message);
+      setFetch(false);
+    }
+  }, [data, shopify]);
+  console.log(data);
 
   const handleFetchChat = useCallback((id: string) => {
     const selected = chats.find((c) => c.id == id);

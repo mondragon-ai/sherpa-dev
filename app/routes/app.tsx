@@ -1,16 +1,33 @@
 import { json } from "@remix-run/node";
-import { authenticate } from "../shopify.server";
+import { authenticate, USAGE_PLAN } from "../shopify.server";
 import { NavMenu } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import type { HeadersFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
+import { SERVER_BASE_URL } from "app/lib/constants";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+  const admin = await authenticate.admin(request);
+  const { session, billing } = admin;
+
+  await billing.require({
+    plans: [USAGE_PLAN],
+    isTest: true,
+    onFailure: async () => billing.request({ plan: USAGE_PLAN, isTest: true }),
+  });
+
+  // const subscription = billingCheck.appSubscriptions[0];
+
+  await fetch(
+    `${SERVER_BASE_URL}/store/${session.shop}/install/${session.accessToken}`,
+    {
+      method: "POST",
+    },
+  );
 
   return json({ apiKey: process.env.SHOPIFY_API_KEY || "" });
 };

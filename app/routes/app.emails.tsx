@@ -1,12 +1,13 @@
-import { Page, Grid, Text } from "@shopify/polaris";
-import styles from "../components/home/Home.module.css";
-import { ChatList } from "app/components/home/ChatList";
+import { Page, Grid } from "@shopify/polaris";
+import { emailsLoader } from "./loaders/emails";
 import { Chat } from "app/components/home/Chat";
-import { ChatDetail } from "app/components/home/ChatDetail";
-import { chat_list, chatDocument } from "app/lib/data/chat";
-import { useCallback, useState } from "react";
+import { useLoaderData } from "@remix-run/react";
 import { ChatDocument } from "app/lib/types/chats";
+import { ChatList } from "app/components/home/ChatList";
+import { useCallback, useEffect, useState } from "react";
+import { ChatDetail } from "app/components/home/ChatDetail";
 
+export const loader = emailsLoader;
 // export const loader = async ({ request }: LoaderFunctionArgs) => {
 //   await authenticate.admin(request);
 
@@ -83,6 +84,8 @@ import { ChatDocument } from "app/lib/types/chats";
 // };
 
 export default function Emails() {
+  const data = useLoaderData<typeof loader>();
+  const [fetching, setFetch] = useState(true);
   const [chat, setChat] = useState<null | ChatDocument>(null);
   const [chats, setChats] = useState<ChatDocument[]>([]);
   // const fetcher = useFetcher<typeof action>();
@@ -102,6 +105,14 @@ export default function Emails() {
   //   }
   // }, [productId, shopify]);
   // const generateProduct = () => fetcher.submit({}, { method: "POST" });
+
+  useEffect(() => {
+    if (data) {
+      setChats(data.emails as unknown as ChatDocument[]);
+      shopify.toast.show(data.message);
+      setFetch(false);
+    }
+  }, [data, shopify]);
 
   const handleFetchChat = useCallback((id: string) => {
     const selected = chats.find((c) => c.id == id);
