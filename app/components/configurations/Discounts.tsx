@@ -13,14 +13,20 @@ import { ConfigurationsType } from "app/lib/types/config";
 
 export const Discounts = ({
   config,
+  loading,
   setConfig,
+  create,
+  deleteDiscount,
 }: {
   config: ConfigurationsType;
+  loading: boolean;
   setConfig: Dispatch<SetStateAction<ConfigurationsType>>;
+  create: (value: string) => void;
+  deleteDiscount: (value: string) => void;
 }) => {
   const handleTextChange = useCallback(
     (v: string) =>
-      setConfig((p) => ({ ...p, discounts: { ...p.discounts, value: v } })),
+      setConfig((p) => ({ ...p, price_rules: { ...p.price_rules, value: v } })),
     [],
   );
 
@@ -64,9 +70,10 @@ export const Discounts = ({
               <Box paddingBlockStart="200">
                 <Button
                   fullWidth
+                  loading={loading}
                   variant="primary"
                   icon={DiscountIcon}
-                  onClick={() => {}}
+                  onClick={() => create(config.price_rules.value)}
                 >
                   Add
                 </Button>
@@ -92,10 +99,11 @@ export const Discounts = ({
               <Box paddingBlockStart="300">
                 <Button
                   fullWidth
+                  loading={loading}
                   variant="primary"
                   tone="critical"
                   icon={DeleteIcon}
-                  onClick={() => {}}
+                  onClick={() => deleteDiscount(config.price_rules.id)}
                 >
                   Delete
                 </Button>

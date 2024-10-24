@@ -33,7 +33,7 @@ export const config_state: ConfigurationsType = {
   automate_actions: false,
   automate_emails: false,
   price_rules: {
-    id: 0,
+    id: "",
     title: "",
     value: "",
     value_type: "percentage",

@@ -1,4 +1,5 @@
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { serverRequest } from "app/lib/networking/server";
 import { authenticate } from "app/shopify.server";
 
 /**
@@ -7,23 +8,83 @@ import { authenticate } from "app/shopify.server";
  */
 export async function configAction({ request, params }: ActionFunctionArgs) {
   const { session } = await authenticate.admin(request);
-  const { shop } = session;
+  const { shop, accessToken } = session;
 
   const formData = await request.formData();
   const type = formData.get("action");
 
   try {
-    if (type === "save") {
-      return json(
-        { message: "Configs Saved", data: null, type: "save", status: 400 },
-        { status: 400 },
-      );
-    }
+    switch (type) {
+      case "save": {
+        const configurations = formData.get("configurations");
+        console.log(configurations);
+        if (!configurations) {
+          return json(
+            {
+              message: "Could not parse",
+              data: null,
+              type: "save",
+              status: 400,
+            },
+            { status: 400 },
+          );
+        }
+        const { message, status, data } = await serverRequest(
+          "POST",
+          `/store/${shop}/configs`,
+          { configurations: JSON.parse(String(configurations)) },
+        );
+        console.log({ message, status, data });
+        return json(
+          {
+            message: message,
+            data: null,
+            type: "save",
+            status: status,
+          },
+          { status: status },
+        );
+      }
+      case "create": {
+        const value = formData.get("value");
+        const discounts = {
+          discounts: { price: Number(value), token: accessToken },
+        };
+        const { message, status, data } = await serverRequest(
+          "POST",
+          `/store/${shop}/discounts`,
+          discounts,
+        );
+        return json(
+          {
+            message: message,
+            data: data.discount,
+            type: "create",
+            status: status,
+          },
+          { status: status },
+        );
+      }
+      case "delete": {
+        const id = formData.get("id");
+        const { message, status } = await serverRequest(
+          "DELETE",
+          `/store/${shop}/discounts/${accessToken}?id=${id}`,
+          null,
+        );
+        return json(
+          { message: message, data: null, type: "delete", status: status },
+          { status: status },
+        );
+      }
 
-    return json(
-      { message: "uncaught Error", data: null, type: "", status: 400 },
-      { status: 400 },
-    );
+      default: {
+        return json(
+          { message: "uncaught Error", data: null, type: "", status: 400 },
+          { status: 400 },
+        );
+      }
+    }
   } catch (error) {
     console.error("Error handling action:", error);
     return json(

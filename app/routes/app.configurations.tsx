@@ -21,8 +21,16 @@ export default function AdditionalPage() {
   const shopify = useAppBridge();
   const data = useLoaderData<typeof loader>();
   const [fetching, setFetch] = useState(true);
-  const { config, error, isLoading, setConfig, setError, handleSaveConfig } =
-    useConfigurations(data.configs as ConfigurationsType);
+  const {
+    config,
+    error,
+    isLoading,
+    setConfig,
+    setError,
+    handleCreateDiscount,
+    handleSaveConfig,
+    handleDeleteDiscount,
+  } = useConfigurations(data.configs as ConfigurationsType);
 
   useEffect(() => {
     if (data && fetching) {
@@ -64,7 +72,13 @@ export default function AdditionalPage() {
         <SpecialCases config={config} setConfig={setConfig} />
 
         {/* DISCOUNT PRICE */}
-        <Discounts config={config} setConfig={setConfig} />
+        <Discounts
+          config={config}
+          loading={isLoading}
+          setConfig={setConfig}
+          create={handleCreateDiscount}
+          deleteDiscount={handleDeleteDiscount}
+        />
 
         {/* AUTOMATION SETTINGS */}
         <Automation config={config} setConfig={setConfig} />
