@@ -5,93 +5,24 @@ import {
   NoteAddIcon,
   SendIcon,
 } from "@shopify/polaris-icons";
-import {
-  createCurrentSeconds,
-  getHoursDifference,
-} from "app/lib/utils/converters/time";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { ChatDocument } from "app/lib/types/chats";
 import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
 import { Action, AgentChat, CustomerChat, Note } from "./Conversation";
-import { ChatDocument } from "app/lib/types/chats";
-import { Conversation } from "app/lib/types/shared";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
 export const Chat = ({
   chat,
-  setChat,
+  deleteChat,
+  resolve,
+  addNote,
 }: {
   chat: null | ChatDocument;
-  setChat: Dispatch<SetStateAction<null | ChatDocument>>;
+  deleteChat: (id: string) => Promise<void>;
+  resolve: (id: string) => Promise<void>;
+  addNote: (id: string, note: string) => Promise<void>;
 }) => {
-  const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("add note here....");
-
   const handleChange = useCallback((newValue: string) => setNote(newValue), []);
-
-  const handleNoteSubmit = useCallback(() => {
-    setChat(
-      (p) =>
-        p && {
-          ...p,
-          conversation: [
-            ...p.conversation,
-            {
-              time: createCurrentSeconds(),
-              is_note: true,
-              message: note,
-              sender: "agent",
-              action: null,
-            } as Conversation,
-          ],
-        },
-    );
-    setNote("");
-  }, [note]);
-
-  const handleResolve = useCallback(() => {
-    // TODO: Auto Resolve & Push Result to close/resolve
-
-    // Update State
-    setChat(
-      (p) =>
-        p && {
-          ...p,
-          status: "resolved",
-          conversation: [
-            ...p.conversation,
-            {
-              time: createCurrentSeconds(),
-              is_note: false,
-              message: "",
-              sender: "agent",
-              action: "closed",
-            } as Conversation,
-          ],
-        },
-    );
-  }, []);
-
-  const handleClose = useCallback(() => {
-    // TODO: Push Result to close/resolve
-
-    // Update State
-    setChat(
-      (p) =>
-        p && {
-          ...p,
-          status: "resolved",
-          conversation: [
-            ...p.conversation,
-            {
-              time: createCurrentSeconds(),
-              is_note: false,
-              message: "",
-              sender: "agent",
-              action: "closed",
-            } as Conversation,
-          ],
-        },
-    );
-  }, []);
 
   return (
     <>
@@ -278,7 +209,7 @@ export const Chat = ({
               <Button
                 icon={DeleteIcon}
                 variant="tertiary"
-                onClick={() => handleResolve()}
+                onClick={() => deleteChat(chat.id)}
                 tone="critical"
               >
                 Delete
@@ -287,7 +218,7 @@ export const Chat = ({
                 icon={ReceiptRefundIcon}
                 variant="primary"
                 disabled={chat.status !== "open"}
-                onClick={() => handleClose()}
+                onClick={() => resolve(chat.id)}
               >
                 Resolve{`${chat.status == "open" ? "" : "d"}`}
               </Button>
@@ -321,7 +252,7 @@ export const Chat = ({
                   return <Note chat={chat} />;
                 }
               })}
-            {loading && <div>Loading more chats...</div>}
+            {/* {loading && <div>Loading more chats...</div>} */}
           </div>
         ) : (
           <SkeletonConvo />
@@ -348,7 +279,7 @@ export const Chat = ({
               <Button
                 icon={SendIcon}
                 variant="primary"
-                onClick={() => handleNoteSubmit()}
+                onClick={() => addNote(String(chat?.id || ""), note)}
               >
                 Submit
               </Button>
