@@ -17,7 +17,6 @@ export async function configAction({ request, params }: ActionFunctionArgs) {
     switch (type) {
       case "save": {
         const configurations = formData.get("configurations");
-        console.log(configurations);
         if (!configurations) {
           return json(
             {
@@ -34,7 +33,6 @@ export async function configAction({ request, params }: ActionFunctionArgs) {
           `/store/${shop}/configs`,
           { configurations: JSON.parse(String(configurations)) },
         );
-        console.log({ message, status, data });
         return json(
           {
             message: message,

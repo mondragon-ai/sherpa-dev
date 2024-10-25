@@ -104,10 +104,13 @@ export default function Index() {
     }
   }, [data, shopify]);
 
-  const handleFetchChat = useCallback((id: string) => {
-    const selected = chats.find((c) => c.id == id);
-    if (selected) setChat(selected);
-  }, []);
+  const handleFetchChat = useCallback(
+    (id: string) => {
+      const selected = chats.find((c) => c.id == id);
+      if (selected) setChat(selected);
+    },
+    [chat, chats],
+  );
 
   return (
     <Page

@@ -13,7 +13,6 @@ export const ChatList = ({
   id: string;
   handleFetchChat: (id: string) => void;
 }) => {
-  const [chats, setChats] = useState<ChatDocument[]>(chat_list);
   const [selected, setSelected] = useState("newest");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -263,8 +262,8 @@ export const ChatList = ({
         </header>
 
         <div className={"listWrapper"}>
-          {chats.map((chat, index) => {
-            if (index === chats.length - 1) {
+          {chat_list.map((chat, index) => {
+            if (index === chat_list.length - 1) {
               return (
                 <div
                   key={index}
@@ -336,7 +335,7 @@ const ChatItem: React.FC<{ chat: ChatDocument; is_selected: boolean }> = ({
         </Text>
 
         <Text variant="bodySm" as={"p"} tone="subdued" truncate>
-          {capitalizeWords(chat.suggested_action)}
+          {capitalizeWords(chat.suggested_action || "")}
         </Text>
       </div>
     </div>

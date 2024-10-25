@@ -98,8 +98,8 @@ export type Conversation = {
 };
 
 export type OrderData = {
-  id: string;
-  total_price: string;
+  order_id: string;
+  current_total_price: string;
   fulfillment_status: "hold" | "shipped" | "delivered";
   payment_status: "hold" | "paid";
   tracking_url: string;

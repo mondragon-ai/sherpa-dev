@@ -1,4 +1,8 @@
-import { capitalizeWords, truncateString } from "app/lib/utils/converters/text";
+import {
+  capitalizeWords,
+  filterNumber,
+  truncateString,
+} from "app/lib/utils/converters/text";
 import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
@@ -147,7 +151,10 @@ const ChatDetails = ({ chat }: ChatProps) => {
   return (
     <section>
       <DetailRow label="Inquiry" value={capitalizeWords(chat.issue)} />
-
+      <DetailRow
+        label="Inquiry"
+        value={truncateString(capitalizeWords(chat.specific_issue), 20)}
+      />
       <div className="row">
         <Text variant="bodySm" as={"p"} tone="subdued">
           Status
@@ -162,9 +169,10 @@ const ChatDetails = ({ chat }: ChatProps) => {
       </div>
       <DetailRow
         label="Suggested Action"
-        value={capitalizeWords(chat.suggested_action)}
+        value={capitalizeWords(chat.suggested_action || "not processed yet")}
       />
-      <DetailRow label="Rating" value={capitalizeWords(chat.rating)} />
+      <DetailRow label="Rating" value={capitalizeWords(chat.rating || "-")} />
+      <DetailRow label="Created At" value={formatTimestamp(chat.created_at)} />
     </section>
   );
 };
@@ -215,7 +223,11 @@ const CustomerDetail = ({ chat }: ChatProps) => {
             value={email}
             onClick={() => copyToClipboard(email)}
           />
-          <DetailRow label="ID" value={id} />
+          <DetailRow
+            label="ID"
+            onClick={() => copyToClipboard(id)}
+            value={id}
+          />
           <DetailRow label="Address" value={address} />
           <DetailRow
             label="Total Spent"
@@ -249,11 +261,11 @@ const OrderDetail = ({ chat }: ChatProps) => {
   }
 
   const {
-    id,
+    order_id,
     order_number,
     payment_status,
     fulfillment_status,
-    total_price,
+    current_total_price,
     created_at,
     line_items,
   } = chat.order;
@@ -268,8 +280,12 @@ const OrderDetail = ({ chat }: ChatProps) => {
       />
       {open && (
         <div className="detail">
-          <DetailRow label="Order ID" value={id} />
-          <DetailRow label="Order Number" value={`#${order_number}`} />
+          <DetailRow
+            label="Order ID"
+            onClick={() => copyToClipboard(order_id)}
+            value={filterNumber(order_id)}
+          />
+          <DetailRow label="Order Number" value={`${order_number}`} />
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
               Paid Status
@@ -280,7 +296,7 @@ const OrderDetail = ({ chat }: ChatProps) => {
           </div>
           <DetailRow
             label="Total Price"
-            value={`$${formatNumber(Number(total_price))}`}
+            value={`$${formatNumber(Number(current_total_price))}`}
           />
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
@@ -322,11 +338,20 @@ const DetailRow = ({
   value: string | JSX.Element;
   onClick?: () => void;
 }) => (
-  <div className="row" onClick={onClick}>
+  <div
+    className="row"
+    onClick={onClick}
+    style={{ cursor: onClick ? "pointer" : "" }}
+  >
     <Text variant="bodySm" as={"p"} tone="subdued">
       {label}
     </Text>
-    <Text variant="bodySm" as={"p"} tone="base" breakWord>
+    <Text
+      variant="bodySm"
+      as={"p"}
+      tone={onClick ? "magic-subdued" : "base"}
+      breakWord
+    >
       {value}
     </Text>
   </div>

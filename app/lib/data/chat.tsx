@@ -7,8 +7,8 @@ import {
 } from "../types/shared";
 
 export const order: OrderData = {
-  id: "order-1234",
-  total_price: "150.00",
+  order_id: "order-1234",
+  current_total_price: "150.00",
   fulfillment_status: "hold",
   payment_status: "paid",
   tracking_url: "http://tracking.example.com/track1234",
@@ -114,6 +114,7 @@ export const conversation: Conversation[] = [
 
 export const chat_list: ChatDocument[] = [
   {
+    specific_issue: "",
     classification: ClassificationTypes.Giveaway,
     suggested_email: "support@example.com",
     email_sent: false,
@@ -139,8 +140,10 @@ export const chat_list: ChatDocument[] = [
     suggested_action_done: false,
     error_info: "",
     timezone: "",
+    manually_triggerd: false,
   },
   {
+    specific_issue: "",
     classification: ClassificationTypes.Giveaway,
     suggested_email: "order@example.com",
     email_sent: true,
@@ -166,8 +169,10 @@ export const chat_list: ChatDocument[] = [
     suggested_action_done: false,
     error_info: "",
     timezone: "",
+    manually_triggerd: false,
   },
   {
+    specific_issue: "",
     classification: ClassificationTypes.Giveaway,
     suggested_email: "support@example.com",
     email_sent: false,
@@ -193,8 +198,10 @@ export const chat_list: ChatDocument[] = [
     suggested_action_done: false,
     error_info: "",
     timezone: "",
+    manually_triggerd: false,
   },
   {
+    specific_issue: "",
     classification: ClassificationTypes.OrderModification,
     suggested_email: "support@example.com",
     email_sent: true,
@@ -220,8 +227,10 @@ export const chat_list: ChatDocument[] = [
     suggested_action_done: false,
     error_info: "",
     timezone: "",
+    manually_triggerd: false,
   },
   {
+    specific_issue: "",
     classification: ClassificationTypes.OrderStatus,
     suggested_email: "billing@example.com",
     email_sent: false,
@@ -247,8 +256,10 @@ export const chat_list: ChatDocument[] = [
     suggested_action_done: false,
     error_info: "",
     timezone: "",
+    manually_triggerd: false,
   },
   {
+    specific_issue: "",
     classification: ClassificationTypes.General,
     suggested_email: "support@example.com",
     email_sent: true,
@@ -274,10 +285,12 @@ export const chat_list: ChatDocument[] = [
     suggested_action_done: false,
     error_info: "",
     timezone: "",
+    manually_triggerd: false,
   },
 ];
 
 export const chatDocument: ChatDocument = {
+  specific_issue: "",
   classification: ClassificationTypes.OrderStatus,
   suggested_email: "support@example.com",
   email_sent: true,
@@ -303,4 +316,5 @@ export const chatDocument: ChatDocument = {
   suggested_action_done: false,
   error_info: "",
   timezone: "",
+  manually_triggerd: false,
 };

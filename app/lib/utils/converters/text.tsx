@@ -35,3 +35,7 @@ export const toUrlHandle = (
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-");
 };
+
+export const filterNumber = (str: string) => {
+  return str.replace(/[^0-9]/g, "");
+};
