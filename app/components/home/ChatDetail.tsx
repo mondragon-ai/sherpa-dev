@@ -150,10 +150,10 @@ const ChatDetails = ({ chat }: ChatProps) => {
 
   return (
     <section>
-      <DetailRow label="Inquiry" value={capitalizeWords(chat.issue)} />
+      <DetailRow label="Inquiry" value={capitalizeWords(chat.issue || "")} />
       <DetailRow
-        label="Inquiry"
-        value={truncateString(capitalizeWords(chat.specific_issue), 20)}
+        label="Specific Issue"
+        value={truncateString(capitalizeWords(chat.specific_issue || ""), 20)}
       />
       <div className="row">
         <Text variant="bodySm" as={"p"} tone="subdued">
@@ -164,7 +164,7 @@ const ChatDetails = ({ chat }: ChatProps) => {
           size="small"
           progress={chat.status == "open" ? "partiallyComplete" : "complete"}
         >
-          {capitalizeWords(chat.status)}
+          {capitalizeWords(chat.status || "")}
         </Badge>
       </div>
       <DetailRow
@@ -231,7 +231,7 @@ const CustomerDetail = ({ chat }: ChatProps) => {
           <DetailRow label="Address" value={address} />
           <DetailRow
             label="Total Spent"
-            value={`$${formatNumber(total_spent)}`}
+            value={`$${formatNumber(Number(total_spent))}`}
           />
           <DetailRow label="Total Orders" value={total_orders.toString()} />
         </div>

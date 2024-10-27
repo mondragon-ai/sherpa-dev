@@ -114,6 +114,7 @@ export const Chat = ({
                 width: fit-content;
                 max-width: 300px;
                 position: relative;
+                overflow: hidden;
                 margin: 0;
                 padding: 10px;
                 border-radius: var(--p-border-radius-300);

@@ -13,10 +13,10 @@ export const ChatList = ({
   id: string;
   handleFetchChat: (id: string) => void;
 }) => {
-  const [selected, setSelected] = useState("newest");
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState("newest");
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleSelectChange = useCallback((value: string) => {
@@ -321,7 +321,7 @@ const ChatItem: React.FC<{ chat: ChatDocument; is_selected: boolean }> = ({
             </Badge>
 
             <Text variant="bodySm" as={"p"} tone="base" truncate>
-              {capitalizeWords(chat.issue)}
+              {capitalizeWords(chat.issue || "")}
             </Text>
           </div>
 

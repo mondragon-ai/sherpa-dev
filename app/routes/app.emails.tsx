@@ -1,123 +1,42 @@
+import { useEffect, useState } from "react";
 import { Page, Grid } from "@shopify/polaris";
 import { emailsLoader } from "./loaders/emails";
 import { Chat } from "app/components/home/Chat";
 import { useLoaderData } from "@remix-run/react";
 import { ChatDocument } from "app/lib/types/chats";
+import { useEmails } from "app/lib/hooks/useEmails";
 import { ChatList } from "app/components/home/ChatList";
-import { useCallback, useEffect, useState } from "react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { ChatDetail } from "app/components/home/ChatDetail";
 
 export const loader = emailsLoader;
-// export const loader = async ({ request }: LoaderFunctionArgs) => {
-//   await authenticate.admin(request);
-
-//   return null;
-// };
-
-// export const action = async ({ request }: ActionFunctionArgs) => {
-//   const { admin } = await authenticate.admin(request);
-//   const color = ["Red", "Orange", "Yellow", "Green"][
-//     Math.floor(Math.random() * 4)
-//   ];
-//   const response = await admin.graphql(
-//     `#graphql
-//       mutation populateProduct($input: ProductInput!) {
-//         productCreate(input: $input) {
-//           product {
-//             id
-//             title
-//             handle
-//             status
-//             variants(first: 10) {
-//               edges {
-//                 node {
-//                   id
-//                   price
-//                   barcode
-//                   createdAt
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }`,
-//     {
-//       variables: {
-//         input: {
-//           title: `${color} Snowboard`,
-//         },
-//       },
-//     },
-//   );
-//   const responseJson = await response.json();
-
-//   const product = responseJson.data!.productCreate!.product!;
-//   const variantId = product.variants.edges[0]!.node!.id!;
-
-//   const variantResponse = await admin.graphql(
-//     `#graphql
-//     mutation shopifyRemixTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-//       productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-//         productVariants {
-//           id
-//           price
-//           barcode
-//           createdAt
-//         }
-//       }
-//     }`,
-//     {
-//       variables: {
-//         productId: product.id,
-//         variants: [{ id: variantId, price: "100.00" }],
-//       },
-//     },
-//   );
-
-//   const variantResponseJson = await variantResponse.json();
-
-//   return json({
-//     product: responseJson!.data!.productCreate!.product,
-//     variant:
-//       variantResponseJson!.data!.productVariantsBulkUpdate!.productVariants,
-//   });
-// };
 
 export default function Emails() {
+  const shopify = useAppBridge();
   const data = useLoaderData<typeof loader>();
   const [fetching, setFetch] = useState(true);
-  const [chat, setChat] = useState<null | ChatDocument>(null);
-  const [chats, setChats] = useState<ChatDocument[]>([]);
-  // const fetcher = useFetcher<typeof action>();
-
-  // const shopify = useAppBridge();
-  // const isLoading =
-  //   ["loading", "submitting"].includes(fetcher.state) &&
-  //   fetcher.formMethod === "POST";
-  // const productId = fetcher.data?.product?.id.replace(
-  //   "gid://shopify/Product/",
-  //   "",
-  // );
-
-  // useEffect(() => {
-  //   if (productId) {
-  //     shopify.toast.show("Product created");
-  //   }
-  // }, [productId, shopify]);
-  // const generateProduct = () => fetcher.submit({}, { method: "POST" });
+  const {
+    chat,
+    chats,
+    error,
+    isLoading,
+    setError,
+    setChats,
+    setChat,
+    handleResolve,
+    handleAddNote,
+    handleDeleteChat,
+    handleFetchChat,
+  } = useEmails();
 
   useEffect(() => {
-    if (data) {
+    if (data && fetching) {
+      console.log(data);
       setChats(data.emails as unknown as ChatDocument[]);
       shopify.toast.show(data.message);
       setFetch(false);
     }
   }, [data, shopify]);
-
-  const handleFetchChat = useCallback((id: string) => {
-    const selected = chats.find((c) => c.id == id);
-    if (selected) setChat(selected);
-  }, []);
 
   return (
     <Page
@@ -137,7 +56,12 @@ export default function Emails() {
         </Grid.Cell>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
           <Placeholder>
-            <Chat chat={chat} setChat={setChat} />
+            <Chat
+              chat={chat}
+              deleteChat={async (id: string) => {}}
+              resolve={async (id: string) => {}}
+              addNote={async (id: string) => {}}
+            />
           </Placeholder>
         </Grid.Cell>
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>

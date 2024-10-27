@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://projects-june-rolled-registry.trycloudflare.com"
+application_url = "https://developers-pilot-specially-again.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_customers,read_orders,read_products,write_customers,write_discoun
 
 [auth]
 redirect_urls = [
-  "https://projects-june-rolled-registry.trycloudflare.com/auth/callback",
-  "https://projects-june-rolled-registry.trycloudflare.com/auth/shopify/callback",
-  "https://projects-june-rolled-registry.trycloudflare.com/api/auth/callback"
+  "https://developers-pilot-specially-again.trycloudflare.com/auth/callback",
+  "https://developers-pilot-specially-again.trycloudflare.com/auth/shopify/callback",
+  "https://developers-pilot-specially-again.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

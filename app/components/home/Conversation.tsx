@@ -1,11 +1,23 @@
 import { Text } from "@shopify/polaris";
 import { Conversation } from "app/lib/types/shared";
 import { getHoursDifference } from "app/lib/utils/converters/time";
+import { marked } from "marked";
+
+export const convertMarkdownToHtml = (markdown: string) => {
+  return marked(markdown);
+};
 
 export const AgentChat = ({ chat }: { chat: Conversation }) => (
   <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
     <div className="msg" style={{ background: "#D9E3F9" }}>
-      {chat.message}
+      {/* <Text variant="bodySm" as={"p"} tone="base" breakWord>
+        {chat.message}
+      </Text> */}
+      <div
+        dangerouslySetInnerHTML={{
+          __html: convertMarkdownToHtml(chat.message),
+        }}
+      />
     </div>
     <Text variant="bodySm" as={"p"} tone="subdued">
       Agent - {getHoursDifference(chat.time)}
@@ -15,7 +27,16 @@ export const AgentChat = ({ chat }: { chat: Conversation }) => (
 
 export const CustomerChat = ({ chat }: { chat: Conversation }) => (
   <div className="msgWrapper">
-    <div className="msg">{chat.message}</div>
+    <div className="msg">
+      {/* <Text variant="bodySm" as={"p"} tone="base" breakWord>
+        {chat.message}
+      </Text> */}
+      <div
+        dangerouslySetInnerHTML={{
+          __html: convertMarkdownToHtml(chat.message),
+        }}
+      />
+    </div>
     <Text variant="bodySm" as={"p"} tone="subdued">
       Customer - {getHoursDifference(chat.time)}
     </Text>
