@@ -1,19 +1,24 @@
+import {
+  deleteEmail,
+  filterEmail,
+  resolveEmail,
+  submitNote,
+} from "app/routes/services/emails";
 import { useFetcher } from "@remix-run/react";
-import { ChatDocument } from "../types/chats";
-import { action } from "app/routes/app._index";
+import { action } from "app/routes/app.emails";
+import { EmailDocument } from "../types/emails";
 import { handleResponse } from "../utils/shared";
 import { useCallback, useEffect, useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
-import { Conversation, FetcherProp } from "../types/shared";
+import { Conversation, EmailConversation, FetcherProp } from "../types/shared";
 import { createCurrentSeconds } from "../utils/converters/time";
-import { deleteChat, resolveChat, submitNote } from "app/routes/services/chats";
 
 export const useEmails = () => {
   const shopify = useAppBridge();
   const fetcher = useFetcher<typeof action>() as FetcherProp;
-  const [chat, setChat] = useState<null | ChatDocument>(null);
-  const [chats, setChats] = useState<ChatDocument[]>([]);
+  const [emails, setEmails] = useState<EmailDocument[]>([]);
   const [error, setError] = useState({ message: "", type: "" });
+  const [email, setEmail] = useState<null | EmailDocument>(null);
 
   const isLoading =
     ["loading", "submitting"].includes(fetcher.state) &&
@@ -25,15 +30,15 @@ export const useEmails = () => {
       switch (fetcher.data.type) {
         case "delete": {
           if (fetcher.data.status < 300) {
-            const filtered = chats.filter((c) => c.id !== fetcher.data?.data);
-            setChats(filtered);
-            setChat(null);
+            const filtered = emails.filter((c) => c.id !== fetcher.data?.data);
+            setEmails(filtered);
+            setEmail(null);
           }
           break;
         }
         case "resolve": {
           if (fetcher.data.status < 300) {
-            setChat(
+            setEmail(
               (p) =>
                 p && {
                   ...p,
@@ -46,7 +51,13 @@ export const useEmails = () => {
                       message: "",
                       sender: "agent",
                       action: "closed",
-                    } as Conversation,
+                      id: `${createCurrentSeconds()}`,
+                      history_id: "",
+                      internal_date: "",
+                      from: "",
+                      subject: "",
+                      attachments: [],
+                    } as EmailConversation,
                   ],
                 },
             );
@@ -54,7 +65,7 @@ export const useEmails = () => {
         }
         case "note": {
           if (fetcher.data.status < 300) {
-            setChat(
+            setEmail(
               (p) =>
                 p && {
                   ...p,
@@ -66,10 +77,22 @@ export const useEmails = () => {
                       message: fetcher.data?.data,
                       sender: "agent",
                       action: null,
-                    } as Conversation,
+                      id: `${createCurrentSeconds()}`,
+                      history_id: "",
+                      internal_date: "",
+                      from: "",
+                      subject: "",
+                      attachments: [],
+                    } as EmailConversation,
                   ],
                 },
             );
+          }
+        }
+        case "filter": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
+            console.log(fetcher.data);
+            setEmails(fetcher.data.data as unknown as EmailDocument[]);
           }
         }
         default:
@@ -79,53 +102,63 @@ export const useEmails = () => {
     }
   }, [fetcher.data]);
 
-  // Select Chat
-  const handleFetchChat = useCallback(
+  // Select Email
+  const handleFetchEmail = useCallback(
     (id: string) => {
-      const selected = chats.find((c) => c.id == id);
-      if (selected) setChat(selected);
+      const selected = emails.find((c) => c.id == id);
+      if (selected) setEmail(selected);
     },
-    [chat, chats],
+    [email, emails],
   );
 
-  // Delete Chat
-  const handleDeleteChat = useCallback(
+  // Delete Email
+  const handleDeleteEmail = useCallback(
     async (id: string) => {
-      await deleteChat(fetcher, id);
+      await deleteEmail(fetcher, id);
     },
-    [fetcher, chats],
+    [fetcher, emails],
   );
 
-  // Resolve Chat  (close & automate)
+  // Resolve Email  (close & automate)
   const handleResolve = useCallback(
     async (id: string) => {
-      if (chat && chat.status !== "open") {
+      if (!email) return;
+      if (email.status == "resolved") {
         return;
       }
-      await resolveChat(fetcher, id);
+      await resolveEmail(fetcher, { email: email.id, type: "email" });
     },
-    [chat, chats],
+    [email, emails],
   );
 
-  // Add Chat Note
+  // Add Email Note
   const handleAddNote = useCallback(
     async (id: string, note: string) => {
       await submitNote(fetcher, id, note);
     },
-    [chat, chats],
+    [email, emails],
+  );
+
+  // Filter Email list
+  const handleFilter = useCallback(
+    async (query: "newest" | "open" | "action_required") => {
+      await filterEmail(fetcher, query);
+    },
+    [email, emails],
   );
 
   return {
-    chat,
-    chats,
+    email,
+    emails,
     error,
     isLoading,
-    setChat,
-    setChats,
+    setEmail,
+    setEmails,
     setError,
+    handleFilter,
     handleAddNote,
     handleResolve,
-    handleFetchChat,
-    handleDeleteChat,
+    handleFetchEmail,
+    handleDeleteEmail,
   };
 };

@@ -97,6 +97,20 @@ export type Conversation = {
   action: null | "closed" | "opened";
 };
 
+export type EmailConversation = {
+  time: number;
+  is_note: boolean;
+  action: null | "closed" | "opened";
+  sender: "agent" | "customer";
+  id: string;
+  history_id: string;
+  internal_date: string;
+  from: string;
+  subject: string;
+  message: string;
+  attachments: any[];
+};
+
 export type OrderData = {
   order_id: string;
   current_total_price: string;

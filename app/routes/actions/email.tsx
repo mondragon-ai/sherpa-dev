@@ -6,7 +6,7 @@ import { authenticate } from "app/shopify.server";
  * Action function to handle order deletion.
  * @param {ActionFunctionArgs} args - The action function arguments.
  */
-export async function chatAction({ request, params }: ActionFunctionArgs) {
+export async function emailAction({ request, params }: ActionFunctionArgs) {
   const { session } = await authenticate.admin(request);
   const { shop, accessToken } = session;
 
@@ -19,7 +19,7 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
         const id = formData.get("id");
         const { message, status } = await serverRequest(
           "DELETE",
-          `/store/${shop}/chats/${id}`,
+          `/store/${shop}/emails/${id}`,
           null,
         );
         return json(
@@ -33,25 +33,11 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
         const { note, id } = JSON.parse(payload as string);
         const { message, status } = await serverRequest(
           "POST",
-          `/store/${shop}/chats/${id}/note`,
+          `/store/${shop}/emails/${id}/note`,
           { note },
         );
         return json(
           { message: message, data: note, type: "note", status: status },
-          { status: status },
-        );
-      }
-
-      case "filter": {
-        const query = formData.get("query") as string;
-        console.log({ query });
-        const { message, status, data } = await serverRequest(
-          "GET",
-          `/store/${shop}/chats/search?type=${query}`,
-          null,
-        );
-        return json(
-          { message: message, data: data, type: "filter", status: status },
           { status: status },
         );
       }
@@ -65,7 +51,21 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
           null,
         );
         return json(
-          { message: message, data: "", type: "resolve", status: status },
+          { message: message, data: "note", type: "resolve", status: status },
+          { status: status },
+        );
+      }
+
+      case "filter": {
+        const query = formData.get("query") as string;
+        console.log({ query });
+        const { message, status, data } = await serverRequest(
+          "GET",
+          `/store/${shop}/emails/search?type=${query}`,
+          null,
+        );
+        return json(
+          { message: message, data: data, type: "filter", status: status },
           { status: status },
         );
       }

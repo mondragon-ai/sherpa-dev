@@ -3,57 +3,78 @@ import { useCallback, useRef, useState } from "react";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 import { Avatar, Badge, Select, Text, TextField } from "@shopify/polaris";
 import { capitalizeWords, getInitials } from "app/lib/utils/converters/text";
+import { EmailDocument } from "app/lib/types/emails";
+
+const options = [
+  { label: "Newest", value: "newest" },
+  { label: "Opened", value: "open" },
+  { label: "Action Required", value: "action_required" },
+];
 
 export const ChatList = ({
   chat_list,
   id,
   handleFetchChat,
+  handleFilter,
 }: {
-  chat_list: ChatDocument[];
+  chat_list: ChatDocument[] | EmailDocument[];
   id: string;
   handleFetchChat: (id: string) => void;
+  handleFilter: (query: "newest" | "open" | "action_required") => Promise<void>;
 }) => {
   const [query, setQuery] = useState("");
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(
+    chat_list.length && chat_list.length < 250 ? false : true,
+  );
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState("newest");
+  const [list, setList] = useState<(ChatDocument | EmailDocument)[]>([]);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const handleSelectChange = useCallback((value: string) => {
-    console.log(value);
+  // Clear Query
+  const handleClearButtonClick = useCallback(() => {
+    setQuery("");
 
-    // TODO: fetch filtered chats
+    console.log("cleared");
+    // TODO: if clear revert to old chats
+  }, [chat_list]);
 
-    // set chats
-    setSelected(value);
-  }, []);
+  // Algolia Search
+  const handleQuery = useCallback(
+    (q: string) => {
+      setQuery(q);
+      console.log("Searching: " + q);
 
-  const options = [
-    { label: "Newest", value: "newest" },
-    { label: "Opened", value: "opened" },
-  ];
+      // TODO: Query algolia
+      // TODO: Update chats?
 
+      if (q == "") {
+        console.log("cleared");
+        // TODO: if clear revert to old chats
+      }
+    },
+    [chat_list],
+  );
+
+  // Fetch Filtered ChatsEmails
+  const handleSelectChange = useCallback(
+    async (value: "newest" | "open" | "action_required") => {
+      await handleFilter(value);
+      setSelected(value);
+    },
+    [],
+  );
+
+  // Fetch More Chats/Emails (infinity)
   const fetchMoreChats = async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
-
     console.log("LOADED MORE");
-
-    // * Simulating an API fetch call
-    // const newChats = await fetch('/api/chats?cursor=' + chats[chats.length - 1].id)
-    //   .then(res => res.json())
-    //   .catch(() => []);
-
-    // if (newChats.length > 0) {
-    //   setChats(prevChats => [...prevChats, ...newChats]);
-    // } else {
-    //   setHasMore(false); // If no more chats are available
-    // }
-
     setLoading(false);
   };
 
+  // Last chat/email ref
   const lastChatRef = useCallback(
     (node: HTMLDivElement) => {
       if (loading) return;
@@ -68,19 +89,8 @@ export const ChatList = ({
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore],
+    [loading, hasMore, chat_list],
   );
-
-  const handleQuery = useCallback((q: string) => {
-    setQuery(q);
-
-    // TODO: Query algolia
-    // TODO: Update chats?
-
-    // TODO: if clear revert to old chats
-  }, []);
-
-  const handleClearButtonClick = useCallback(() => setQuery(""), []);
 
   return (
     <>
@@ -262,25 +272,26 @@ export const ChatList = ({
         </header>
 
         <div className={"listWrapper"}>
-          {chat_list.map((chat, index) => {
-            if (index === chat_list.length - 1) {
-              return (
-                <div
-                  key={index}
-                  ref={lastChatRef}
-                  onClick={() => handleFetchChat(chat.id)}
-                >
-                  <ChatItem chat={chat} is_selected={id == chat.id} />
-                </div>
-              );
-            } else {
-              return (
-                <div key={index} onClick={() => handleFetchChat(chat.id)}>
-                  <ChatItem chat={chat} is_selected={id == chat.id} />
-                </div>
-              );
-            }
-          })}
+          {chat_list &&
+            chat_list.map((chat, index) => {
+              if (index === chat_list.length - 1) {
+                return (
+                  <div
+                    key={index}
+                    ref={lastChatRef}
+                    onClick={() => handleFetchChat(chat.id)}
+                  >
+                    <ChatItem chat={chat} is_selected={id == chat.id} />
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={index} onClick={() => handleFetchChat(chat.id)}>
+                    <ChatItem chat={chat} is_selected={id == chat.id} />
+                  </div>
+                );
+              }
+            })}
           {loading && <div>Loading more chats...</div>}
         </div>
       </div>
@@ -288,9 +299,12 @@ export const ChatList = ({
   );
 };
 
-const ChatItem: React.FC<{ chat: ChatDocument; is_selected: boolean }> = ({
+const ChatItem = ({
   chat,
   is_selected,
+}: {
+  chat: ChatDocument | EmailDocument;
+  is_selected: boolean;
 }) => {
   const name = chat.customer
     ? `${chat.customer.first_name} ${chat.customer.last_name}`

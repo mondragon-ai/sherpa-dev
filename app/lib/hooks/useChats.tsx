@@ -6,7 +6,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { Conversation, FetcherProp } from "../types/shared";
 import { createCurrentSeconds } from "../utils/converters/time";
-import { deleteChat, resolveChat, submitNote } from "app/routes/services/chats";
+import {
+  deleteChat,
+  filterChat,
+  resolveChat,
+  submitNote,
+} from "app/routes/services/chats";
 
 export const useChats = () => {
   const shopify = useAppBridge();
@@ -72,6 +77,12 @@ export const useChats = () => {
             );
           }
         }
+        case "filter": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
+            console.log(fetcher.data);
+            setChats(fetcher.data.data as unknown as ChatDocument[]);
+          }
+        }
         default:
           break;
       }
@@ -99,10 +110,11 @@ export const useChats = () => {
   // Resolve Chat  (close & automate)
   const handleResolve = useCallback(
     async (id: string) => {
-      if (chat && chat.status !== "open") {
+      if (!chat) return;
+      if (chat.status == "resolved") {
         return;
       }
-      await resolveChat(fetcher, id);
+      await resolveChat(fetcher, { email: chat.id, type: "chat" });
     },
     [chat, chats],
   );
@@ -115,6 +127,14 @@ export const useChats = () => {
     [chat, chats],
   );
 
+  // Filter Chat list
+  const handleFilter = useCallback(
+    async (query: "newest" | "open" | "action_required") => {
+      await filterChat(fetcher, query);
+    },
+    [chat, chats],
+  );
+
   return {
     chat,
     chats,
@@ -123,6 +143,7 @@ export const useChats = () => {
     setChat,
     setChats,
     setError,
+    handleFilter,
     handleAddNote,
     handleResolve,
     handleFetchChat,

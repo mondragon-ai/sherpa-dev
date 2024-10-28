@@ -22,13 +22,14 @@ export default function Index() {
     chats,
     error,
     isLoading,
-    setError,
-    setChats,
     setChat,
-    handleResolve,
+    setChats,
+    setError,
+    handleFilter,
     handleAddNote,
-    handleDeleteChat,
+    handleResolve,
     handleFetchChat,
+    handleDeleteChat,
   } = useChats();
 
   useEffect(() => {
@@ -62,6 +63,7 @@ export default function Index() {
             <ChatList
               chat_list={chats}
               id={chat ? chat.id : ""}
+              handleFilter={handleFilter}
               handleFetchChat={handleFetchChat}
             />
           </Placeholder>

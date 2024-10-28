@@ -9,6 +9,8 @@ import { ChatDocument } from "app/lib/types/chats";
 import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
 import { Action, AgentChat, CustomerChat, Note } from "./Conversation";
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { EmailDocument } from "app/lib/types/emails";
+import { capitalizeWords } from "app/lib/utils/converters/text";
 
 export const Chat = ({
   chat,
@@ -16,13 +18,25 @@ export const Chat = ({
   resolve,
   addNote,
 }: {
-  chat: null | ChatDocument;
+  chat: null | ChatDocument | EmailDocument;
   deleteChat: (id: string) => Promise<void>;
   resolve: (id: string) => Promise<void>;
   addNote: (id: string, note: string) => Promise<void>;
 }) => {
+  const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("add note here....");
   const handleChange = useCallback((newValue: string) => setNote(newValue), []);
+
+  const handleAddNote = useCallback(async () => {
+    setLoading(true);
+    if (!chat || !chat.id) return;
+    if (note == "") return;
+
+    await addNote(String(chat?.id || ""), note);
+
+    setNote("");
+    setLoading(false);
+  }, [note, chat, loading]);
 
   return (
     <>
@@ -120,6 +134,10 @@ export const Chat = ({
                 border-radius: var(--p-border-radius-300);
                 background: #EEF1F1;
             }
+            
+            .msg > div > p {
+                margin-bottom: 10px
+            }
 
             .msgWrapper > p {
                 margin-top: 5px;
@@ -201,7 +219,9 @@ export const Chat = ({
           <header>
             <Text variant="headingLg" as={"strong"}>
               {chat.customer
-                ? `${chat.customer.first_name} ${chat.customer.last_name}`
+                ? capitalizeWords(
+                    `${chat.customer.first_name} ${chat.customer.last_name}`,
+                  )
                 : chat.email
                   ? chat.email
                   : "Anonymous"}
@@ -278,9 +298,11 @@ export const Chat = ({
             </div>
             <div className="txtContainerFooter">
               <Button
+                disabled={loading}
+                loading={loading}
                 icon={SendIcon}
                 variant="primary"
-                onClick={() => addNote(String(chat?.id || ""), note)}
+                onClick={handleAddNote}
               >
                 Submit
               </Button>

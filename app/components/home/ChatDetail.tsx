@@ -8,12 +8,13 @@ import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { copyToClipboard } from "app/lib/utils/shared";
 import { Badge, Icon, Text } from "@shopify/polaris";
+import { EmailDocument } from "app/lib/types/emails";
 import { ChatDocument } from "app/lib/types/chats";
 import { SkeletonDetail } from "./Skeleton";
 import { useState } from "react";
 
 interface ChatProps {
-  chat: null | ChatDocument;
+  chat: null | ChatDocument | EmailDocument;
 }
 
 export const ChatDetail = ({ chat }: ChatProps) => {
@@ -150,10 +151,19 @@ const ChatDetails = ({ chat }: ChatProps) => {
 
   return (
     <section>
-      <DetailRow label="Inquiry" value={capitalizeWords(chat.issue || "")} />
+      <DetailRow label="Inquiry" value={capitalizeWords(chat.issue || "-")} />
+      {(chat as ChatDocument).specific_issue && (
+        <DetailRow
+          label="Specific Issue"
+          value={truncateString(
+            capitalizeWords((chat as ChatDocument).specific_issue || "-"),
+            20,
+          )}
+        />
+      )}
       <DetailRow
-        label="Specific Issue"
-        value={truncateString(capitalizeWords(chat.specific_issue || ""), 20)}
+        label="Classification"
+        value={capitalizeWords(chat.classification || "-")}
       />
       <div className="row">
         <Text variant="bodySm" as={"p"} tone="subdued">
