@@ -38,4 +38,5 @@ export type ChatDocument = {
   updated_at: number;
   created_at: number;
   order: null | OrderData;
+  sentiment: RatingTypes;
 };

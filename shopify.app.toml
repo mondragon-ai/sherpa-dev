@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://elementary-bound-arrive-previous.trycloudflare.com"
+application_url = "https://joshua-legislation-live-extraction.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_customers,read_orders,read_products,write_customers,write_discoun
 
 [auth]
 redirect_urls = [
-  "https://elementary-bound-arrive-previous.trycloudflare.com/auth/callback",
-  "https://elementary-bound-arrive-previous.trycloudflare.com/auth/shopify/callback",
-  "https://elementary-bound-arrive-previous.trycloudflare.com/api/auth/callback"
+  "https://joshua-legislation-live-extraction.trycloudflare.com/auth/callback",
+  "https://joshua-legislation-live-extraction.trycloudflare.com/auth/shopify/callback",
+  "https://joshua-legislation-live-extraction.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

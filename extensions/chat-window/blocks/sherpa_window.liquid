@@ -1,0 +1,282 @@
+
+
+  <!-- CHAT BUTTON TO OPENED -->
+  <button id="closed-window" is="closed-window" style="display: block; z-index: 9001;">
+    <div class="closed-chat-btn"  style="display: block;"></div>
+  </button>
+  
+  
+  <!-- CHAT WINDOW OPENED -->
+  <div  id="chat-window" style="display: none;  z-index: 9001;">
+  
+    <!-- CHAT HEADER -->
+    <div class="chat-header" style="background: linear-gradient(135deg,  {{ block.settings.header_color }} 0%, {{ block.settings.header_color_two }} 100%)">
+      <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="display: flex; flex-direction: row; width: 75%;">
+          <div class="avatars-wrapper">
+            <div class="header-ava"></div>
+          </div>
+          <h2 class="twolines"><span class="top-heading">Chat with </span>{{ block.settings.agent_name }}</h2>
+        </div>
+        <div style="display: flex; flex-direction: row; width: 25%; justify-content: flex-end;">
+          <button id="minimize-btn" class="material-icons exit-chat" type="button" aria-label="Minimize">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" id="ic-minimize">
+              <path d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="offline-message">
+        <span class="online">We reply immediately</span>
+      </div>
+    </div>
+  
+    <!-- PRE CHECK WINDOW -->
+    <div id="pre_check"  style="display: block;" >
+      <div id="precheck-group">
+        <div class="prefetchRow">
+
+          <!-- ISSUE SELECTOR HERE -->
+          <div class="col" style="position: relative;">
+            <div class="customInput col"
+                style="width: 100%; border-radius: 10px;">
+                <label htmlFor="order_number">What can I help you with?</label>
+                <select id="issue" style="color: black; width: 100%; padding: 0 0.5rem; font-size: 20px;">
+                  <option value="ORDER">Order Question</option>
+                  <option value="GENERAL">General Question</option>
+                  <option value="SUBSCRIPTION">Subscription Help</option>
+                  <option value="SHIPPING">Address Issues</option>
+                  <option value="EXCHANGE">Exchange Product</option>
+                  <option value="REFUND">Refund / Return Product</option>
+                </select>
+            </div>
+            <div class="reqMark">!</div>
+          </div>
+          
+          <div id="emailContainer" class="col" style="position: relative;">
+            <div class="customInput col"
+              style="width: 100%; border-radius: 10px;">
+              <label htmlFor="email">Email Address</label>
+              <input id="emailInput" style="color: black; width: 100%; padding: 0 0.5rem; font-size: 20px;"
+                placeholder="Email Address"
+                name="email"
+                type="text"/>
+            </div>
+            <div class="reqMark">!</div>
+          </div>
+          
+          <div  id="orderContainer" class="col" style="position: relative;">
+            <div class="customInput col"
+              style="width: 100%; border-radius: 10px;">
+              <label htmlFor="order_number">Order Number (OPTIONAL)</label>
+              <input id="orderInput" style="color: black; width: 100%; padding: 0 0.5rem; font-size: 20px;"
+                placeholder="SH-125783"
+                name="order_number"
+                type="text"/>
+            </div>
+          </div>
+
+          <div id="error_msg"  style="display: block;">
+          </div>
+
+          <div class="customInput row" style="width: 100%; border-radius: 10px;">
+            <button id="prefetch_btn">Submit</button>
+            <div id="queue"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- CHAT CONVERSATION WINDOW -->
+    <div id="CHAT"  style="display: none;" >
+      <div id="conversation-group">
+        <div id="messages" aria-live="polite" aria-atomic="false" data-testid="messagesLog">
+        </div>
+        <div id="conversation-scroll"></div>
+      </div>
+  
+      <!-- CHAT INPUT -->
+      <div class="input-group">
+        <div class="drag-active-wrapper footer-input-wrapper">
+          <hr>
+          <textarea id="new-message-textarea" rows="1" placeholder="Enter your message..." class="" aria-label="New message" data-testid="newMessageTextarea"></textarea>
+        </div>
+      </div>
+  
+      <!-- CHAT SUBMIT -->
+      <div id="button" data-testid="widgetButton" class="chat-open mobile-size__large bubbleAnimation-appear-done bubbleAnimation-enter-done">
+        <div class="buttonWave"></div>
+        <button type="button" id="button-body" data-testid="widgetButtonBody" class=" chrome" tabindex="0" aria-label="Close chat widget">
+          <i class="material-icons type1 for-closed">
+            <svg id="ic_bubble" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path>
+              <path d="M0 0h24v24H0z" fill="none"></path>
+            </svg>
+          </i>
+          <i class="material-icons type2 for-closed ">
+            <svg id="ic_create" fill="blue" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+              <path d="M0 0h24v24H0z" fill="none"></path>
+            </svg>
+          </i>
+          <i class="material-icons type1 for-opened active" style="color: rgb(255, 255, 255);">
+            <svg id="ic_send" fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+              <path d="M0 0h24v24H0z" fill="none"></path>
+            </svg>
+          </i>
+          <i class="material-icons type2 for-opened active">
+            <svg id="ic_send" fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+              <path d="M0 0h24v24H0z" fill="none"></path>
+            </svg>
+          </i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+<style>
+
+
+  .closed-chat-btn {
+    background:url("{{ 'chat_icon.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover;
+    width: 200px;
+    height: 70px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    position: absolute;
+    top: 0;
+  }
+  .header-ava {
+    {% if block.settings.avatar_image %} 
+      background: url("{{ block.settings.avatar_image | image_url: width: 1200 }}") no-repeat center / cover !important;
+    {% else %}
+      background: url("{{ 'bot.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover !important;
+    {% endif %}
+    width: 52px;
+    height: 52px;
+    border-radius: 24px;
+    float: left;
+    display: block !important;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+
+    function addOperatorMessage(response) {
+      var messageContainer = document.getElementById('messages');
+      var operatorMessage = document.createElement('div');
+      operatorMessage.className = 'message message-operator';
+      operatorMessage.innerHTML = '<span class="message-content">' + response + '</span>';
+      messageContainer.appendChild(operatorMessage);
+    };
+
+    function addCustomerMessage(msg) {
+        var messageContainer = document.getElementById('messages');
+        var customerMessage = document.createElement('div');
+        customerMessage.className = 'message message-visitor';
+        customerMessage.innerHTML = '<span class="message-content">' + msg + '</span>';
+        messageContainer.appendChild(customerMessage);
+    };
+
+    var chatId = sessionStorage.getItem("cha_uid") ? sessionStorage.getItem("cha_uid") : "";
+
+    console.log("[chatId]");
+    console.log(chatId);
+
+    if (chatId !== "") {
+      document.getElementById("pre_check").style.display = "none";
+      document.getElementById("CHAT").style.display = "block";
+    } else {
+      document.getElementById("pre_check").style.display = "block";
+      document.getElementById("CHAT").style.display = "none";
+    }
+
+    var store_domain = {{ shop.permanent_domain | json }};
+    sessionStorage.setItem("shop", store_domain);
+    console.log(store_domain);
+
+
+    // Check for cha_uid and fetch data
+    if (chatId) {
+      var requestData = {
+        domain: store_domain,
+        chat_uuid: chatId
+      };
+
+      fetch('https://us-central1-sherpa-dc1fe.cloudfunctions.net/admin/merchant/chats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'impowered-api-key': '93ffea0b049a934f0751266e796d85a4827994d4427244eb7643b9b88c824863'
+        },
+        body: JSON.stringify(requestData)
+      })
+      .then(function(response) {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Failed to fetch data');
+        }
+      })
+      .then(function(data) {
+        console.log('Data fetched successfully:');
+        console.log(data.data.result);
+        if (data.data.result && data.data.result[0] && data.data.result[0].chat && data.data.result[0].chat[0]) {
+          const chats = data.data.result[0].chat && data.data.result[0].chat[0] ? data.data.result[0].chat : [];
+          console.log(chats);
+          addOperatorMessage(data.data.result[0].initial_message);
+
+          if (chats && chats.length > 0) {
+            chats.forEach(function(chat) { // Change 'chat' to 'chats' here
+              addCustomerMessage(chat.customer);
+              addOperatorMessage(chat.agent);
+            });
+          }
+        }
+      })
+      .catch(function(error) {
+        console.error('Error fetching data:', error);
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Sherpa ChatBot",
+  "target": "body",
+  "stylesheet": "chat-window.css",
+  "javascript": "closed-window.js",
+  "settings": [
+    {
+      "type": "text",
+      "id": "header_color",
+      "label": "Header Color (left gradient)",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "header_color_two",
+      "label": "Header Color (right gradient)",
+      "default": "#434343"
+    },
+    {
+      "type": "text",
+      "id": "agent_name",
+      "label": "Agent Name",
+      "default": "Sherpa Bot"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_image",
+      "label": "Avatar Image"
+    }
+  ]
+}
+{% endschema %}

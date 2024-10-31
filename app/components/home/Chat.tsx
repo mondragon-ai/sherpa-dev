@@ -126,7 +126,8 @@ export const Chat = ({
                 align-items: flex-start;
                 height: auto;
                 width: fit-content;
-                max-width: 300px;
+                max-width: 80%;
+                width: content-fit;
                 position: relative;
                 overflow: hidden;
                 margin: 0;
@@ -136,8 +137,13 @@ export const Chat = ({
             }
             
             .msg > div > p {
-                margin-bottom: 10px
+                margin-bottom: 20px;
             }
+
+            .msg > div > p:last-of-type {
+                margin-bottom: 5px;
+            }
+
 
             .msgWrapper > p {
                 margin-top: 5px;

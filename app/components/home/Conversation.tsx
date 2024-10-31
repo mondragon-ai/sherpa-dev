@@ -55,7 +55,7 @@ export const Note = ({ chat }: { chat: Conversation }) => (
 );
 
 export const Action = ({ chat }: { chat: Conversation }) => (
-  <div className="actionText">
+  <div className="actionText" style={{ margin: "1.2rem 0 2.5rem 0" }}>
     <Text variant="bodySm" as={"p"} tone="magic">
       {chat.action === "closed"
         ? `Chat closed ${getHoursDifference(chat.time)} ago.`

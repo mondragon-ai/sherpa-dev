@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./closed-window.js"></script>
+    <link rel="stylesheet" href="chat-window.css" />
+    <title>Document</title>
+  </head>
+  <body style="background: black">
+    <!-- CHAT BUTTON TO OPENED -->
+    <button
+      id="closed-window"
+      is="closed-window"
+      style="display: block; z-index: 9001"
+    >
+      <div class="closed-chat-btn" style="display: block"></div>
+    </button>
+
+    <!-- CHAT WINDOW OPENED -->
+    <div id="chat-window" style="display: none; z-index: 9001">
+      <!-- CHAT HEADER -->
+      <div
+        class="chat-header"
+        style="background: linear-gradient(135deg, black 0%, black 100%)"
+      >
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <div style="display: flex; flex-direction: row; width: 75%">
+            <div class="avatars-wrapper">
+              <div class="header-ava"></div>
+            </div>
+            <h2 class="twolines">
+              <span class="top-heading">Chat with </span> Mitchel
+            </h2>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              width: 25%;
+              justify-content: flex-end;
+            "
+          >
+            <button
+              id="minimize-btn"
+              class="material-icons exit-chat"
+              type="button"
+              aria-label="Minimize"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                id="ic-minimize"
+              >
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path
+                  d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="offline-message">
+          <span class="online">2 Agents online</span>
+        </div>
+      </div>
+
+      <!-- PRE CHECK WINDOW -->
+      <div id="pre_check" style="display: block">
+        <div id="precheck-group">
+          <div class="prefetchRow">
+            <!-- ISSUE SELECTOR HERE -->
+            <div class="col">
+              <label htmlFor="order_number">What can I help you with?</label>
+              <div class="customInput">
+                <select id="issue">
+                  <option value="ORDER">Please Select One</option>
+                  <option value="ORDER">Order Question</option>
+                  <option value="GENERAL">General Question</option>
+                  <option value="PRODUCT">Product Question</option>
+                  <option value="SUBSCRIPTION">Subscription Help</option>
+                  <option value="SHIPPING">Address Issues</option>
+                  <option value="EXCHANGE">Exchange Product</option>
+                  <option value="REFUND">Refund / Return Product</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="orderContainer" class="col">
+              <label htmlFor="specific_issue"
+                >Specific Question (optional)</label
+              >
+              <div class="customInput">
+                <input
+                  id="specific_issue"
+                  placeholder="status udpdate"
+                  name="specific_issue"
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div id="error_msg" style="display: block"></div>
+
+            <div class="customInput row">
+              <button id="next_stage">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODCT CHECK WINDOW -->
+      <div id="product_check" style="display: none">
+        <div id="precheck-group">
+          <div class="prefetchRow">
+            <div id="orderContainer" class="col">
+              <label htmlFor="product_search">Product Search</label>
+              <div class="customInput">
+                <input
+                  id="product_search"
+                  placeholder="Title or SKU"
+                  name="product_search"
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div id="error_msg" style="display: block"></div>
+
+            <div class="customInput row">
+              <button id="product_btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER CHECK WINDOW -->
+      <div id="product_list" style="display: none">
+        <div id="precheck-group">
+          <div class="prefetchRow">
+            <div id="error_msg" style="display: block"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMER CHECK WINDOW -->
+      <div id="customer_check" style="display: none">
+        <div id="precheck-group">
+          <div class="prefetchRow">
+            <div id="orderContainer" class="col">
+              <label htmlFor="email_input">Customer Email</label>
+              <div class="customInput">
+                <input
+                  id="email_input"
+                  placeholder="john@email.com"
+                  name="email_input"
+                  type="email"
+                />
+              </div>
+            </div>
+
+            <div id="error_msg" style="display: block"></div>
+
+            <div class="customInput row">
+              <button id="customer_btn">Find Orders</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER CHECK WINDOW -->
+      <div id="order_check" style="display: none">
+        <div id="precheck-group">
+          <div class="prefetchRow">
+            <div id="error_msg" style="display: block"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT CONVERSATION WINDOW -->
+      <div id="chat_window" style="display: none">
+        <div id="conversation-group">
+          <div
+            id="messages"
+            aria-live="polite"
+            aria-atomic="false"
+            data-testid="messagesLog"
+          ></div>
+          <div id="conversation-scroll"></div>
+        </div>
+
+        <!-- CHAT INPUT -->
+        <div class="input-group">
+          <div class="drag-active-wrapper footer-input-wrapper">
+            <hr />
+            <textarea
+              id="new-message-textarea"
+              rows="1"
+              placeholder="Enter your message..."
+              class=""
+              aria-label="New message"
+              data-testid="newMessageTextarea"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- CHAT SUBMIT -->
+        <div
+          id="button"
+          data-testid="widgetButton"
+          class="chat-open mobile-size__large bubbleAnimation-appear-done bubbleAnimation-enter-done"
+        >
+          <div class="buttonWave"></div>
+          <button
+            type="button"
+            id="button-body"
+            data-testid="widgetButtonBody"
+            class="chrome"
+            tabindex="0"
+            aria-label="Close chat widget"
+          >
+            <i class="material-icons type1 for-closed">
+              <svg
+                id="ic_bubble"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                ></path>
+                <path d="M0 0h24v24H0z" fill="none"></path>
+              </svg>
+            </i>
+            <i class="material-icons type2 for-closed">
+              <svg
+                id="ic_create"
+                fill="blue"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                ></path>
+                <path d="M0 0h24v24H0z" fill="none"></path>
+              </svg>
+            </i>
+            <i
+              class="material-icons type1 for-opened active"
+              style="color: rgb(255, 255, 255)"
+            >
+              <svg
+                id="ic_send"
+                fill="#FFFFFF"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                <path d="M0 0h24v24H0z" fill="none"></path>
+              </svg>
+            </i>
+            <i class="material-icons type2 for-opened active">
+              <svg
+                id="ic_send"
+                fill="#FFFFFF"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                <path d="M0 0h24v24H0z" fill="none"></path>
+              </svg>
+            </i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .closed-chat-btn {
+        background: url("./chat_icon.png") no-repeat center / contain;
+        width: 120px;
+        height: 70px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        position: absolute;
+        top: 0;
+      }
+      .header-ava {
+        background: url("./mitchell.jpg") no-repeat center / cover !important;
+        width: 52px;
+        height: 52px;
+        border-radius: 24px;
+        float: left;
+        display: block !important;
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        function addOperatorMessage(response) {
+          var messageContainer = document.getElementById("messages");
+          var operatorMessage = document.createElement("div");
+          operatorMessage.className = "message message-operator";
+          operatorMessage.innerHTML =
+            '<span class="message-content">' + response + "</span>";
+          messageContainer.appendChild(operatorMessage);
+        }
+
+        function addCustomerMessage(msg) {
+          var messageContainer = document.getElementById("messages");
+          var customerMessage = document.createElement("div");
+          customerMessage.className = "message message-visitor";
+          customerMessage.innerHTML =
+            '<span class="message-content">' + msg + "</span>";
+          messageContainer.appendChild(customerMessage);
+        }
+
+        var chatId = sessionStorage.getItem("cha_uid")
+          ? sessionStorage.getItem("cha_uid")
+          : "";
+
+        console.log("[chatId]");
+        console.log(chatId);
+
+        if (chatId !== "") {
+          document.getElementById("pre_check").style.display = "none";
+          document.getElementById("CHAT").style.display = "block";
+        } else {
+          document.getElementById("pre_check").style.display = "block";
+          document.getElementById("CHAT").style.display = "none";
+        }
+
+        var store_domain = "dummy-store-usa.myshopify.com";
+        sessionStorage.setItem("shop", store_domain);
+        console.log(store_domain);
+
+        // Check for cha_uid and fetch data
+        if (chatId) {
+          var requestData = {
+            domain: store_domain,
+            chat_uuid: chatId,
+          };
+          console.log({ requestData });
+
+          // fetch(
+          //   "https://us-central1-sherpa-dc1fe.cloudfunctions.net/admin/merchant/chats",
+          //   {
+          //     method: "POST",
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //       "impowered-api-key":
+          //         "93ffea0b049a934f0751266e796d85a4827994d4427244eb7643b9b88c824863",
+          //     },
+          //     body: JSON.stringify(requestData),
+          //   },
+          // )
+          //   .then(function (response) {
+          //     if (response.ok) {
+          //       return response.json();
+          //     } else {
+          //       throw new Error("Failed to fetch data");
+          //     }
+          //   })
+          //   .then(function (data) {
+          //     console.log("Data fetched successfully:");
+          //     console.log(data.data.result);
+          //     if (
+          //       data.data.result &&
+          //       data.data.result[0] &&
+          //       data.data.result[0].chat &&
+          //       data.data.result[0].chat[0]
+          //     ) {
+          //       const chats =
+          //         data.data.result[0].chat && data.data.result[0].chat[0]
+          //           ? data.data.result[0].chat
+          //           : [];
+          //       console.log(chats);
+          //       addOperatorMessage(data.data.result[0].initial_message);
+
+          //       if (chats && chats.length > 0) {
+          //         chats.forEach(function (chat) {
+          //           // Change 'chat' to 'chats' here
+          //           addCustomerMessage(chat.customer);
+          //           addOperatorMessage(chat.agent);
+          //         });
+          //       }
+          //     }
+          //   })
+          //   .catch(function (error) {
+          //     console.error("Error fetching data:", error);
+          //   });
+        }
+      });
+    </script>
+  </body>
+</html>

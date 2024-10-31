@@ -3,7 +3,7 @@ import {
   filterNumber,
   truncateString,
 } from "app/lib/utils/converters/text";
-import { CaretDownIcon, CaretUpIcon } from "@shopify/polaris-icons";
+import { CaretDownIcon, CaretUpIcon, ChatIcon } from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { copyToClipboard } from "app/lib/utils/shared";
@@ -134,6 +134,7 @@ export const ChatDetail = ({ chat }: ChatProps) => {
               <ChatDetails chat={chat} />
               <CustomerDetail chat={chat} />
               <OrderDetail chat={chat} />
+              <SummaryDetail chat={chat} />
             </>
           ) : (
             <>
@@ -151,6 +152,20 @@ const ChatDetails = ({ chat }: ChatProps) => {
 
   return (
     <section>
+      <div className="row">
+        <Text variant="bodySm" as={"p"} tone="subdued">
+          Ticket Issue
+        </Text>
+        {chat.classification ? (
+          <Badge tone={"new"} size="small" icon={ChatIcon}>
+            {capitalizeWords(chat.classification?.toLocaleLowerCase())}
+          </Badge>
+        ) : (
+          <Text variant="bodySm" as={"p"} tone="subdued">
+            -
+          </Text>
+        )}
+      </div>
       <DetailRow label="Inquiry" value={capitalizeWords(chat.issue || "-")} />
       {(chat as ChatDocument).specific_issue && (
         <DetailRow
@@ -161,10 +176,6 @@ const ChatDetails = ({ chat }: ChatProps) => {
           )}
         />
       )}
-      <DetailRow
-        label="Classification"
-        value={capitalizeWords(chat.classification || "-")}
-      />
       <div className="row">
         <Text variant="bodySm" as={"p"} tone="subdued">
           Status
@@ -181,8 +192,18 @@ const ChatDetails = ({ chat }: ChatProps) => {
         label="Suggested Action"
         value={capitalizeWords(chat.suggested_action || "not processed yet")}
       />
-      <DetailRow label="Rating" value={capitalizeWords(chat.rating || "-")} />
-      <DetailRow label="Created At" value={formatTimestamp(chat.created_at)} />
+      <DetailRow
+        label="Sentiment"
+        value={capitalizeWords(chat.sentiment || "-")}
+      />
+      <DetailRow
+        label="Customer Rating"
+        value={capitalizeWords(chat.rating || "-")}
+      />
+      <DetailRow
+        label="Created At"
+        value={formatTimestamp(Number(chat.created_at))}
+      />
     </section>
   );
 };
@@ -278,8 +299,11 @@ const OrderDetail = ({ chat }: ChatProps) => {
     current_total_price,
     created_at,
     line_items,
+    tracking_url,
   } = chat.order;
   const [open, toggleOpen] = useState(false);
+
+  console.log(created_at);
 
   return (
     <section>
@@ -316,7 +340,16 @@ const OrderDetail = ({ chat }: ChatProps) => {
               {capitalizeWords(fulfillment_status)}
             </Badge>
           </div>
-          <DetailRow label="Placed At" value={formatTimestamp(created_at)} />
+
+          <DetailRow
+            label="Tracking"
+            onClick={() => copyToClipboard(tracking_url)}
+            value={tracking_url ? "URL" : "-"}
+          />
+          <DetailRow
+            label="Placed At"
+            value={formatTimestamp(Number(created_at))}
+          />
           <div className="row">
             <Text variant="bodySm" as={"p"} tone="subdued">
               Line Items
@@ -333,6 +366,45 @@ const OrderDetail = ({ chat }: ChatProps) => {
                 })}
             </Text>
           </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
+const SummaryDetail = ({ chat }: ChatProps) => {
+  if (!chat) return null;
+
+  if (!chat.summary) {
+    return (
+      <section>
+        <div
+          onClick={() => {}}
+          className="row"
+          style={{ justifyContent: "space-between", marginBottom: "15px" }}
+        >
+          <Text variant="headingMd" as={"strong"} tone="base">
+            Recent Chat Summary
+          </Text>
+          <Icon source={CaretUpIcon} />
+        </div>
+      </section>
+    );
+  }
+  const [open, toggleOpen] = useState(false);
+
+  return (
+    <section>
+      <ToggleHeader
+        title="Recent Chat Summary"
+        open={open}
+        onClick={() => toggleOpen(!open)}
+      />
+      {open && (
+        <div className="detail" style={{ width: "100%" }}>
+          <Text variant="bodySm" as={"p"} tone={"base"} breakWord>
+            {chat.summary}
+          </Text>
         </div>
       )}
     </section>

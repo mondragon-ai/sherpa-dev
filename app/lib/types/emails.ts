@@ -41,6 +41,7 @@ export type EmailDocument = {
   order: null | OrderData;
   source: "gmail" | "outlook";
   history_id: string;
+  sentiment: RatingTypes;
 };
 
 export type EmailMessage = {
