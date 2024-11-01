@@ -309,6 +309,7 @@ svg:not(:root) {
   clear: both;
   position: relative;
   transition: margin 0.28s ease-in-out 0s;
+  margin: 10px 0;
 }
 
 .message-visitor {
@@ -383,6 +384,9 @@ textarea {
   letter-spacing: -0.24px;
   -webkit-font-smoothing: antialiased;
   color: rgb(6, 19, 43);
+  font-size: 13px !important;
+  line-height: 15px;
+  font-family: sans-serif !important;
 }
 textarea:focus-visible {
   outline: none !important;
@@ -684,6 +688,7 @@ textarea:focus-visible {
   font-family: sans-serif;
 }
 
+#precheck_error,
 #order_error,
 #customer_error,
 #product_error {
@@ -789,7 +794,7 @@ textarea:focus-visible {
   justify-content: center;
   height: 20px;
   margin-bottom: 10px;
-  padding: 2rem !important;
+  padding: 10px 7px !;
 }
 
 .typing-indicator-dot {
@@ -837,6 +842,8 @@ textarea:focus-visible {
   height: auto;
   margin-bottom: 7px;
   overflow: hidden;
+  font-size: 13px;
+  font-family: sans-serif;
 }
 .rating {
   display: flex;
@@ -845,6 +852,9 @@ textarea:focus-visible {
   justify-content: space-evenly;
   height: 50px;
   margin-bottom: 7px;
+  font-size: 13px;
+  font-family: sans-serif;
+  font-weight: 550;
 }
 
 .rating-item {

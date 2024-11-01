@@ -1,7 +1,74 @@
 // Open  & Close the chat
 document.addEventListener("DOMContentLoaded", function () {
+  var live = document.querySelector(".online");
+
+  const a = getRandomNumber(5);
+  live.innerHTML = `${a} Agents online`;
+
   var chat_window = document.getElementById("chat-window");
   var close_btn = document.getElementById("minimize-btn");
+  const domain = chat_window.getAttribute("data-shopify-domain");
+
+  storeString("domain", domain);
+  var p = getItems("payload");
+
+  async function fetchChat() {
+    return await fetchActiveThread();
+  }
+
+  async function fetchActiveThread() {
+    var payload = getItems("payload");
+    if (!payload) {
+      hideAllWindows();
+      document.getElementById("pre_check").style.display = "block";
+      return 500;
+    }
+    var domain = getString("domain");
+    var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/store/${domain}/chats/thread/${payload.email}`;
+    try {
+      var response = await fetch(url);
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - Not Active.`);
+
+        hideAllWindows();
+        document.getElementById("pre_check").style.display = "block";
+        clearItem("payload");
+
+        return response.status;
+      }
+
+      var data = await response.json();
+
+      var convo = data?.data;
+      if (!convo) {
+        hideAllWindows();
+        document.getElementById("pre_check").style.display = "block";
+
+        return 422;
+      }
+
+      for (const c of convo) {
+        if (c.sender === "agent" && !c.is_note) {
+          addAgentMessage(c.message);
+        } else if (c.sender === "customer") {
+          addCustomerMessage(c.message);
+        }
+      }
+      return 200;
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return 500;
+    }
+  }
+
+  if (p && p.email && domain) {
+    fetchChat();
+    hideAllWindows();
+    document.getElementById("chat_window").style.display = "block";
+  } else {
+    hideAllWindows();
+    document.getElementById("pre_check").style.display = "block";
+  }
 
   // * 1. TOGGLE OPEN & CLOSE CHAT WINDOW
   // ! =============================================================
@@ -65,16 +132,49 @@ document.addEventListener("DOMContentLoaded", function () {
   var start_chat = document.getElementById("start_chat");
   if (start_chat) {
     // Start chat with AI Agent (if issue == general)
-    start_chat.addEventListener("click", function () {
+    start_chat.addEventListener("click", async function () {
+      toggleLoading(start_chat, true);
       var issue = document.getElementById("issue").value;
       var specific_issue = document.getElementById("specific_issue").value;
       var email = document.getElementById("email_optional").value;
 
-      if (!issue) return;
-      hideAllWindows();
-      document.getElementById("chat_window").style.display = "block";
+      if (!email) {
+        var errorMsg = document.getElementById("precheck_error");
+        errorMsg.innerHTML = "<span>VALID EMAIL REQUREID.</span>";
+        toggleLoading(start_chat, false);
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        toggleLoading(start_chat, false);
+        var errorMsg = document.getElementById("precheck_error");
+        errorMsg.innerHTML = "<span>VALID EMAIL REQUREID.</span>";
+      }
+
+      if (!issue) {
+        var errorMsg = document.getElementById("precheck_error");
+        errorMsg.innerHTML = "<span>CHOOSE AN ISSUE.</span>";
+        toggleLoading(start_chat, false);
+        return;
+      }
+
+      storeItems("payload", {
+        issue: issue.toLocaleLowerCase(),
+        specific_issue,
+        email,
+      });
 
       // start chat
+      var result = await startChat();
+      if (result.status > 300) return false;
+
+      if (result.status == 200) {
+        addAgentMessage(result.agent);
+      }
+
+      hideAllWindows();
+      document.getElementById("chat_window").style.display = "block";
+      toggleLoading(start_chat, false);
     });
   }
 
@@ -155,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // * 4. FETCH & RENDER PRODUCTS
   // ! =============================================================
   async function fetchProducts(query) {
-    const domain = "dummy-store-usa.myshopify.com";
+    const domain = getString("domain");
     const url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/products/${query}`;
     console.log("Fetch Products:", query);
 
@@ -260,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // * 5. FETCH & RENDER ORDERS
   // ! =============================================================
   async function fetchOrders(email) {
-    const domain = "dummy-store-usa.myshopify.com";
+    const domain = getString("domain");
     const url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/customer/${email}/orders`;
 
     try {
@@ -325,7 +425,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const parent = document.querySelector("#order_check .prefetchRow");
     if (!parent) return false;
 
-    parent.innerHTML = `<div class="nav-row" id="order_back"><span>back</span></div><div id="windowHdr"><span><strong>1</strong> Person ahead of you...</span></div>`;
+    const n = getRandomNumber(3);
+
+    parent.innerHTML = `<div class="nav-row" id="order_back"><span>back</span></div><div id="windowHdr"><span><strong>${n}</strong> Person ahead of you...</span></div>`;
 
     var payload = getItems("payload");
     if (!payload) {
@@ -333,7 +435,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("pre_check").style.display = "block";
       return false;
     }
-    storeItems("payload", { ...payload, order_id: orderID });
+    storeItems("payload", { ...payload, order_id: extractNumbers(orderID) });
 
     var result = await startChat();
     if (result.status > 300) return false;
@@ -355,7 +457,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("pre_check").style.display = "block";
       return { agent: "", status: 500 };
     }
-    var domain = "dummy-store-usa.myshopify.com";
+    var domain = getString("domain");
     var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/initiate/${payload.email}`;
     var options = {
       method: "POST",
@@ -380,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
           if (c.sender === "agent" && !c.is_note) {
             addAgentMessage(c.message);
           } else if (c.sender === "customer") {
-            console.log("CUSTOMER");
+            addCustomerMessage(c.message);
           }
         }
         return { agent: "", status: 201 };
@@ -393,9 +495,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // * 7. SUBMIT CUSTOMER
+  // * 7. SUBMIT CUSTOMER MSG
   // ! =============================================================
-  var send_btn = document.getElementById("customer_submit");
+  var chat = "";
+  var response_timeout;
+  var typing_timeout;
+  var typing = createTypingIndicator();
+  var message_container = document.getElementById("messages");
+  var operatorResponsesCount = 0;
+
+  var send_btn = document.getElementById("button");
   if (send_btn) {
     send_btn.addEventListener("click", submitMessage);
   }
@@ -410,10 +519,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  var chat = "";
-  var response_timeout;
-  var typing_timeout;
-  var typing = createTypingIndicator();
   function submitMessage() {
     var message = textarea.value.trim();
     chat = chat + " " + message;
@@ -426,69 +531,152 @@ document.addEventListener("DOMContentLoaded", function () {
       clearTimeout(typing_timeout);
 
       typing_timeout = setTimeout(() => {
-        var message_container = document.getElementById("messages");
         message_container.appendChild(typing);
       }, 15000);
 
-      response_timeout = setTimeout(() => {
-        console.log("timer ended");
-        const payload = getItems("payload");
-        console.log(payload);
-        // sendMessage
-        chat = "";
-      }, 30000);
+      response_timeout = setTimeout(
+        async () => await handleSendingMessage(),
+        30000,
+      );
     }
   }
 
-  var operatorResponsesCount = 0;
-  function sendMessage(message, shop, cha_uid) {
-    // modified the links for prod
-    var url =
-      "https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/respond";
-    var data = {
-      initial_msg: message,
-      cha_uid: cha_uid,
-      domain: shop,
-    };
+  async function handleSendingMessage() {
+    console.log("timer ended");
+    const response = await sendMessage();
+    console.log({ response });
+
+    if (response) {
+      addAgentMessage(response);
+      operatorResponsesCount++;
+      if (operatorResponsesCount == 3) {
+        console.log("ADD CHAT RATING");
+        injectRating();
+        setupRatingEventListeners();
+      }
+    }
+
+    chat = "";
+    message_container.removeChild(typing);
+  }
+
+  async function sendMessage() {
+    var domain = getString("domain");
+    var payload = getItems("payload");
+    console.log({ payload, domain, chat });
+    if (!domain || !payload.email || !chat) return "";
+    var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/respond/${payload.email}`;
 
     var options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ message: chat }),
     };
+    console.log({ url, options });
 
-    var messageContainer = document.getElementById("messages");
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - Failed to fetch products.`);
+        return "";
+      }
+      const data = await response.json();
+      return data?.data?.response || "";
+    } catch (error) {
+      console.error("Error getting response:", error);
+      return "";
+    }
+  }
 
-    fetch(url, options)
-      .then(function (response) {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Error sending message");
-        }
-      })
-      .then(function (responseText) {
-        messageContainer.removeChild(typingIndicator);
-        addOperatorMessage(responseText.data);
-        operatorResponsesCount++;
-        if (operatorResponsesCount == 3) {
-          injectNewDiv();
-          // Initial setup
-          setupRatingEventListeners();
-        }
-      })
-      .catch(function (error) {
-        alert("Try again later.");
-        messageContainer.removeChild(typingIndicator);
-        console.error("Error sending message:", error);
+  // * 8. HANDLE RATING
+  // ! =============================================================
+  function injectRating() {
+    var message_container = document.getElementById("messages");
+    var newDiv = document.createElement("div");
+    newDiv.className = "message message-operator rating-container";
+    newDiv.innerHTML =
+      '<div style=" text-align: center; padding: 0  0 1rem 0;"><span>Let Us Know How We Are Doing</span></div><div class="rating" style="display: flex !important;"><div class="rating-item" id="POSITIVE"><span>😀</span><span>Positive</span></div><div class="rating-item" id="NEUTRAL"><span>😐</span><span>Neutral</span></div><div class="rating-item" id="NEGATIVE"><span>🙁</span><span>Negative</span></div></div>';
+    message_container.appendChild(newDiv);
+  }
+
+  function setupRatingEventListeners() {
+    var ratingItems = document.getElementsByClassName("rating-item");
+    for (var i = 0; i < ratingItems.length; i++) {
+      ratingItems[i].addEventListener("click", async function (event) {
+        await rateChat(event);
       });
+    }
+  }
+
+  async function rateChat(event) {
+    var rating_span = event.currentTarget;
+    var rating_id = rating_span.id.toLocaleLowerCase();
+    console.log(rating_id);
+
+    var domain = getString("domain");
+    var payload = getItems("payload");
+    console.log({ payload, domain, chat });
+    if (!domain || !payload.email || !rating_id) return "";
+    var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/store/${domain}/chats/${payload.email}/rate?rating=${rating_id}`;
+
+    var options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    console.log({ url, options });
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - Failed to fetch products.`);
+        return "";
+      }
+
+      console.log("Rating submitted successfully");
+      var ratingContainer = document.getElementsByClassName("rating-container");
+      ratingContainer[0].style.display = "none";
+    } catch (error) {
+      console.error("Error getting response:", error);
+      return "";
+    }
+  }
+
+  // * 9. ADD MESSAGE DIVS
+  // ! =============================================================
+
+  // Add Messages - Agent Response
+  function addAgentMessage(response) {
+    var msg_container = document.getElementById("messages");
+    var agent = document.createElement("div");
+    agent.className = "message message-operator";
+    agent.innerHTML = `<span class="message-content">${response}</span>`;
+    msg_container.appendChild(agent);
+  }
+
+  // Add Messages - Customer Response
+  function addCustomerMessage(msg) {
+    var container = document.getElementById("messages");
+    var message = document.createElement("div");
+    message.className = "message message-visitor";
+    message.innerHTML = `<span class="message-content" style="color: #f7f7f7">${msg}</span>`;
+    container.appendChild(message);
+  }
+
+  // Typing Indicator
+  function createTypingIndicator() {
+    var typingIndicator = document.createElement("div");
+    typingIndicator.className = "message message-operator typing-indicator";
+    typingIndicator.innerHTML =
+      '<span class="typing-indicator-dot"></span><span class="typing-indicator-dot"></span><span class="typing-indicator-dot"></span>';
+    return typingIndicator;
   }
 
   // * 8. HELPERS - UI/Storage/Formatting
   // ! =============================================================
-
   function hideAllWindows() {
     document.getElementById("pre_check").style.display = "none";
     document.getElementById("product_check").style.display = "none";
@@ -526,8 +714,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Validate Emails
   function isValidEmail(email) {
-    var emailRegex = /^\S+@\S+\.\S+$/;
-    return emailRegex.test(email);
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
   }
 
   // Local Storage
@@ -537,12 +725,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function storeString(key, value) {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(key, value);
+    }
+  }
+
   function getItems(key) {
     if (typeof window !== "undefined") {
       const value = window.localStorage.getItem(key);
       return JSON.parse(value);
     }
     return null; // Handle cases where window is not defined
+  }
+
+  function getString(key) {
+    if (typeof window !== "undefined") {
+      const value = window.localStorage.getItem(key);
+      return value;
+    }
+    return null;
+  }
+
+  function clearItem(key) {
+    console.log("CLEARED");
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(key);
+    }
   }
 
   // Formatters
@@ -562,95 +771,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return word;
   }
 
-  // Add Messages - Agent Response
-  function addAgentMessage(response) {
-    var msg_container = document.getElementById("messages");
-    var agent = document.createElement("div");
-    agent.className = "message message-operator";
-    agent.innerHTML = `<span class="message-content">${response}</span>`;
-    msg_container.appendChild(agent);
-  }
-
-  // Add Messages - Customer Response
-  function addCustomerMessage(msg) {
-    var container = document.getElementById("messages");
-    var message = document.createElement("div");
-    message.className = "message message-visitor";
-    message.innerHTML = `<span class="message-content">${msg}</span>`;
-    container.appendChild(message);
-  }
-
-  // Typing Indicator
-  function createTypingIndicator() {
-    var typingIndicator = document.createElement("div");
-    typingIndicator.className = "message message-operator typing-indicator";
-    typingIndicator.innerHTML =
-      '<span class="typing-indicator-dot"></span><span class="typing-indicator-dot"></span><span class="typing-indicator-dot"></span>';
-    return typingIndicator;
-  }
-
-  function injectNewDiv() {
-    var messageContainer = document.getElementById("messages");
-    var newDiv = document.createElement("div");
-    newDiv.className = "message message-operator rating-container";
-    newDiv.innerHTML =
-      '<div style=" text-align: center; padding: 0  0 1rem 0;"><span>Let Us Know How We Are Doing</span></div><div class="rating" style="display: flex !important;"><div class="rating-item" id="POSITIVE"><span>😀</span><span>Positive</span></div><div class="rating-item" id="NEUTRAL"><span>😐</span><span>Neutral</span></div><div class="rating-item" id="NEGATIVE"><span>🙁</span><span>Negative</span></div></div>';
-    messageContainer.appendChild(newDiv);
-  }
-
-  function setupRatingEventListeners() {
-    var ratingItems = document.getElementsByClassName("rating-item");
-    for (var i = 0; i < ratingItems.length; i++) {
-      console.log(ratingItems[i]);
-      ratingItems[i].addEventListener("click", rateChat);
-    }
-  }
-
-  function rateChat(event) {
-    var ratingSpan = event.currentTarget;
-    console.log(ratingSpan);
-    var ratingId = ratingSpan.id.toLocaleLowerCase();
-    console.log(ratingId);
-    var cha_uid = sessionStorage.getItem("cha_uid");
-    var domain = sessionStorage.getItem("shop");
-
-    var ratingData = {
-      rating: {
-        negative: 0,
-        positive: 0,
-        neutral: 0,
-      },
-      cha_uid: cha_uid,
-      domain: domain,
-    };
-
-    ratingData.rating[ratingId] = 1;
-    console.log(ratingData);
-
-    fetch(
-      "https://us-central1-sherpa-dc1fe.cloudfunctions.net/tools/chat/rate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ratingData),
-      },
-    )
-      .then(function (response) {
-        if (response.ok) {
-          // Rating submitted successfully
-          // You can perform any additional actions here
-          console.log("Rating submitted successfully");
-          var ratingContainer =
-            document.getElementsByClassName("rating-container");
-          ratingContainer[0].style.display = "none";
-        } else {
-          throw new Error("Error submitting rating");
-        }
-      })
-      .catch(function (error) {
-        console.error("Error submitting rating:", error);
-      });
+  function getRandomNumber(num) {
+    return Math.floor(Math.random() * num) + 1;
   }
 });

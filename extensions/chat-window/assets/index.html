@@ -18,7 +18,11 @@
     </button>
 
     <!-- CHAT WINDOW OPENED -->
-    <div id="chat-window" style="display: none; z-index: 9001">
+    <div
+      data-shopify-domain="dummy-store-usa.myshopify.com"
+      id="chat-window"
+      style="display: none; z-index: 9001"
+    >
       <!-- CHAT HEADER -->
       <div
         class="chat-header"
@@ -109,7 +113,7 @@
             </div>
 
             <div id="email_gen" class="col" style="display: none">
-              <label htmlFor="email_optional">Customer Email (optional)</label>
+              <label htmlFor="email_optional">Customer Email</label>
               <div class="customInput">
                 <input
                   id="email_optional"
@@ -120,7 +124,7 @@
               </div>
             </div>
 
-            <div id="error_msg" style="display: block"></div>
+            <div id="precheck_error" style="display: block"></div>
 
             <div class="customInput row">
               <button id="next_stage">Next</button>
@@ -341,103 +345,5 @@
         display: block !important;
       }
     </style>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        function addOperatorMessage(response) {
-          var messageContainer = document.getElementById("messages");
-          var operatorMessage = document.createElement("div");
-          operatorMessage.className = "message message-operator";
-          operatorMessage.innerHTML =
-            '<span class="message-content">' + response + "</span>";
-          messageContainer.appendChild(operatorMessage);
-        }
-
-        function addCustomerMessage(msg) {
-          var messageContainer = document.getElementById("messages");
-          var customerMessage = document.createElement("div");
-          customerMessage.className = "message message-visitor";
-          customerMessage.innerHTML =
-            '<span class="message-content">' + msg + "</span>";
-          messageContainer.appendChild(customerMessage);
-        }
-
-        var chatId = sessionStorage.getItem("cha_uid")
-          ? sessionStorage.getItem("cha_uid")
-          : "";
-
-        console.log("[chatId]");
-        console.log(chatId);
-
-        if (chatId !== "") {
-          document.getElementById("pre_check").style.display = "none";
-          document.getElementById("CHAT").style.display = "block";
-        } else {
-          document.getElementById("pre_check").style.display = "block";
-          document.getElementById("CHAT").style.display = "none";
-        }
-
-        var store_domain = "dummy-store-usa.myshopify.com";
-        sessionStorage.setItem("shop", store_domain);
-        console.log(store_domain);
-
-        // Check for cha_uid and fetch data
-        if (chatId) {
-          var requestData = {
-            domain: store_domain,
-            chat_uuid: chatId,
-          };
-          console.log({ requestData });
-
-          // fetch(
-          //   "https://us-central1-sherpa-dc1fe.cloudfunctions.net/admin/merchant/chats",
-          //   {
-          //     method: "POST",
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //       "impowered-api-key":
-          //         "93ffea0b049a934f0751266e796d85a4827994d4427244eb7643b9b88c824863",
-          //     },
-          //     body: JSON.stringify(requestData),
-          //   },
-          // )
-          //   .then(function (response) {
-          //     if (response.ok) {
-          //       return response.json();
-          //     } else {
-          //       throw new Error("Failed to fetch data");
-          //     }
-          //   })
-          //   .then(function (data) {
-          //     console.log("Data fetched successfully:");
-          //     console.log(data.data.result);
-          //     if (
-          //       data.data.result &&
-          //       data.data.result[0] &&
-          //       data.data.result[0].chat &&
-          //       data.data.result[0].chat[0]
-          //     ) {
-          //       const chats =
-          //         data.data.result[0].chat && data.data.result[0].chat[0]
-          //           ? data.data.result[0].chat
-          //           : [];
-          //       console.log(chats);
-          //       addOperatorMessage(data.data.result[0].initial_message);
-
-          //       if (chats && chats.length > 0) {
-          //         chats.forEach(function (chat) {
-          //           // Change 'chat' to 'chats' here
-          //           addCustomerMessage(chat.customer);
-          //           addOperatorMessage(chat.agent);
-          //         });
-          //       }
-          //     }
-          //   })
-          //   .catch(function (error) {
-          //     console.error("Error fetching data:", error);
-          //   });
-        }
-      });
-    </script>
   </body>
 </html>
