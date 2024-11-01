@@ -2,12 +2,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   var live = document.querySelector(".online");
 
-  const a = getRandomNumber(5);
+  var a = getRandomNumber(5);
   live.innerHTML = `${a} Agents online`;
 
   var chat_window = document.getElementById("chat-window");
   var close_btn = document.getElementById("minimize-btn");
-  const domain = chat_window.getAttribute("data-shopify-domain");
+  var domain = chat_window.getAttribute("data-shopify-domain");
 
   storeString("domain", domain);
   var p = getItems("payload");
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return 422;
       }
 
-      for (const c of convo) {
+      for (var c of convo) {
         if (c.sender === "agent" && !c.is_note) {
           addAgentMessage(c.message);
         } else if (c.sender === "customer") {
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // * 2. NAVIGATE WINDOWS - HANDLING DATA
   // ! =============================================================
-  const issue = document.getElementById("issue");
+  var issue = document.getElementById("issue");
   if (issue) {
     issue.addEventListener("change", function () {
       var option = this.value;
@@ -255,18 +255,17 @@ document.addEventListener("DOMContentLoaded", function () {
   // * 4. FETCH & RENDER PRODUCTS
   // ! =============================================================
   async function fetchProducts(query) {
-    const domain = getString("domain");
-    const url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/products/${query}`;
-    console.log("Fetch Products:", query);
+    var domain = getString("domain");
+    var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/products/${query}`;
 
     try {
-      const response = await fetch(url);
+      var response = await fetch(url);
       if (!response.ok) {
         console.error(`Error: ${response.status} - Failed to fetch products.`);
         return [];
       }
 
-      const data = await response.json();
+      var data = await response.json();
       return data?.data?.products || [];
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -277,13 +276,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderProducts(products) {
     if (!products.length) return false;
 
-    const parentContainer = document.querySelector(
-      "#product_list .prefetchRow",
-    );
+    var parentContainer = document.querySelector("#product_list .prefetchRow");
     if (!parentContainer) return false;
 
     products.forEach((product) => {
-      const rowDiv = createProductRow(product);
+      var rowDiv = createProductRow(product);
       rowDiv.addEventListener("click", () => handleProductClick(product.id));
       parentContainer.appendChild(rowDiv);
     });
@@ -291,31 +288,42 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function createProductRow(product) {
-    const placeholder =
+    var placeholder =
       "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081";
-    const imgSrc = product.img || placeholder;
-    const statusColor =
+    var imgSrc = product.image || placeholder;
+    var statusColor =
       product.status.toLocaleLowerCase() === "active"
         ? { bg: "#AEFEBF", text: "#024B3F" }
         : { bg: "#FED1D6", text: "#8E0B21" };
 
-    const rowDiv = createElementWithAttributes("div", ["row-product"], {
+    var rowDiv = createElementWithAttributes("div", ["row-product"], {
       id: product.id || "",
     });
-    const imgDiv = createElementWithAttributes(
+
+    var stock_level =
+      product.stock_level <= 0
+        ? "out of stock"
+        : `stock level x ${product.stock_level}`;
+
+    var status =
+      product.status.toLocaleLowerCase() == "active"
+        ? "Active"
+        : "Not Available";
+
+    var imgDiv = createElementWithAttributes(
       "div",
       ["product-img"],
       {},
       `<img src="${imgSrc}" alt="product" />`,
     );
-    const txtDiv = createElementWithAttributes(
+    var txtDiv = createElementWithAttributes(
       "div",
       ["product-col", "col"],
       {},
       `<span style="font-weight: 800; font-size: 14;">${product.title}</span>
       <div class="row-order" style="padding: 10px 10px 0px 0">
-        <span style="color: ${statusColor.text}; background: ${statusColor.bg}; padding: 3px 5px; border-radius: 4px;">${product.status.toLocaleLowerCase()}</span>
-        <span>stock level x ${product.stock_level}</span>
+        <span style="color: ${statusColor.text}; background: ${statusColor.bg}; padding: 3px 5px; border-radius: 4px;">${status}</span>
+        <span style="color: ${product.stock_level <= 0 ? "#8E0B21" : ""}">${stock_level}</span>
       </div>`,
     );
 
@@ -327,7 +335,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ? Not sure what to do here
   function handleProductClick(productId) {
-    console.log("Product clicked:", productId);
     // hideAllWindows();
   }
 
@@ -357,20 +364,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  var product_list_back = document.getElementById("product_list_back");
+  if (product_list_back) {
+    product_list_back.addEventListener("click", function () {
+      hideAllWindows();
+      document.getElementById("pre_check").style.display = "block";
+    });
+  }
+
   // * 5. FETCH & RENDER ORDERS
   // ! =============================================================
   async function fetchOrders(email) {
-    const domain = getString("domain");
-    const url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/customer/${email}/orders`;
+    var domain = getString("domain");
+    var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/customer/${email}/orders`;
 
     try {
-      const response = await fetch(url);
+      var response = await fetch(url);
       if (!response.ok) {
         console.error(`Error: ${response.status} - Failed to fetch products.`);
         return [];
       }
 
-      const data = await response.json();
+      var data = await response.json();
 
       return data?.data?.orders || [];
     } catch (error) {
@@ -382,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderOrders(orders) {
     if (!orders.length) return false;
 
-    const parentContainer = document.querySelector("#order_check .prefetchRow");
+    var parentContainer = document.querySelector("#order_check .prefetchRow");
     if (!parentContainer) return false;
 
     orders.forEach((order) => {
@@ -396,7 +411,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function createOrderEl(order) {
-    const statusColor =
+    var statusColor =
       order.fulfillment_status === "FULFILLED"
         ? { bg: "#AEFEBF", text: "#024B3F" }
         : { bg: "#FED1D6", text: "#8E0B21" };
@@ -420,12 +435,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Start Chat with valid order
   async function handleOrderClick(orderID) {
-    console.log("Order clicked:", orderID);
-
-    const parent = document.querySelector("#order_check .prefetchRow");
+    var parent = document.querySelector("#order_check .prefetchRow");
     if (!parent) return false;
 
-    const n = getRandomNumber(3);
+    var n = getRandomNumber(3);
 
     parent.innerHTML = `<div class="nav-row" id="order_back"><span>back</span></div><div id="windowHdr"><span><strong>${n}</strong> Person ahead of you...</span></div>`;
 
@@ -478,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var convo = data?.data;
         if (!convo) return { agent: "", status: 422 };
 
-        for (const c of convo) {
+        for (var c of convo) {
           if (c.sender === "agent" && !c.is_note) {
             addAgentMessage(c.message);
           } else if (c.sender === "customer") {
@@ -542,20 +555,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function handleSendingMessage() {
-    console.log("timer ended");
-    const response = await sendMessage();
-    console.log({ response });
+    var response = await sendMessage();
 
     if (response) {
       addAgentMessage(response);
       operatorResponsesCount++;
       if (operatorResponsesCount == 3) {
-        console.log("ADD CHAT RATING");
         injectRating();
         setupRatingEventListeners();
       }
     }
-
     chat = "";
     message_container.removeChild(typing);
   }
@@ -563,7 +572,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function sendMessage() {
     var domain = getString("domain");
     var payload = getItems("payload");
-    console.log({ payload, domain, chat });
+
     if (!domain || !payload.email || !chat) return "";
     var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/respond/${payload.email}`;
 
@@ -574,15 +583,14 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       body: JSON.stringify({ message: chat }),
     };
-    console.log({ url, options });
 
     try {
-      const response = await fetch(url, options);
+      var response = await fetch(url, options);
       if (!response.ok) {
-        console.error(`Error: ${response.status} - Failed to fetch products.`);
+        console.error(`Error: ${response.status} - Failed To Send message.`);
         return "";
       }
-      const data = await response.json();
+      var data = await response.json();
       return data?.data?.response || "";
     } catch (error) {
       console.error("Error getting response:", error);
@@ -611,13 +619,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function rateChat(event) {
+    var ratingContainer = document.getElementsByClassName("rating-container");
+    ratingContainer[0].style.display = "none";
+
     var rating_span = event.currentTarget;
     var rating_id = rating_span.id.toLocaleLowerCase();
-    console.log(rating_id);
 
     var domain = getString("domain");
     var payload = getItems("payload");
-    console.log({ payload, domain, chat });
+
     if (!domain || !payload.email || !rating_id) return "";
     var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/store/${domain}/chats/${payload.email}/rate?rating=${rating_id}`;
 
@@ -627,18 +637,15 @@ document.addEventListener("DOMContentLoaded", function () {
         "Content-Type": "application/json",
       },
     };
-    console.log({ url, options });
 
     try {
-      const response = await fetch(url, options);
+      var response = await fetch(url, options);
       if (!response.ok) {
         console.error(`Error: ${response.status} - Failed to fetch products.`);
         return "";
       }
 
       console.log("Rating submitted successfully");
-      var ratingContainer = document.getElementsByClassName("rating-container");
-      ratingContainer[0].style.display = "none";
     } catch (error) {
       console.error("Error getting response:", error);
       return "";
@@ -653,7 +660,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var msg_container = document.getElementById("messages");
     var agent = document.createElement("div");
     agent.className = "message message-operator";
-    agent.innerHTML = `<span class="message-content">${response}</span>`;
+    agent.innerHTML = `<span class="message-content">${marked.parse(response)}</span>`;
     msg_container.appendChild(agent);
   }
 
@@ -662,7 +669,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var container = document.getElementById("messages");
     var message = document.createElement("div");
     message.className = "message message-visitor";
-    message.innerHTML = `<span class="message-content" style="color: #f7f7f7">${msg}</span>`;
+    message.innerHTML = `<span class="message-content" style="color: #f7f7f7"><p>${msg}</p></span>`;
     container.appendChild(message);
   }
 
@@ -703,9 +710,9 @@ document.addEventListener("DOMContentLoaded", function () {
     attributes = {},
     innerHTML = "",
   ) {
-    const element = document.createElement(tag);
+    var element = document.createElement(tag);
     if (classNames.length) element.classList.add(...classNames);
-    for (const [key, value] of Object.entries(attributes)) {
+    for (var [key, value] of Object.entries(attributes)) {
       element.setAttribute(key, value);
     }
     element.innerHTML = innerHTML;
@@ -714,7 +721,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Validate Emails
   function isValidEmail(email) {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   }
 
@@ -733,7 +740,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getItems(key) {
     if (typeof window !== "undefined") {
-      const value = window.localStorage.getItem(key);
+      var value = window.localStorage.getItem(key);
       return JSON.parse(value);
     }
     return null; // Handle cases where window is not defined
@@ -741,7 +748,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getString(key) {
     if (typeof window !== "undefined") {
-      const value = window.localStorage.getItem(key);
+      var value = window.localStorage.getItem(key);
       return value;
     }
     return null;
@@ -757,14 +764,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Formatters
   function extractNumbers(str) {
     const numbers = str.match(/\d+/g);
-    return numbers ? numbers.map(Number) : [];
+    return numbers ? numbers.join("") : "";
   }
 
   function capitalizeWords(str) {
-    const words = str.replaceAll("_", " ").split(" ");
+    var words = str.replaceAll("_", " ").split(" ");
 
     let word = "";
-    for (const w of words) {
+    for (var w of words) {
       word += w.charAt(0).toLocaleUpperCase() + w.substring(1) + " ";
     }
 

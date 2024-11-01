@@ -28,6 +28,28 @@
         class="chat-header"
         style="background: linear-gradient(135deg, black 0%, black 100%)"
       >
+        <!-- <div class="moreWrapper">
+          <div>
+            <span>End Chat</span>
+            <svg
+              class="w-6 h-6 text-gray-800 dark:text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+          </div>
+        </div> -->
         <div
           style="
             display: flex;
@@ -70,6 +92,30 @@
                 ></path>
               </svg>
             </button>
+            <!-- <button
+              id="more"
+              class="material-icons exit-chat"
+              type="button"
+              aria-label="Minimize"
+            >
+              <svg
+                class="w-6 h-6 text-gray-800 dark:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.2"
+                  d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+            </button> -->
           </div>
         </div>
         <div class="offline-message">
@@ -168,6 +214,9 @@
       <div id="product_list" style="display: none">
         <div id="precheck-group">
           <div class="prefetchRow">
+            <div class="nav-row" id="product_list_back">
+              <span>back</span>
+            </div>
             <div id="error_msg" style="display: block"></div>
           </div>
         </div>
@@ -345,5 +394,7 @@
         display: block !important;
       }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   </body>
 </html>

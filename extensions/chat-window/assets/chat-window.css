@@ -40,6 +40,47 @@
   }
 }
 
+/* .moreWrapper {
+  display: flex;
+  position: absolute;
+  bottom: -20px;
+  right: 0;
+  width: 200px;
+  height: 100px;
+  background-color: #161616;
+  padding: 0;
+  margin: 0;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  z-index: 100;
+  border-radius: 5px;
+}
+
+.moreWrapper > div {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding: 10px 15px;
+  box-sizing: border-box;
+  margin: 0;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #4d4d4d;
+}
+.moreWrapper > div:hover {
+  background-color: #000000;
+  cursor: pointer;
+}
+.moreWrapper > div > span {
+  font-size: 16px;
+  line-height: 15px;
+  font-family: sans-serif;
+  font-weight: 500;
+} */
+
 button[is="closed-window"] {
   position: fixed;
   bottom: 0px;
@@ -125,6 +166,7 @@ canvas:empty {
 #chat-window h2 {
   font-size: 22px;
   font-weight: 600;
+  font-family: sans-serif;
   color: currentcolor;
   margin: 4px 0px 0px;
   padding: 0px;
@@ -135,7 +177,6 @@ canvas:empty {
   white-space: nowrap;
   overflow: hidden;
   vertical-align: bottom;
-  font-family: sans-serif;
 }
 
 #chat-window h2 .top-heading {
@@ -372,7 +413,7 @@ hr {
 
 textarea {
   border: 0px;
-  min-width: 300px;
+  min-width: 275px;
   width: auto;
   font-size: 17px;
   padding: 20px 0px 14px;
@@ -721,6 +762,37 @@ textarea:focus-visible {
   line-height: 13px;
 }
 
+.message-content {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-content p,
+.message-content ul,
+.message-content ul li {
+  font-size: 13px;
+  font-weight: 450;
+  font-family: sans-serif;
+  line-height: 20px;
+  margin: 0;
+}
+
+.message-content ul {
+  margin: 0;
+  display: table;
+}
+
+.message-content ul li {
+  margin: 5px 0;
+}
+
+.message-content p {
+  margin: 5px 0;
+}
+
 .prefetchRow {
   cursor: pointer;
   position: relative;
@@ -855,6 +927,7 @@ textarea:focus-visible {
   font-size: 13px;
   font-family: sans-serif;
   font-weight: 550;
+  width: 100%;
 }
 
 .rating-item {
