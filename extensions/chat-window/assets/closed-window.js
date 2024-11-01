@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var chat_window = document.getElementById("chat-window");
   var close_btn = document.getElementById("minimize-btn");
 
+  // * 1. TOGGLE OPEN & CLOSE CHAT WINDOW
+  // ! =============================================================
   var initial_chat = document.getElementById("closed-window");
   if (initial_chat) {
     initial_chat.addEventListener("click", function () {
@@ -16,6 +18,24 @@ document.addEventListener("DOMContentLoaded", function () {
     close_btn.addEventListener("click", function () {
       initial_chat.style.display = "block";
       chat_window.style.display = "none";
+    });
+  }
+
+  // * 2. NAVIGATE WINDOWS - HANDLING DATA
+  // ! =============================================================
+  const issue = document.getElementById("issue");
+  if (issue) {
+    issue.addEventListener("change", function () {
+      var option = this.value;
+      if (option == "GENERAL") {
+        document.getElementById("email_gen").style.display = "block";
+        document.getElementById("start_chat").style.display = "block";
+        document.getElementById("next_stage").style.display = "none";
+      } else {
+        document.getElementById("email_gen").style.display = "none";
+        document.getElementById("start_chat").style.display = "none";
+        document.getElementById("next_stage").style.display = "block";
+      }
     });
   }
 
@@ -33,41 +53,117 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("customer_check").style.display = "block";
       }
 
-      storeItems("payload", { issue, specific_issue });
-      console.log("Selected Issue:", issue);
-      console.log("Specific Issue:", specific_issue);
+      storeItems("payload", {
+        issue: issue.toLocaleLowerCase(),
+        specific_issue,
+      });
+    });
+  }
+
+  // * 3. INITIATE SERVER REQUESTS - Buttons
+  // ! =============================================================
+  var start_chat = document.getElementById("start_chat");
+  if (start_chat) {
+    // Start chat with AI Agent (if issue == general)
+    start_chat.addEventListener("click", function () {
+      var issue = document.getElementById("issue").value;
+      var specific_issue = document.getElementById("specific_issue").value;
+      var email = document.getElementById("email_optional").value;
+
+      if (!issue) return;
+      hideAllWindows();
+      document.getElementById("chat_window").style.display = "block";
+
+      // start chat
+    });
+  }
+
+  var customer_btn = document.getElementById("customer_btn");
+  if (customer_btn) {
+    // Fetch Valid Customer orders
+    customer_btn.addEventListener("click", async function () {
+      var email = document.getElementById("email_input").value;
+      toggleLoading(customer_btn, true);
+
+      if (!email) {
+        toggleLoading(customer_btn, false);
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        toggleLoading(customer_btn, false);
+        var errorMsg = document.getElementById("customer_error");
+        errorMsg.innerHTML = "<span>VALID EMAIL REQUREID.</span>";
+      }
+
+      var payload = getItems("payload");
+      if (!payload) {
+        hideAllWindows();
+        document.getElementById("pre_check").style.display = "block";
+        return;
+      }
+      storeItems("payload", { ...payload, email: email });
+
+      var orders = await fetchOrders(email);
+
+      if (!orders.length) {
+        var errorMsg = document.getElementById("customer_error");
+        errorMsg.innerHTML = "<span>NO ORDERS FOUND. TRY ANOTHER EMAIL.</span>";
+
+        toggleLoading(customer_btn, false);
+        return;
+      }
+      renderOrders(orders);
+
+      hideAllWindows();
+      document.getElementById("order_check").style.display = "block";
+
+      toggleLoading(customer_btn, false);
     });
   }
 
   var product_btn = document.getElementById("product_btn");
   if (product_btn) {
+    // Fetch Products (if available)
     product_btn.addEventListener("click", async function () {
       var query = document.getElementById("product_search").value;
-      product_btn.innerHTML = "Fetching Product";
-      product_btn.className = "loading_btn";
-      product_btn.disabled = true;
+      toggleLoading(product_btn, true);
 
-      if (!query) return;
+      if (!query) {
+        toggleLoading(product_btn, false);
+        return;
+      }
 
-      var result = await fetchProducts(query);
-      console.log({ result });
+      var products = await fetchProducts(query);
+
+      if (!products.length) {
+        var errorMsg = document.getElementById("product_error");
+        errorMsg.innerHTML = "<span>NO PRODUCTS FOUND. TRY AGAIN.</span>";
+
+        toggleLoading(product_btn, false);
+        return;
+      }
+      renderProducts(products);
 
       hideAllWindows();
       document.getElementById("product_list").style.display = "block";
 
-      console.log("Product Query:", query);
+      toggleLoading(product_btn, false);
     });
   }
 
+  // * 4. FETCH & RENDER PRODUCTS
+  // ! =============================================================
   async function fetchProducts(query) {
-    const url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${this.domain}/products/${query}`;
+    const domain = "dummy-store-usa.myshopify.com";
+    const url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/products/${query}`;
     console.log("Fetch Products:", query);
 
     try {
       const response = await fetch(url);
       if (!response.ok) {
         console.error(`Error: ${response.status} - Failed to fetch products.`);
-        return false;
+        return [];
       }
 
       const data = await response.json();
@@ -79,13 +175,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderProducts(products) {
-    if (!products.length) return;
+    if (!products.length) return false;
+
+    const parentContainer = document.querySelector(
+      "#product_list .prefetchRow",
+    );
+    if (!parentContainer) return false;
 
     products.forEach((product) => {
       const rowDiv = createProductRow(product);
       rowDiv.addEventListener("click", () => handleProductClick(product.id));
-      this.parentContainer.appendChild(rowDiv);
+      parentContainer.appendChild(rowDiv);
     });
+    return true;
   }
 
   function createProductRow(product) {
@@ -123,483 +225,222 @@ document.addEventListener("DOMContentLoaded", function () {
     return rowDiv;
   }
 
+  // ? Not sure what to do here
   function handleProductClick(productId) {
     console.log("Product clicked:", productId);
-    hideAllWindows();
+    // hideAllWindows();
   }
 
-  async function fetchProducts(query) {
-    console.log("Fetch Products:", query);
-    const domain = "dummy-store-usa.myshopify.com";
-    const url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/products/${query}`;
-
-    try {
-      const response = await fetch(url);
-      console.log(response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        const products = data.data.products;
-
-        const parentContainer = document.querySelector(
-          "#product_list .prefetchRow",
-        );
-        if (!parentContainer || !products) return false;
-
-        console.log({ products });
-
-        products.forEach((product) => {
-          const rowDiv = document.createElement("div");
-          rowDiv.classList.add("row-product");
-          rowDiv.id = `${product.id || ""}`;
-
-          const placeholder =
-            "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081";
-
-          // Image container
-          const imgDiv = document.createElement("div");
-          imgDiv.classList.add("product-img");
-          imgDiv.innerHTML = `<img src="${product.img || placeholder}" alt="product" />`;
-
-          var bkg =
-            product.status.toLocaleLowerCase() == "active"
-              ? "#AEFEBF"
-              : "#FED1D6";
-          var color =
-            product.status.toLocaleLowerCase() == "active"
-              ? "#024B3F"
-              : "#8E0B21";
-
-          const txtDiv = document.createElement("div");
-          txtDiv.classList.add("product-col", "col");
-          txtDiv.innerHTML = `
-            <span style="font-weight: 800; font-size: 14;">${product.title}</span>
-            <div class="row-order" style="padding: 10px 10px 0px 0">
-              <span style="
-                color: ${color};
-                background: ${bkg};
-                padding: 3px 5px;
-                border-radius: 4px;">${product.status.toLocaleLowerCase()}</span>
-              <span>stock level x ${product.stock_level}</span>
-            </div>`;
-
-          rowDiv.appendChild(imgDiv);
-          rowDiv.appendChild(txtDiv);
-
-          rowDiv.addEventListener("click", function () {
-            console.log("clicked");
-            console.log(this.id);
-            hideAllWindows();
-            // document.getElementById("chat_window").style.display = "block";
-          });
-
-          parentContainer.appendChild(rowDiv);
-        });
-        return true;
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-    return false;
-  }
-
-  var customer_btn = document.getElementById("customer_btn");
-  if (customer_btn) {
-    customer_btn.addEventListener("click", function () {
-      var email = document.getElementById("email_input").value;
-
+  // * 4. NAVIGATE WINDOWS - GO BACK
+  // ! =============================================================
+  var customer_back = document.getElementById("customer_back");
+  if (customer_back) {
+    customer_back.addEventListener("click", function () {
       hideAllWindows();
-      document.getElementById("order_check").style.display = "block";
-      loadOrders();
-
-      console.log("Customer Email:", email);
+      document.getElementById("pre_check").style.display = "block";
     });
   }
 
-  async function loadOrders() {
+  var order_back = document.getElementById("order_back");
+  if (order_back) {
+    order_back.addEventListener("click", function () {
+      hideAllWindows();
+      document.getElementById("customer_check").style.display = "block";
+    });
+  }
+
+  var product_back = document.getElementById("product_back");
+  if (product_back) {
+    product_back.addEventListener("click", function () {
+      hideAllWindows();
+      document.getElementById("pre_check").style.display = "block";
+    });
+  }
+
+  // * 5. FETCH & RENDER ORDERS
+  // ! =============================================================
+  async function fetchOrders(email) {
+    const domain = "dummy-store-usa.myshopify.com";
+    const url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/customer/${email}/orders`;
+
     try {
-      //   // Fetch data (replace with your actual API endpoint)
-      //   const response = await fetch("https://api.example.com/orders");
-      //   const orders = await response.json();
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - Failed to fetch products.`);
+        return [];
+      }
 
-      const parentContainer = document.querySelector(
-        "#order_check .prefetchRow",
-      );
-      product_list;
+      const data = await response.json();
 
-      var orders = [
-        {
-          order_number: 1234,
-          fulfillment_status: "hold",
-          tracking_url: "",
-          total_price: "49.00",
-        },
-      ];
-
-      orders.forEach((order) => {
-        var colDiv = document.createElement("div");
-        colDiv.classList.add("col", "col-order");
-
-        var rowDiv1 = document.createElement("div");
-        rowDiv1.classList.add("row", "row-order");
-        rowDiv1.innerHTML = `<span>#${order.order_number}</span><span>${order.fulfillment_status}</span>`;
-
-        var rowDiv2 = document.createElement("div");
-        rowDiv2.classList.add("row", "row-order");
-        rowDiv2.innerHTML = `<span>Tracking: <a href="#">${order.tracking_url}</a></span><span>$${order.total_price}</span>`;
-
-        colDiv.appendChild(rowDiv1);
-        colDiv.appendChild(rowDiv2);
-
-        colDiv.addEventListener("click", function () {
-          console.log("clicked");
-          hideAllWindows();
-          document.getElementById("chat_window").style.display = "block";
-        });
-
-        parentContainer.appendChild(colDiv);
-      });
+      return data?.data?.orders || [];
     } catch (error) {
-      console.error("Error loading orders:", error);
+      console.error("Error fetching products:", error);
+      return [];
     }
   }
 
-  function hideAllWindows() {
-    document.getElementById("pre_check").style.display = "none";
-    document.getElementById("product_check").style.display = "none";
-    document.getElementById("product_list").style.display = "none";
-    document.getElementById("customer_check").style.display = "none";
-    document.getElementById("order_check").style.display = "none";
+  function renderOrders(orders) {
+    if (!orders.length) return false;
+
+    const parentContainer = document.querySelector("#order_check .prefetchRow");
+    if (!parentContainer) return false;
+
+    orders.forEach((order) => {
+      var colDiv = createOrderEl(order);
+      colDiv.addEventListener("click", async function () {
+        await handleOrderClick(order.id);
+      });
+      parentContainer.appendChild(colDiv);
+    });
+    return true;
   }
 
-  function extractNumbersFromString(inputString) {
-    return inputString.replace(/[^0-9]/g, "");
+  function createOrderEl(order) {
+    const statusColor =
+      order.fulfillment_status === "FULFILLED"
+        ? { bg: "#AEFEBF", text: "#024B3F" }
+        : { bg: "#FED1D6", text: "#8E0B21" };
+
+    var colDiv = document.createElement("div");
+    colDiv.classList.add("col", "col-order");
+
+    var rowDiv1 = document.createElement("div");
+    rowDiv1.classList.add("row", "row-order");
+    rowDiv1.innerHTML = `<span>${order.order_number}</span><span style="color: ${statusColor.text}; background: ${statusColor.bg}; padding: 3px 5px; border-radius: 4px;">${capitalizeWords(order.fulfillment_status.toLocaleLowerCase())}</span>`;
+
+    var rowDiv2 = document.createElement("div");
+    rowDiv2.classList.add("row", "row-order");
+    rowDiv2.innerHTML = `<span>Tracking: <a href="${order.tracking_url || "#"}">${order.tracking_url ? extractNumbers(order.tracking_url) : "no tracking"}</a></span><span>$${order.current_total_price}</span>`;
+
+    colDiv.appendChild(rowDiv1);
+    colDiv.appendChild(rowDiv2);
+
+    return colDiv;
   }
 
-  function isValidEmail(email) {
-    var emailRegex = /^\S+@\S+\.\S+$/;
-    return emailRegex.test(email);
-  }
+  // Start Chat with valid order
+  async function handleOrderClick(orderID) {
+    console.log("Order clicked:", orderID);
 
-  function addOperatorMessage(response) {
-    var messageContainer = document.getElementById("messages");
-    var operatorMessage = document.createElement("div");
-    operatorMessage.className = "message message-operator";
-    operatorMessage.innerHTML =
-      '<span class="message-content">' + response + "</span>";
-    messageContainer.appendChild(operatorMessage);
-  }
+    const parent = document.querySelector("#order_check .prefetchRow");
+    if (!parent) return false;
 
-  function storeItems(key, value) {
-    if (typeof window !== "undefined") {
-      console.log("STORING");
-      window.localStorage.setItem(key, JSON.stringify(value));
+    parent.innerHTML = `<div class="nav-row" id="order_back"><span>back</span></div><div id="windowHdr"><span><strong>1</strong> Person ahead of you...</span></div>`;
+
+    var payload = getItems("payload");
+    if (!payload) {
+      hideAllWindows();
+      document.getElementById("pre_check").style.display = "block";
+      return false;
     }
+    storeItems("payload", { ...payload, order_id: orderID });
+
+    var result = await startChat();
+    if (result.status > 300) return false;
+
+    if (result.status == 200) {
+      addAgentMessage(result.agent);
+    }
+
+    hideAllWindows();
+    document.getElementById("chat_window").style.display = "block";
   }
 
-  function getItems(key) {
-    if (typeof window !== "undefined") {
-      const value = window.localStorage.getItem(key);
-      return JSON.parse(value);
+  // * 6. START CHAT WITH AGENT (email & order)
+  // ! =============================================================
+  async function startChat() {
+    var payload = getItems("payload");
+    if (!payload) {
+      hideAllWindows();
+      document.getElementById("pre_check").style.display = "block";
+      return { agent: "", status: 500 };
     }
-    return null; // Handle cases where window is not defined
-  }
-});
-
-// var issue_select = document.getElementById("issue");
-// if (issue_select) {
-//   issue_select.addEventListener("change", function () {
-//     var option = this.value;
-//     if (option == "GENERAL") {
-//       orderContainer.style.display = "none";
-//     } else {
-//       emailContainer.style.display = "block";
-//       orderContainer.style.display = "block";
-//     }
-//     console.log(option);
-//   });
-// }
-
-// Prefetch Data
-document.addEventListener("DOMContentLoaded", function () {
-  var prefetchBtn = document.getElementById("prefetch_btn");
-  var prefetchWinow = document.getElementById("pre_check");
-  var chatWindow = document.getElementById("CHAT");
-
-  // Inputs
-  var emailInput = document.getElementById("emailInput");
-  var orderInput = document.getElementById("orderInput");
-
-  var queue = document.getElementById("queue");
-  var issueSelect = document.getElementById("issue");
-
-  prefetchBtn.addEventListener("click", function () {
-    prefetchBtn.disabled = true; // Disable the button
-    prefetchBtn.className = "loading_btn";
-    prefetchBtn.innerHTML = "Waiting for Agent"; // Display "loading" text
-    var issue = issueSelect.value;
-
-    var email = emailInput.value.trim();
-    if ((email !== "" && isValidEmail(email)) || issue == "GENERAL") {
-      var order_number = orderInput.value.trim();
-      var shop = sessionStorage.getItem("shop");
-
-      queue.innerHTML =
-        '<span style="color:#000; margin-left: 1rem;">' +
-        "<strong>1</strong> Person ahead of you..." +
-        "</span>";
-      setTimeout(async () => {
-        await verifyData(
-          email,
-          extractNumbersFromString(order_number),
-          shop,
-          issue,
-        );
-      }, 3000);
-    } else {
-      email.value = "";
-
-      prefetchBtn.disabled = false;
-      prefetchBtn.innerHTML = "Submit";
-      var errorMsg = document.getElementById("error_msg");
-      errorMsg.innerHTML =
-        '<span style="color:red;">' +
-        "VALID EMAIL USED FOR ORDER REQUIRED" +
-        "</span>";
-      errorMsg.classList.add("fade-out");
-      setTimeout(function () {
-        errorMsg.classList.remove("fade-out");
-        errorMsg.innerHTML = "";
-      }, 3000);
-    }
-  });
-
-  async function verifyData(email, order_number, shop, issue) {
-    console.log({ order_number });
-
-    // modified the links for prod
-    var url =
-      "https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/initialize";
-    var data = {
-      email,
-      order_number: order_number ?? "",
-      domain: shop,
-      issue: issue,
-    };
-
+    var domain = "dummy-store-usa.myshopify.com";
+    var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/initiate/${payload.email}`;
     var options = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat: payload }),
     };
 
     try {
-      const response = await fetch(url, options);
-
-      if (response.status === 422) {
-        var errorMsg = document.getElementById("error_msg");
-        errorMsg.innerHTML =
-          '<span style="color:red; font-size: 2.6vh;">' +
-          "A valid customer email is required." +
-          "</span>";
-        errorMsg.classList.add("fade-out");
-        setTimeout(function () {
-          errorMsg.classList.remove("fade-out");
-          errorMsg.innerHTML = "";
-        }, 5000);
-        email.value = "";
-        order_number.value = "";
-        prefetchBtn.disabled = false;
-        prefetchBtn.className = "";
-        prefetchBtn.innerHTML = "Submit";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        return;
-      } else if (response.status === 500) {
-        var errorMsg = document.getElementById("error_msg");
-        errorMsg.innerHTML =
-          '<span style="color:red; font-size: 2.6vh;">' +
-          "Uh Oh, contact the merchant via email" +
-          "</span>";
-        errorMsg.classList.add("fade-out");
-        setTimeout(function () {
-          errorMsg.classList.remove("fade-out");
-          errorMsg.innerHTML = "";
-        }, 5000);
-        email.value = "";
-        order_number.value = "";
-        prefetchBtn.disabled = false;
-        prefetchBtn.className = "";
-        prefetchBtn.innerHTML = "Submit";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        return;
-      } else if (response.status === 409) {
-        var errorMsg = document.getElementById("error_msg");
-        errorMsg.innerHTML =
-          '<span style="color:red; font-size: 2.6vh;">' +
-          "Customer email <strong>must</strong> match order Email" +
-          "</span>";
-        errorMsg.classList.add("fade-out");
-        setTimeout(function () {
-          errorMsg.classList.remove("fade-out");
-          errorMsg.innerHTML = "";
-        }, 5000);
-        email.value = "";
-        order_number.value = "";
-        prefetchBtn.disabled = false;
-        prefetchBtn.className = "";
-        prefetchBtn.innerHTML = "Submit";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        return;
-      } else if (response.status === 403) {
-        var errorMsg = document.getElementById("error_msg");
-        errorMsg.innerHTML =
-          '<span style="color:red; font-size: 2.6vh;">' +
-          "Customer email <strong>must</strong> match order Email" +
-          "</span>";
-        errorMsg.classList.add("fade-out");
-        setTimeout(function () {
-          errorMsg.classList.remove("fade-out");
-          errorMsg.innerHTML = "";
-        }, 5000);
-        email.value = "";
-        order_number.value = "";
-        prefetchBtn.disabled = false;
-        prefetchBtn.className = "";
-        prefetchBtn.innerHTML = "Submit";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        alert("Agents not available at the moment.");
-        return;
-      } else if (response.status === 429) {
-        var errorMsg = document.getElementById("error_msg");
-        errorMsg.innerHTML =
-          '<span style="color:red; font-size: 2.6vh;">' +
-          "Merchant Needs To Pay for Service." +
-          "</span>";
-        errorMsg.classList.add("fade-out");
-        setTimeout(function () {
-          errorMsg.classList.remove("fade-out");
-          errorMsg.innerHTML = "";
-        }, 5000);
-        email.value = "";
-        order_number.value = "";
-        prefetchBtn.disabled = false;
-        prefetchBtn.className = "";
-        prefetchBtn.innerHTML = "Submit";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        return;
-      } else if (response.ok) {
-        email.value = "";
-        order_number.value = "";
-        prefetchBtn.disabled = false;
-        prefetchBtn.className = "";
-        prefetchBtn.innerHTML = "Submit";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        const data = await response.json();
-        console.log(data);
-
-        sessionStorage.setItem("cha_uid", data.data.cha_uid);
-        sessionStorage.setItem("access_token", data.data.access_token);
-        console.log(sessionStorage.getItem("cha_uid"));
-        console.log(sessionStorage.getItem("access_token"));
-
-        prefetchWinow.style.display = "none";
-        chatWindow.style.display = "block";
-        addOperatorMessage(data.data.agents_init_message);
-      } else {
-        email.value = "";
-        order_number.value = "";
-        queue.innerHTML =
-          '<span style="color:#000; margin-left: 1rem;">' + "</span>";
-        prefetchBtn.disabled = false;
-        prefetchBtn.innerHTML = "Submit";
-        prefetchBtn.className = "";
-        alert("Agents not available at the moment.");
+      var response = await fetch(url, options);
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - Failed to fetch products.`);
+        return { agent: "", status: response.status };
       }
-    } catch (error) {
-      console.log("[error");
-      console.log(error);
-      email.value = "";
-      order_number.value = "";
-      queue.innerHTML =
-        '<span style="color:#000; margin-left: 1rem;">' + "</span>";
 
-      prefetchBtn.disabled = false;
-      prefetchBtn.innerHTML = "Submit";
-      var errorMsg = document.getElementById("error_msg");
-      errorMsg.innerHTML =
-        '<span style="color:red; font-size: 2.6vh;">' +
-        "Try Again Later. No Reps are available." +
-        "</span>";
-      errorMsg.classList.add("fade-out");
-      setTimeout(function () {
-        errorMsg.classList.remove("fade-out");
-        errorMsg.innerHTML = "";
-      }, 5000);
-      alert("Agents not available at the moment.");
+      var data = await response.json();
+
+      if (response.status == 201) {
+        var convo = data?.data;
+        if (!convo) return { agent: "", status: 422 };
+
+        for (const c of convo) {
+          if (c.sender === "agent" && !c.is_note) {
+            addAgentMessage(c.message);
+          } else if (c.sender === "customer") {
+            console.log("CUSTOMER");
+          }
+        }
+        return { agent: "", status: 201 };
+      }
+
+      return { agent: data?.data?.message || "", status: 200 };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { agent: "", status: 500 };
     }
   }
-});
 
-// Talk with the Agent
-document.addEventListener("DOMContentLoaded", function () {
-  var sendButton = document.getElementById("button");
+  // * 7. SUBMIT CUSTOMER
+  // ! =============================================================
+  var send_btn = document.getElementById("customer_submit");
+  if (send_btn) {
+    send_btn.addEventListener("click", submitMessage);
+  }
+
   var textarea = document.getElementById("new-message-textarea");
-  var cus_chat = "";
-  var responseTimeout;
-  var typingTimeout;
-  var typingIndicator = createTypingIndicator();
-  var operatorResponsesCount = 0;
+  if (textarea) {
+    textarea.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        submitMessage();
+      }
+    });
+  }
 
+  var chat = "";
+  var response_timeout;
+  var typing_timeout;
+  var typing = createTypingIndicator();
   function submitMessage() {
-    var messageText = textarea.value.trim();
-    cus_chat = cus_chat + " " + messageText;
+    var message = textarea.value.trim();
+    chat = chat + " " + message;
 
-    if (messageText !== "") {
-      addCustomerMessage(messageText);
+    if (message !== "") {
+      addCustomerMessage(message);
       textarea.value = "";
-      console.log("chat started");
 
-      clearTimeout(responseTimeout);
-      clearTimeout(typingTimeout);
+      clearTimeout(response_timeout);
+      clearTimeout(typing_timeout);
 
-      typingTimeout = setTimeout(() => {
-        // Add typing indicator
-        var messageContainer = document.getElementById("messages");
-        messageContainer.appendChild(typingIndicator);
+      typing_timeout = setTimeout(() => {
+        var message_container = document.getElementById("messages");
+        message_container.appendChild(typing);
       }, 15000);
 
-      responseTimeout = setTimeout(() => {
+      response_timeout = setTimeout(() => {
         console.log("timer ended");
-        const shop = sessionStorage.getItem("shop");
-        const cha_uid = sessionStorage.getItem("cha_uid");
-
-        console.log(shop);
-        console.log(cha_uid);
-        console.log(cus_chat);
-
-        sendMessage(cus_chat, shop, cha_uid);
-        cus_chat = "";
+        const payload = getItems("payload");
+        console.log(payload);
+        // sendMessage
+        chat = "";
       }, 30000);
     }
   }
 
-  sendButton.addEventListener("click", submitMessage);
-
-  textarea.addEventListener("keydown", function (event) {
-    if (event.key === "Enter" && !event.shiftKey) {
-      submitMessage();
-      event.preventDefault();
-    }
-  });
-
+  var operatorResponsesCount = 0;
   function sendMessage(message, shop, cha_uid) {
     // modified the links for prod
     var url =
@@ -645,24 +486,101 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  function addOperatorMessage(response) {
-    var messageContainer = document.getElementById("messages");
-    var operatorMessage = document.createElement("div");
-    operatorMessage.className = "message message-operator";
-    operatorMessage.innerHTML =
-      '<span class="message-content">' + response + "</span>";
-    messageContainer.appendChild(operatorMessage);
+  // * 8. HELPERS - UI/Storage/Formatting
+  // ! =============================================================
+
+  function hideAllWindows() {
+    document.getElementById("pre_check").style.display = "none";
+    document.getElementById("product_check").style.display = "none";
+    document.getElementById("product_list").style.display = "none";
+    document.getElementById("customer_check").style.display = "none";
+    document.getElementById("order_check").style.display = "none";
   }
 
+  function toggleLoading(el, loading) {
+    if (loading) {
+      el.innerHTML = "loading...";
+      el.className = "loading_btn";
+      el.disabled = true;
+    } else {
+      el.innerHTML = "Fetch Product";
+      el.classList.remove("loading_btn");
+      el.disabled = false;
+    }
+  }
+
+  function createElementWithAttributes(
+    tag,
+    classNames = [],
+    attributes = {},
+    innerHTML = "",
+  ) {
+    const element = document.createElement(tag);
+    if (classNames.length) element.classList.add(...classNames);
+    for (const [key, value] of Object.entries(attributes)) {
+      element.setAttribute(key, value);
+    }
+    element.innerHTML = innerHTML;
+    return element;
+  }
+
+  // Validate Emails
+  function isValidEmail(email) {
+    var emailRegex = /^\S+@\S+\.\S+$/;
+    return emailRegex.test(email);
+  }
+
+  // Local Storage
+  function storeItems(key, value) {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    }
+  }
+
+  function getItems(key) {
+    if (typeof window !== "undefined") {
+      const value = window.localStorage.getItem(key);
+      return JSON.parse(value);
+    }
+    return null; // Handle cases where window is not defined
+  }
+
+  // Formatters
+  function extractNumbers(str) {
+    const numbers = str.match(/\d+/g);
+    return numbers ? numbers.map(Number) : [];
+  }
+
+  function capitalizeWords(str) {
+    const words = str.replaceAll("_", " ").split(" ");
+
+    let word = "";
+    for (const w of words) {
+      word += w.charAt(0).toLocaleUpperCase() + w.substring(1) + " ";
+    }
+
+    return word;
+  }
+
+  // Add Messages - Agent Response
+  function addAgentMessage(response) {
+    var msg_container = document.getElementById("messages");
+    var agent = document.createElement("div");
+    agent.className = "message message-operator";
+    agent.innerHTML = `<span class="message-content">${response}</span>`;
+    msg_container.appendChild(agent);
+  }
+
+  // Add Messages - Customer Response
   function addCustomerMessage(msg) {
-    var messageContainer = document.getElementById("messages");
-    var customerMessage = document.createElement("div");
-    customerMessage.className = "message message-visitor";
-    customerMessage.innerHTML =
-      '<span class="message-content">' + msg + "</span>";
-    messageContainer.appendChild(customerMessage);
+    var container = document.getElementById("messages");
+    var message = document.createElement("div");
+    message.className = "message message-visitor";
+    message.innerHTML = `<span class="message-content">${msg}</span>`;
+    container.appendChild(message);
   }
 
+  // Typing Indicator
   function createTypingIndicator() {
     var typingIndicator = document.createElement("div");
     typingIndicator.className = "message message-operator typing-indicator";

@@ -108,10 +108,25 @@
               </div>
             </div>
 
+            <div id="email_gen" class="col" style="display: none">
+              <label htmlFor="email_optional">Customer Email (optional)</label>
+              <div class="customInput">
+                <input
+                  id="email_optional"
+                  placeholder="john@email.com"
+                  name="email_optional"
+                  type="email"
+                />
+              </div>
+            </div>
+
             <div id="error_msg" style="display: block"></div>
 
             <div class="customInput row">
               <button id="next_stage">Next</button>
+            </div>
+            <div class="customInput row">
+              <button id="start_chat" style="display: none">Start Chat</button>
             </div>
           </div>
         </div>
@@ -121,6 +136,9 @@
       <div id="product_check" style="display: none">
         <div id="precheck-group">
           <div class="prefetchRow">
+            <div class="nav-row" id="product_back">
+              <span>back</span>
+            </div>
             <div id="orderContainer" class="col">
               <label htmlFor="product_search">Product Search</label>
               <div class="customInput">
@@ -133,7 +151,7 @@
               </div>
             </div>
 
-            <div id="error_msg" style="display: block"></div>
+            <div id="product_error" style="display: block"></div>
 
             <div class="customInput row">
               <button id="product_btn">Next</button>
@@ -142,7 +160,7 @@
         </div>
       </div>
 
-      <!-- ORDER CHECK WINDOW -->
+      <!-- PRODUCT CHECK WINDOW -->
       <div id="product_list" style="display: none">
         <div id="precheck-group">
           <div class="prefetchRow">
@@ -155,6 +173,9 @@
       <div id="customer_check" style="display: none">
         <div id="precheck-group">
           <div class="prefetchRow">
+            <div class="nav-row" id="customer_back">
+              <span>back</span>
+            </div>
             <div id="orderContainer" class="col">
               <label htmlFor="email_input">Customer Email</label>
               <div class="customInput">
@@ -167,7 +188,7 @@
               </div>
             </div>
 
-            <div id="error_msg" style="display: block"></div>
+            <div id="customer_error" style="display: block"></div>
 
             <div class="customInput row">
               <button id="customer_btn">Find Orders</button>
@@ -180,7 +201,13 @@
       <div id="order_check" style="display: none">
         <div id="precheck-group">
           <div class="prefetchRow">
-            <div id="error_msg" style="display: block"></div>
+            <div class="nav-row" id="order_back">
+              <span>back</span>
+            </div>
+            <div id="windowHdr">
+              <span> Please select an order to start</span>
+            </div>
+            <div id="order_error" style="display: block"></div>
           </div>
         </div>
       </div>
