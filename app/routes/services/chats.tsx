@@ -78,3 +78,22 @@ export const filterChat = async (
     console.error("Error deleting chats:", error);
   }
 };
+
+/**
+ * Handles the Chat request (from algolia).
+ * @param {FetcherWithComponents} fetcher - The fetcher to submit the request.
+ * @param {string} id - Chat ID
+ */
+export const fetchChat = async (
+  fetcher: FetcherWithComponents<ActionFetcherType>,
+  id: string,
+): Promise<void> => {
+  try {
+    const formData = new FormData();
+    formData.append("action", "request");
+    formData.append("id", id);
+    fetcher.submit(formData, { method: "POST" });
+  } catch (error) {
+    console.error("Error request chat:", error);
+  }
+};

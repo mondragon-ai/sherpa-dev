@@ -29,6 +29,7 @@ export default function Index() {
     handleAddNote,
     handleResolve,
     handleFetchChat,
+    handleRequestChat,
     handleDeleteChat,
   } = useChats();
 
@@ -61,7 +62,8 @@ export default function Index() {
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
             <ChatList
-              domain="dummy-store-usa.myshopify.com"
+              handleRequestChat={handleRequestChat}
+              domain={data.shop}
               type="chat"
               chat_list={chats}
               id={chat ? chat.id : ""}

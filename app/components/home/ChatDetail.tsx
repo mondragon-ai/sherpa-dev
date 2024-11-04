@@ -182,9 +182,21 @@ const ChatDetails = ({ chat }: ChatProps) => {
           Status
         </Text>
         <Badge
-          tone={chat.status == "open" ? "warning" : "success"}
+          tone={
+            chat.status == "open"
+              ? "warning"
+              : chat.status == "action_required"
+                ? "critical"
+                : "success"
+          }
           size="small"
-          progress={chat.status == "open" ? "partiallyComplete" : "complete"}
+          progress={
+            chat.status == "open"
+              ? "incomplete"
+              : chat.status == "action_required"
+                ? "partiallyComplete"
+                : "complete"
+          }
         >
           {capitalizeWords(chat.status || "")}
         </Badge>
@@ -193,6 +205,13 @@ const ChatDetails = ({ chat }: ChatProps) => {
         label="Suggested Action"
         value={capitalizeWords(chat.suggested_action || "not processed yet")}
       />
+
+      <DetailRow
+        label="Action Complete"
+        value={chat.suggested_action_done ? "Yes" : "No"}
+      />
+
+      <DetailRow label="Email Sent" value={chat.email_sent ? "Yes" : "No"} />
       <DetailRow
         label="Sentiment"
         value={capitalizeWords(chat.sentiment || "-")}

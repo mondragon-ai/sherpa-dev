@@ -70,6 +70,21 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
         );
       }
 
+      case "request": {
+        const id = formData.get("id");
+        const { message, status, data } = await serverRequest(
+          "GET",
+          `/store/${shop}/chats/${id}`,
+          null,
+        );
+
+        console.log(data);
+        return json(
+          { message: message, data: id, type: "request", status: status },
+          { status: status },
+        );
+      }
+
       default: {
         return json(
           { message: "uncaught Error", data: null, type: "", status: 400 },

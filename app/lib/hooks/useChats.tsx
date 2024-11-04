@@ -8,6 +8,7 @@ import { Conversation, FetcherProp } from "../types/shared";
 import { createCurrentSeconds } from "../utils/converters/time";
 import {
   deleteChat,
+  fetchChat,
   filterChat,
   resolveChat,
   submitNote,
@@ -135,6 +136,13 @@ export const useChats = () => {
     [chat, chats],
   );
 
+  const handleRequestChat = useCallback(
+    async (id: string) => {
+      await fetchChat(fetcher, id);
+    },
+    [chat, chats],
+  );
+
   return {
     chat,
     chats,
@@ -148,5 +156,6 @@ export const useChats = () => {
     handleResolve,
     handleFetchChat,
     handleDeleteChat,
+    handleRequestChat,
   };
 };

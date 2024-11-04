@@ -18,6 +18,7 @@ export const ChatList = ({
   type,
   domain,
   handleFetchChat,
+  handleRequestChat,
   handleFilter,
 }: {
   chat_list: ChatDocument[] | EmailDocument[];
@@ -25,6 +26,7 @@ export const ChatList = ({
   type: "email" | "chat";
   domain: string;
   handleFetchChat: (id: string) => void;
+  handleRequestChat: (id: string) => void;
   handleFilter: (query: "newest" | "open" | "action_required") => Promise<void>;
 }) => {
   const [query, setQuery] = useState("");
@@ -299,7 +301,7 @@ export const ChatList = ({
               })
             : list.map((chat, index) => {
                 return (
-                  <div key={index} onClick={() => handleFetchChat(chat.id)}>
+                  <div key={index} onClick={() => handleRequestChat(chat.id)}>
                     <ChatItem chat={chat} is_selected={id == chat.id} />
                   </div>
                 );
@@ -337,10 +339,20 @@ const ChatItem = ({
         <header>
           <div>
             <Badge
-              tone={chat.status == "open" ? "warning" : "success"}
+              tone={
+                chat.status == "open"
+                  ? "warning"
+                  : chat.status == "action_required"
+                    ? "critical"
+                    : "success"
+              }
               size="small"
               progress={
-                chat.status == "open" ? "partiallyComplete" : "complete"
+                chat.status == "open"
+                  ? "incomplete"
+                  : chat.status == "action_required"
+                    ? "partiallyComplete"
+                    : "complete"
               }
             >
               {capitalizeWords(chat.status)}

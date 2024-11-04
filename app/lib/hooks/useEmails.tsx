@@ -1,5 +1,6 @@
 import {
   deleteEmail,
+  fetchEmail,
   filterEmail,
   resolveEmail,
   submitNote,
@@ -147,6 +148,14 @@ export const useEmails = () => {
     [email, emails],
   );
 
+  // Fetch Email (algolia)
+  const handleRequestEmail = useCallback(
+    async (id: string) => {
+      await fetchEmail(fetcher, id);
+    },
+    [email, emails],
+  );
+
   return {
     email,
     emails,
@@ -160,5 +169,6 @@ export const useEmails = () => {
     handleResolve,
     handleFetchEmail,
     handleDeleteEmail,
+    handleRequestEmail,
   };
 };
