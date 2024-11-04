@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return 500;
     }
     var domain = getString("domain");
-    var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/store/${domain}/chats/thread/${payload.email}`;
+    var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/store/${domain}/chats/thread/${payload.email}`;
     try {
       var response = await fetch(url);
       if (!response.ok) {
@@ -376,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ! =============================================================
   async function fetchOrders(email) {
     var domain = getString("domain");
-    var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/customer/${email}/orders`;
+    var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/customer/${email}/orders`;
 
     try {
       var response = await fetch(url);
@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return { agent: "", status: 500 };
     }
     var domain = getString("domain");
-    var url = `http://127.0.0.1:5001/sherpa-dc1fe/us-central1/agents/${domain}/initiate/${payload.email}`;
+    var url = `https://us-central1-sherpa-dc1fe.cloudfunctions.net/agents/${domain}/initiate/${payload.email}`;
     var options = {
       method: "POST",
       headers: { "Content-Type": "application/json" },

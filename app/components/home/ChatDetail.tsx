@@ -6,6 +6,7 @@ import {
 import { CaretDownIcon, CaretUpIcon, ChatIcon } from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
+import { convertMarkdownToHtml } from "./Conversation";
 import { copyToClipboard } from "app/lib/utils/shared";
 import { Badge, Icon, Text } from "@shopify/polaris";
 import { EmailDocument } from "app/lib/types/emails";
@@ -303,8 +304,6 @@ const OrderDetail = ({ chat }: ChatProps) => {
   } = chat.order;
   const [open, toggleOpen] = useState(false);
 
-  console.log(created_at);
-
   return (
     <section>
       <ToggleHeader
@@ -403,7 +402,11 @@ const SummaryDetail = ({ chat }: ChatProps) => {
       {open && (
         <div className="detail" style={{ width: "100%" }}>
           <Text variant="bodySm" as={"p"} tone={"base"} breakWord>
-            {chat.summary}
+            <div
+              dangerouslySetInnerHTML={{
+                __html: convertMarkdownToHtml(chat.summary),
+              }}
+            />
           </Text>
         </div>
       )}

@@ -136,17 +136,43 @@ export const Chat = ({
                 background: #EEF1F1;
             }
             
-            .msg > div > p {
+            .msg > div {
+              width: 100%;
+              position: relative;
+            }
+            
+            .msg > div a,
+            .msg > div p {
                 margin-bottom: 20px;
+                width: 100%;
+                display: block;
+                overflow: hidden;
+                /* text-decoration: double; */
+                text-overflow: ellipsis;
             }
 
-            .msg > div > p:last-of-type {
+            .msg > div a:last-of-type,
+            .msg > div p:last-of-type {
                 margin-bottom: 5px;
             }
 
 
             .msgWrapper > p {
                 margin-top: 5px;
+            }
+
+            .msg pre, .msg p, .msg a, .msg code {
+              width: 100%;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              word-break: break-word;
+              overflow-wrap: break-word;
+              height: auto;
+              display: block;
+              margin-bottom: 7px;
+              font-size: 13px;
+              font-family: sans-serif;
+              font-weight: 350;
             }
 
             .chatFooterWrapper {

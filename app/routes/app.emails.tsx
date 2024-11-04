@@ -60,6 +60,8 @@ export default function Emails() {
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
             <ChatList
+              domain="dummy-store-usa.myshopify.com"
+              type="email"
               chat_list={emails}
               id={email ? email.id : ""}
               handleFilter={handleFilter}

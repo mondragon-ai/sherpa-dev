@@ -10,9 +10,6 @@ export const convertMarkdownToHtml = (markdown: string) => {
 export const AgentChat = ({ chat }: { chat: Conversation }) => (
   <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
     <div className="msg" style={{ background: "#D9E3F9" }}>
-      {/* <Text variant="bodySm" as={"p"} tone="base" breakWord>
-        {chat.message}
-      </Text> */}
       <div
         dangerouslySetInnerHTML={{
           __html: convertMarkdownToHtml(chat.message),
@@ -28,9 +25,6 @@ export const AgentChat = ({ chat }: { chat: Conversation }) => (
 export const CustomerChat = ({ chat }: { chat: Conversation }) => (
   <div className="msgWrapper">
     <div className="msg">
-      {/* <Text variant="bodySm" as={"p"} tone="base" breakWord>
-        {chat.message}
-      </Text> */}
       <div
         dangerouslySetInnerHTML={{
           __html: convertMarkdownToHtml(chat.message),

@@ -1,9 +1,10 @@
 import { ChatDocument } from "app/lib/types/chats";
-import { useCallback, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 import { Avatar, Badge, Select, Text, TextField } from "@shopify/polaris";
 import { capitalizeWords, getInitials } from "app/lib/utils/converters/text";
 import { EmailDocument } from "app/lib/types/emails";
+import { fetchSearchResults } from "app/lib/configs/algolia";
 
 const options = [
   { label: "Newest", value: "newest" },
@@ -14,11 +15,15 @@ const options = [
 export const ChatList = ({
   chat_list,
   id,
+  type,
+  domain,
   handleFetchChat,
   handleFilter,
 }: {
   chat_list: ChatDocument[] | EmailDocument[];
   id: string;
+  type: "email" | "chat";
+  domain: string;
   handleFetchChat: (id: string) => void;
   handleFilter: (query: "newest" | "open" | "action_required") => Promise<void>;
 }) => {
@@ -28,32 +33,32 @@ export const ChatList = ({
   );
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState("newest");
-  const [list, setList] = useState<(ChatDocument | EmailDocument)[]>([]);
+  const [list, setList] = useState<ChatDocument[] | EmailDocument[]>([]);
   const observer = useRef<IntersectionObserver | null>(null);
 
   // Clear Query
   const handleClearButtonClick = useCallback(() => {
     setQuery("");
-
-    console.log("cleared");
-    // TODO: if clear revert to old chats
-  }, [chat_list]);
+    setList([]);
+  }, [chat_list, list, query]);
 
   // Algolia Search
   const handleQuery = useCallback(
-    (q: string) => {
+    async (q: string) => {
       setQuery(q);
-      console.log("Searching: " + q);
 
-      // TODO: Query algolia
-      // TODO: Update chats?
+      // Query algolia
+      const index = type == "chat" ? "sherpa_chats" : "sherpa_emails";
+      const items = await fetchSearchResults(q, domain, index);
+
+      // Update chats?
+      setList(items);
 
       if (q == "") {
-        console.log("cleared");
-        // TODO: if clear revert to old chats
+        setList([]);
       }
     },
-    [chat_list],
+    [chat_list, list, query],
   );
 
   // Fetch Filtered ChatsEmails
@@ -272,26 +277,33 @@ export const ChatList = ({
         </header>
 
         <div className={"listWrapper"}>
-          {chat_list &&
-            chat_list.map((chat, index) => {
-              if (index === chat_list.length - 1) {
-                return (
-                  <div
-                    key={index}
-                    ref={lastChatRef}
-                    onClick={() => handleFetchChat(chat.id)}
-                  >
-                    <ChatItem chat={chat} is_selected={id == chat.id} />
-                  </div>
-                );
-              } else {
+          {chat_list && !list.length
+            ? chat_list.map((chat, index) => {
+                if (index === chat_list.length - 1) {
+                  return (
+                    <div
+                      key={index}
+                      ref={lastChatRef}
+                      onClick={() => handleFetchChat(chat.id)}
+                    >
+                      <ChatItem chat={chat} is_selected={id == chat.id} />
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={index} onClick={() => handleFetchChat(chat.id)}>
+                      <ChatItem chat={chat} is_selected={id == chat.id} />
+                    </div>
+                  );
+                }
+              })
+            : list.map((chat, index) => {
                 return (
                   <div key={index} onClick={() => handleFetchChat(chat.id)}>
                     <ChatItem chat={chat} is_selected={id == chat.id} />
                   </div>
                 );
-              }
-            })}
+              })}
           {loading && <div>Loading more chats...</div>}
         </div>
       </div>
