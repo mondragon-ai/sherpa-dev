@@ -321,62 +321,42 @@
       </div>
     </div>
 
-    <style>
-      .closed-chat-btn {
-        background: url("./chat_icon.png") no-repeat center / contain;
-        width: 120px;
-        height: 70px;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        position: absolute;
-        top: 0;
+  <style>
+    .closed-chat-btn {
+      background:url("{{ 'chat_icon.png' | asset_img_url: '1200x1200' }}") no-repeat center / contain;
+      width: 100px;
+      height: 30px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      position: absolute;
+      top: 30px;
+    }
+    .header-ava {
+      {% if block.settings.avatar_image %} 
+        background: url("{{ block.settings.avatar_image | image_url: width: 1200 }}") no-repeat center / cover !important;
+      {% else %}
+        background: url("{{ 'bot.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover !important;
+      {% endif %}
+      width: 52px;
+      height: 52px;
+      border-radius: 24px;
+      float: left;
+      display: block !important;
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var store_domain = {{ shop.permanent_domain | json }};
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("domain", store_domain);
       }
-      .header-ava {
-        background: url("./mitchell.jpg") no-repeat center / cover !important;
-        width: 52px;
-        height: 52px;
-        border-radius: 24px;
-        float: left;
-        display: block !important;
-      }
-    </style>
+      console.log({store_domain});
+    });
+  </script>
 
-
-<style>
-  .closed-chat-btn {
-    background:url("{{ 'chat_icon.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover;
-    width: 120px;
-    height: 70px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    position: absolute;
-    top: 0;
-  }
-  .header-ava {
-    {% if block.settings.avatar_image %} 
-      background: url("{{ block.settings.avatar_image | image_url: width: 1200 }}") no-repeat center / cover !important;
-    {% else %}
-      background: url("{{ 'bot.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover !important;
-    {% endif %}
-    width: 52px;
-    height: 52px;
-    border-radius: 24px;
-    float: left;
-    display: block !important;
-  }
-</style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var store_domain = {{ shop.permanent_domain | json }};
-    sessionStorage.setItem("shop", store_domain);
-    console.log(store_domain);
-  });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
 
 {% schema %}
 {

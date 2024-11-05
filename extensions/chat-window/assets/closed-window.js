@@ -7,9 +7,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var chat_window = document.getElementById("chat-window");
   var close_btn = document.getElementById("minimize-btn");
-  var domain = chat_window.getAttribute("data-shopify-domain");
+  // var domain = chat_window.getAttribute("data-shopify-domain");
+  // console.log({ domain });
 
-  storeString("domain", domain);
+  // storeString("domain", domain);
   var p = getItems("payload");
 
   async function fetchChat() {
@@ -61,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  if (p && p.email && domain) {
+  if (p && p.email) {
     fetchChat();
     hideAllWindows();
     document.getElementById("chat_window").style.display = "block";

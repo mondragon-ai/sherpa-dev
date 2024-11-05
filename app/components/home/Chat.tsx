@@ -270,10 +270,10 @@ export const Chat = ({
               <Button
                 icon={ReceiptRefundIcon}
                 variant="primary"
-                disabled={chat.status !== "open"}
+                disabled={chat.status == "resolved"}
                 onClick={() => resolve(chat.id)}
               >
-                Resolve{`${chat.status == "open" ? "" : "d"}`}
+                Resolve{`${chat.status == "resolved" ? "d" : ""}`}
               </Button>
             </div>
           </header>

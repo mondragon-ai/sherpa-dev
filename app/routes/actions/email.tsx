@@ -72,15 +72,15 @@ export async function emailAction({ request, params }: ActionFunctionArgs) {
 
       case "request": {
         const id = formData.get("id");
+        console.log({ id });
         const { message, status, data } = await serverRequest(
           "GET",
-          `/store/${shop}/emails/${id}`,
+          `/store/${shop}/email/${id}`,
           null,
         );
 
-        console.log(data);
         return json(
-          { message: message, data: id, type: "request", status: status },
+          { message: message, data: data, type: "request", status: status },
           { status: status },
         );
       }

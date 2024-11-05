@@ -127,3 +127,20 @@ export type LineItem = {
   options: string;
   title: string;
 };
+
+export type ShopInfoResponse = {
+  shop: {
+    name: string;
+    primaryDomain: {
+      url: string;
+    };
+    currencyCode: string;
+    billingAddress: {
+      address1: string | null;
+      city: string | null;
+      provinceCode: string | null;
+      zip: string | null;
+    };
+    ianaTimezone: string;
+  };
+};

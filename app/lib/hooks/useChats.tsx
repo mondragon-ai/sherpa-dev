@@ -56,6 +56,16 @@ export const useChats = () => {
                   ],
                 },
             );
+            const map = chats.map((c) => {
+              if (c.id == chat?.id) {
+                return {
+                  ...c,
+                  status: "resolved" as any,
+                };
+              }
+              return c;
+            });
+            setChats(map);
           }
         }
         case "note": {
@@ -80,8 +90,13 @@ export const useChats = () => {
         }
         case "filter": {
           if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
-            console.log(fetcher.data);
             setChats(fetcher.data.data as unknown as ChatDocument[]);
+          }
+        }
+
+        case "request": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "request") {
+            setChat(fetcher.data.data as unknown as ChatDocument);
           }
         }
         default:
@@ -138,6 +153,7 @@ export const useChats = () => {
 
   const handleRequestChat = useCallback(
     async (id: string) => {
+      console.log(id);
       await fetchChat(fetcher, id);
     },
     [chat, chats],

@@ -92,8 +92,13 @@ export const useEmails = () => {
         }
         case "filter": {
           if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
-            console.log(fetcher.data);
             setEmails(fetcher.data.data as unknown as EmailDocument[]);
+          }
+        }
+
+        case "request": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "request") {
+            setEmail(fetcher.data.data as unknown as EmailDocument);
           }
         }
         default:
