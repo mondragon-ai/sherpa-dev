@@ -31,6 +31,7 @@ export default function Emails() {
     handleFetchEmail,
     handleDeleteEmail,
     handleRequestEmail,
+    handleFetchNext,
   } = useEmails();
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function Emails() {
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 3, xl: 3 }}>
           <Placeholder>
             <ChatList
+              handleFetchNext={handleFetchNext}
               handleRequestChat={handleRequestEmail}
               domain={data.shop}
               type="email"

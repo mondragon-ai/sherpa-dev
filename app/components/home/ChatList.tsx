@@ -20,6 +20,7 @@ export const ChatList = ({
   handleFetchChat,
   handleRequestChat,
   handleFilter,
+  handleFetchNext,
 }: {
   chat_list: ChatDocument[] | EmailDocument[];
   id: string;
@@ -28,11 +29,9 @@ export const ChatList = ({
   handleFetchChat: (id: string) => void;
   handleRequestChat: (id: string) => void;
   handleFilter: (query: "newest" | "open" | "action_required") => Promise<void>;
+  handleFetchNext: (time: number) => void;
 }) => {
   const [query, setQuery] = useState("");
-  const [hasMore, setHasMore] = useState(
-    chat_list.length && chat_list.length < 250 ? false : true,
-  );
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState("newest");
   const [list, setList] = useState<ChatDocument[] | EmailDocument[]>([]);
@@ -73,11 +72,11 @@ export const ChatList = ({
   );
 
   // Fetch More Chats/Emails (infinity)
-  const fetchMoreChats = async () => {
-    if (loading || !hasMore) return;
+  const fetchMoreChats = async (time: number) => {
+    if (loading) return;
 
     setLoading(true);
-    console.log("LOADED MORE");
+    handleFetchNext(time);
     setLoading(false);
   };
 
@@ -89,14 +88,17 @@ export const ChatList = ({
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          fetchMoreChats();
+        if (entries[0].isIntersecting) {
+          const last = chat_list[chat_list.length - 1];
+          if (chat_list.length >= 250 && last) {
+            fetchMoreChats(last.created_at);
+          }
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, chat_list],
+    [loading, chat_list],
   );
 
   return (

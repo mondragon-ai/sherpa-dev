@@ -97,3 +97,22 @@ export const fetchChat = async (
     console.error("Error request chat:", error);
   }
 };
+
+/**
+ * Handles the next list of chats (infinity scroll)
+ * @param {FetcherWithComponents} fetcher - The fetcher to submit the request.
+ * @param {string} time - Chat ID
+ */
+export const fetchNext = async (
+  fetcher: FetcherWithComponents<ActionFetcherType>,
+  time: number,
+): Promise<void> => {
+  try {
+    const formData = new FormData();
+    formData.append("action", "next");
+    formData.append("time", `${time}`);
+    fetcher.submit(formData, { method: "POST" });
+  } catch (error) {
+    console.error("Error request next chat list:", error);
+  }
+};

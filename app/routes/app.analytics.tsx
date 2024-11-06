@@ -166,8 +166,8 @@ const TopAnalytics = ({ analytics }: { analytics: CleanedAnalytics }) => {
           fixed={0}
           tip="Total emails received"
         >
-          {incoming_chats.length ? (
-            <LineChartStats suffix={""} data={incoming_chats} />
+          {incoming_emails.length ? (
+            <LineChartStats suffix={""} data={incoming_emails} />
           ) : (
             <SkeletonChart />
           )}
@@ -181,8 +181,8 @@ const TopAnalytics = ({ analytics }: { analytics: CleanedAnalytics }) => {
           fixed={0}
           tip="Total chats received"
         >
-          {incoming_emails.length ? (
-            <LineChartStats suffix={""} data={incoming_emails} />
+          {incoming_chats.length ? (
+            <LineChartStats suffix={""} data={incoming_chats} />
           ) : (
             <SkeletonChart />
           )}

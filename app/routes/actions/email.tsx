@@ -85,6 +85,21 @@ export async function emailAction({ request, params }: ActionFunctionArgs) {
         );
       }
 
+      case "next": {
+        const time = formData.get("time");
+        console.log({ time });
+        const { message, status, data } = await serverRequest(
+          "GET",
+          `/store/${shop}/chats/next/${time}`,
+          null,
+        );
+
+        return json(
+          { message: message, data: data, type: "next", status: status },
+          { status: status },
+        );
+      }
+
       default: {
         return json(
           { message: "uncaught Error", data: null, type: "", status: 400 },

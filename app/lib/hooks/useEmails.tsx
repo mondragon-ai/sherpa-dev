@@ -1,6 +1,7 @@
 import {
   deleteEmail,
   fetchEmail,
+  fetchNext,
   filterEmail,
   resolveEmail,
   submitNote,
@@ -37,6 +38,7 @@ export const useEmails = () => {
           }
           break;
         }
+
         case "resolve": {
           if (fetcher.data.status < 300) {
             setEmail(
@@ -64,6 +66,7 @@ export const useEmails = () => {
             );
           }
         }
+
         case "note": {
           if (fetcher.data.status < 300) {
             setEmail(
@@ -90,6 +93,7 @@ export const useEmails = () => {
             );
           }
         }
+
         case "filter": {
           if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
             setEmails(fetcher.data.data as unknown as EmailDocument[]);
@@ -99,6 +103,16 @@ export const useEmails = () => {
         case "request": {
           if (fetcher.data.status < 300 && fetcher.data.type == "request") {
             setEmail(fetcher.data.data as unknown as EmailDocument);
+          }
+        }
+
+        case "next": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "next") {
+            if (!fetcher.data || !fetcher.data.data) return;
+
+            if (fetcher.data && fetcher.data.data && fetcher.data.data.length) {
+              setEmails((p) => p && [...p, ...fetcher?.data?.data]);
+            }
           }
         }
         default:
@@ -161,6 +175,14 @@ export const useEmails = () => {
     [email, emails],
   );
 
+  // Fetch next 250 chats (infinity scroll)
+  const handleFetchNext = useCallback(
+    async (time: number) => {
+      await fetchNext(fetcher, time);
+    },
+    [email, emails],
+  );
+
   return {
     email,
     emails,
@@ -175,5 +197,6 @@ export const useEmails = () => {
     handleFetchEmail,
     handleDeleteEmail,
     handleRequestEmail,
+    handleFetchNext,
   };
 };

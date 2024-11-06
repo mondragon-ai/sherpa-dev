@@ -12,6 +12,7 @@ import {
   filterChat,
   resolveChat,
   submitNote,
+  fetchNext,
 } from "app/routes/services/chats";
 
 export const useChats = () => {
@@ -37,6 +38,7 @@ export const useChats = () => {
           }
           break;
         }
+
         case "resolve": {
           if (fetcher.data.status < 300) {
             setChat(
@@ -68,6 +70,7 @@ export const useChats = () => {
             setChats(map);
           }
         }
+
         case "note": {
           if (fetcher.data.status < 300) {
             setChat(
@@ -88,6 +91,7 @@ export const useChats = () => {
             );
           }
         }
+
         case "filter": {
           if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
             setChats(fetcher.data.data as unknown as ChatDocument[]);
@@ -97,6 +101,16 @@ export const useChats = () => {
         case "request": {
           if (fetcher.data.status < 300 && fetcher.data.type == "request") {
             setChat(fetcher.data.data as unknown as ChatDocument);
+          }
+        }
+
+        case "next": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "next") {
+            if (!fetcher.data || !fetcher.data.data) return;
+
+            if (fetcher.data && fetcher.data.data && fetcher.data.data.length) {
+              setChats((p) => p && [...p, ...fetcher?.data?.data]);
+            }
           }
         }
         default:
@@ -151,10 +165,19 @@ export const useChats = () => {
     [chat, chats],
   );
 
+  // Fetch Single chat (algolia)
   const handleRequestChat = useCallback(
     async (id: string) => {
       console.log(id);
       await fetchChat(fetcher, id);
+    },
+    [chat, chats],
+  );
+
+  // Fetch next 250 chats (infinity scroll)
+  const handleFetchNext = useCallback(
+    async (time: number) => {
+      await fetchNext(fetcher, time);
     },
     [chat, chats],
   );
@@ -173,5 +196,6 @@ export const useChats = () => {
     handleFetchChat,
     handleDeleteChat,
     handleRequestChat,
+    handleFetchNext,
   };
 };
