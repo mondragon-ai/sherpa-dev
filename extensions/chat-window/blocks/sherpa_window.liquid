@@ -19,7 +19,7 @@
       <!-- CHAT HEADER -->
       <div
         class="chat-header"
-        style="background: linear-gradient(135deg, black 0%, black 100%)"
+        style="background: linear-gradient(135deg,  {{ block.settings.header_color }} 0%, {{ block.settings.header_color_two }} 100%)"
       >
         <div
           style="
@@ -33,7 +33,7 @@
               <div class="header-ava"></div>
             </div>
             <h2 class="twolines">
-              <span class="top-heading">Chat with </span> Mitchel
+              <span class="top-heading">Chat with </span> {{ block.settings.agent_name }}
             </h2>
           </div>
           <div
@@ -336,7 +336,7 @@
       {% if block.settings.avatar_image %} 
         background: url("{{ block.settings.avatar_image | image_url: width: 1200 }}") no-repeat center / cover !important;
       {% else %}
-        background: url("{{ 'bot.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover !important;
+        background: url("{{ 'sherpa.png' | asset_img_url: '1200x1200' }}") no-repeat center / cover !important;
       {% endif %}
       width: 52px;
       height: 52px;

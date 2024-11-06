@@ -40,10 +40,29 @@ export const CustomerChat = ({ chat }: { chat: Conversation }) => (
 export const Note = ({ chat }: { chat: Conversation }) => (
   <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
     <div className="msg" style={{ background: "#F5E6A9" }}>
-      {chat.message}
+      <div
+        dangerouslySetInnerHTML={{
+          __html: convertMarkdownToHtml(chat.message),
+        }}
+      />
     </div>
     <Text variant="bodySm" as={"p"} tone="subdued">
       Note - {getHoursDifference(chat.time)}
+    </Text>
+  </div>
+);
+
+export const SuggestedEmail = ({ chat }: { chat: Conversation }) => (
+  <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
+    <div className="msg" style={{ background: "#D9E3F9" }}>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: convertMarkdownToHtml(chat.message),
+        }}
+      />
+    </div>
+    <Text variant="bodySm" as={"p"} tone="subdued">
+      Suggested Email - {getHoursDifference(chat.time)}
     </Text>
   </div>
 );

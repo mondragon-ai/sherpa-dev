@@ -77,6 +77,7 @@ export default function Index() {
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
           <Placeholder>
             <Chat
+              isLoading={isLoading}
               chat={chat}
               deleteChat={handleDeleteChat}
               resolve={handleResolve}

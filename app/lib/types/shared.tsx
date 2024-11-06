@@ -93,7 +93,7 @@ export type Conversation = {
   time: number;
   is_note: boolean;
   message: string;
-  sender: "agent" | "customer";
+  sender: "agent" | "customer" | "email";
   action: null | "closed" | "opened";
 };
 

@@ -7,7 +7,13 @@ import {
 } from "@shopify/polaris-icons";
 import { ChatDocument } from "app/lib/types/chats";
 import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
-import { Action, AgentChat, CustomerChat, Note } from "./Conversation";
+import {
+  Action,
+  AgentChat,
+  CustomerChat,
+  Note,
+  SuggestedEmail,
+} from "./Conversation";
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { EmailDocument } from "app/lib/types/emails";
 import { capitalizeWords } from "app/lib/utils/converters/text";
@@ -17,11 +23,13 @@ export const Chat = ({
   deleteChat,
   resolve,
   addNote,
+  isLoading,
 }: {
   chat: null | ChatDocument | EmailDocument;
   deleteChat: (id: string) => Promise<void>;
   resolve: (id: string) => Promise<void>;
   addNote: (id: string, note: string) => Promise<void>;
+  isLoading: boolean;
 }) => {
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("add note here....");
@@ -35,7 +43,7 @@ export const Chat = ({
     await addNote(String(chat?.id || ""), note);
 
     setNote("");
-    setLoading(false);
+    // setLoading(false);
   }, [note, chat, loading]);
 
   return (
@@ -262,6 +270,7 @@ export const Chat = ({
               <Button
                 icon={DeleteIcon}
                 variant="tertiary"
+                loading={isLoading}
                 onClick={() => deleteChat(chat.id)}
                 tone="critical"
               >
@@ -270,6 +279,7 @@ export const Chat = ({
               <Button
                 icon={ReceiptRefundIcon}
                 variant="primary"
+                loading={isLoading}
                 disabled={chat.status == "resolved"}
                 onClick={() => resolve(chat.id)}
               >
@@ -304,6 +314,9 @@ export const Chat = ({
                 if (chat.is_note) {
                   return <Note chat={chat} />;
                 }
+                if (chat.sender == "email" && !chat.action && !chat.is_note) {
+                  return <SuggestedEmail chat={chat} />;
+                }
               })}
             {/* {loading && <div>Loading more chats...</div>} */}
           </div>
@@ -330,8 +343,8 @@ export const Chat = ({
             </div>
             <div className="txtContainerFooter">
               <Button
-                disabled={loading}
-                loading={loading}
+                disabled={loading || isLoading}
+                loading={loading || isLoading}
                 icon={SendIcon}
                 variant="primary"
                 onClick={handleAddNote}

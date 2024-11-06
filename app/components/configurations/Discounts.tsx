@@ -10,6 +10,7 @@ import {
 import { DiscountIcon, DeleteIcon } from "@shopify/polaris-icons";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { ConfigurationsType } from "app/lib/types/config";
+import { filterNumber } from "app/lib/utils/converters/text";
 
 export const Discounts = ({
   config,
@@ -83,11 +84,11 @@ export const Discounts = ({
             <BlockStack gap="200">
               <Box paddingBlockStart="300">
                 <Text as="h3" variant="bodyLg" tone="base">
-                  Price Rule Created: {config.price_rules.value}
+                  Price Rule Created: {Number(config.price_rules.value) * 100}%
                 </Text>
                 <Box paddingBlockStart="200">
                   <Text as="h3" variant="bodyMd" tone="base">
-                    {config.price_rules.id}
+                    Discount ID: {filterNumber(config.price_rules.id)}
                   </Text>
                 </Box>
                 <Text as="p" variant="bodyXs" tone="magic-subdued">

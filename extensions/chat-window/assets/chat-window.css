@@ -428,6 +428,7 @@ textarea {
   font-size: 13px !important;
   line-height: 15px;
   font-family: sans-serif !important;
+  min-height: 70px;
 }
 textarea:focus-visible {
   outline: none !important;
