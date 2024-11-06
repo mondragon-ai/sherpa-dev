@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://plays-employees-designation-trinity.trycloudflare.com"
+application_url = "https://formula-controlling-herself-etc.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_customers,read_orders,read_products,write_customers,write_discoun
 
 [auth]
 redirect_urls = [
-  "https://plays-employees-designation-trinity.trycloudflare.com/auth/callback",
-  "https://plays-employees-designation-trinity.trycloudflare.com/auth/shopify/callback",
-  "https://plays-employees-designation-trinity.trycloudflare.com/api/auth/callback"
+  "https://formula-controlling-herself-etc.trycloudflare.com/auth/callback",
+  "https://formula-controlling-herself-etc.trycloudflare.com/auth/shopify/callback",
+  "https://formula-controlling-herself-etc.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

@@ -36,8 +36,10 @@ export type MerchantDocument = {
 export type AppTypes = {
   name: "gmail" | "outlook" | "stripe" | "recharge";
   token: string;
+  refresh_token: string;
   connected: boolean;
   email: string;
+  time: number;
 };
 
 export type LinkType = {

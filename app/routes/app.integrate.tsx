@@ -9,71 +9,41 @@ import {
   Button,
   Image,
 } from "@shopify/polaris";
-import { app_list, connected_apps } from "app/lib/data/integrate";
-import { useCallback, useEffect, useState } from "react";
+import { useLoaderData } from "@remix-run/react";
+import { useIntegrate } from "app/lib/hooks/useIntegrate";
+import { integrationLoader } from "./loaders/integration";
+import { IntegrationAction } from "./actions/Integration";
+import { useEffect, useState } from "react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 
-type ConnectedApps = {
-  title: string;
-  text: string;
-  img: string;
-  pending: boolean;
-  connected: boolean;
-};
+export const loader = integrationLoader;
+export const action = IntegrationAction;
+
 export default function Integrate() {
-  const [app, setApps] = useState<ConnectedApps[]>([]);
-  const handleIntegrate = useCallback((app: string) => {
-    console.log(app);
-  }, []);
+  const shopify = useAppBridge();
+  const data = useLoaderData<typeof loader>();
+  const {
+    apps,
+    error,
+    setApps,
+    setError,
+    handleRecahrgeSave,
+    handleRecahrgeRemove,
+    handleLinkGmail,
+    handleGmailRemove,
+  } = useIntegrate();
 
   useEffect(() => {
-    setApps([]);
-
-    const newApps: ConnectedApps[] = [];
-
-    for (let a of app_list) {
-      const matchingConnectedApp = connected_apps.find(
-        (c) => c.title.toLocaleLowerCase() === a.title.toLocaleLowerCase(),
-      );
-
-      if (matchingConnectedApp) {
-        const exists = newApps.some(
-          (app) =>
-            app.title.toLocaleLowerCase() ===
-            matchingConnectedApp.title.toLocaleLowerCase(),
-        );
-
-        if (!exists) {
-          newApps.push({
-            title: matchingConnectedApp.title,
-            text: a.text,
-            img: a.img,
-            pending: false,
-            connected: matchingConnectedApp.connected,
-          });
-        }
-      } else {
-        const exists = newApps.some(
-          (app) =>
-            app.title.toLocaleLowerCase() === a.title.toLocaleLowerCase(),
-        );
-
-        if (!exists) {
-          newApps.push({
-            title: a.title,
-            text: a.text,
-            img: a.img,
-            pending: false,
-            connected: false,
-          });
-        }
-      }
+    if (data && !apps) {
+      setApps(data.apps as any);
+      shopify.toast.show(data.message);
     }
+  }, [data, shopify]);
 
-    setApps((prev) => [...prev, ...newApps]);
-  }, []);
+  const gmail = apps ? apps.find((a) => a.name == "gmail") : null;
+  const recharge = apps ? apps.find((a) => a.name == "recharge") : null;
 
-  console.log(app);
-
+  console.log(apps);
   return (
     <Page title="Integration">
       <BlockStack gap={"300"}>
@@ -99,19 +69,59 @@ export default function Integrate() {
                   3rd Party Apps
                 </Text>
                 <Grid columns={{ sm: 3 }}>
-                  {app &&
-                    app.map((a) => {
-                      return (
-                        <App
-                          title={a.title}
-                          text={a.text}
-                          img={a.img}
-                          pending={a.pending}
-                          connected={a.connected}
-                          connect={handleIntegrate}
-                        />
-                      );
-                    })}
+                  <App
+                    title={"Gmail"}
+                    text={
+                      "Connect your customer service inbox to Sherpa for auto-completion"
+                    }
+                    img={
+                      "https://static.vecteezy.com/system/resources/previews/020/964/377/non_2x/gmail-mail-icon-for-web-design-free-png.png"
+                    }
+                    pending={false}
+                    connected={gmail ? gmail?.connected : false}
+                    connect={handleLinkGmail}
+                    remove={handleGmailRemove}
+                  />
+                  <App
+                    title={"Outlook"}
+                    text={
+                      "Connect your customer service inbox to Sherpa for auto-completion"
+                    }
+                    img={
+                      "https://cdn3.iconfinder.com/data/icons/social-media-logos-flat-colorful-1/2048/5382_-_Outlook-512.png"
+                    }
+                    pending={true}
+                    connected={false}
+                    connect={() => {}}
+                    remove={handleRecahrgeRemove}
+                  />
+                  <App
+                    title={"Stripe"}
+                    text={
+                      "Subscription can be searched and modified via Sherpa"
+                    }
+                    img={
+                      "https://cdn.iconscout.com/icon/free/png-256/free-stripe-logo-icon-download-in-svg-png-gif-file-formats--flat-social-media-branding-pack-logos-icons-498440.png?f=webp&w=256"
+                    }
+                    pending={true}
+                    connected={false}
+                    connect={() => {}}
+                    remove={handleRecahrgeRemove}
+                  />
+                  <App
+                    title={"Recharge"}
+                    text={
+                      "Subscription can be searched and modified via Sherpa"
+                    }
+                    img={
+                      "https://d3fmzy9bmh9dam.cloudfront.net/wp-content/uploads/2022/02/11.svg"
+                    }
+                    pending={false}
+                    token={recharge ? recharge?.token : ""}
+                    connected={recharge ? recharge?.connected : false}
+                    connect={handleRecahrgeSave}
+                    remove={handleRecahrgeRemove}
+                  />
                 </Grid>
               </BlockStack>
             </Card>
@@ -130,10 +140,22 @@ interface AppProps {
   img: string;
   pending: boolean;
   connected: boolean;
-  connect: (app: string) => void;
+  connect: (v: string) => void;
+  remove: () => void;
+  token?: string;
 }
 
-const App = ({ text, title, img, pending, connected, connect }: AppProps) => {
+const App = ({
+  text,
+  title,
+  img,
+  pending,
+  connected,
+  token,
+  connect,
+  remove,
+}: AppProps) => {
+  const [v, setV] = useState(token || "");
   return (
     <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 4, xl: 4 }}>
       <Box
@@ -173,13 +195,45 @@ const App = ({ text, title, img, pending, connected, connect }: AppProps) => {
               {text}
             </Text>
           </div>
-          <Button
-            variant="primary"
-            disabled={pending || connected}
-            onClick={() => connect(title.toLocaleLowerCase())}
-          >
-            {pending ? "Coming" : "Connect"}
-          </Button>
+          {title == "Recharge" && (token == "" || !token) ? (
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                margin: "10px 0 20px 0",
+              }}
+            >
+              <TextField
+                label="Access Token"
+                placeholder="shp_at_123..."
+                value={v}
+                onChange={setV}
+                error=""
+                type="text"
+                autoComplete="off"
+              />
+            </div>
+          ) : null}
+          {!connected ? (
+            <Button
+              variant="primary"
+              disabled={pending || connected}
+              onClick={() => connect(v)}
+            >
+              {pending ? "Coming Soon" : "Connect"}
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              disabled={!connected}
+              onClick={() => remove()}
+            >
+              Remove App
+            </Button>
+          )}
         </div>
       </Box>
     </Grid.Cell>
