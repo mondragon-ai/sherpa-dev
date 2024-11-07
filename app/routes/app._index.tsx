@@ -32,6 +32,7 @@ export default function Index() {
     handleRequestChat,
     handleDeleteChat,
     handleFetchNext,
+    handleSendEmail,
   } = useChats();
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function Index() {
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
           <Placeholder>
             <Chat
+              handleSendEmail={handleSendEmail}
               isLoading={isLoading}
               chat={chat}
               deleteChat={handleDeleteChat}

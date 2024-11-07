@@ -51,7 +51,6 @@ export const useIntegrate = () => {
           break;
         }
         case "save_gmail": {
-          console.log(fetcher.data.data.url);
           if (fetcher.data.data.url) {
             setApps(
               (p) =>
@@ -97,19 +96,16 @@ export const useIntegrate = () => {
 
   // unlink recharge
   const handleRecahrgeRemove = useCallback(async () => {
-    console.log("REMOVE RECHARGE");
     removeRechargeToken(fetcher);
   }, [fetcher.data]);
 
   // link gmail
   const handleLinkGmail = useCallback(async () => {
-    console.log("LINK GMAIL");
     startGmailOauth(fetcher);
   }, [fetcher, apps]);
 
   // unlink recharge
   const handleGmailRemove = useCallback(async () => {
-    console.log("REMOVE GMAIL");
     removeGmailToken(fetcher);
   }, [fetcher.data]);
 

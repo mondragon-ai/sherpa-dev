@@ -15,7 +15,6 @@ export async function IntegrationAction({
 
   const formData = await request.formData();
   const type = formData.get("action");
-  console.log(type);
 
   try {
     switch (type) {
@@ -37,7 +36,6 @@ export async function IntegrationAction({
           `/apps/recharge/${shop}/save/${token}`,
           null,
         );
-        console.log({ message, status, data });
         return json(
           {
             message: message,
@@ -67,14 +65,12 @@ export async function IntegrationAction({
       }
 
       case "save_gmail": {
-        console.log("STRTING");
         const data = await serverRequest(
           "GET",
           `/apps/gmail/${shop}/auth`,
           null,
         );
 
-        console.log(data);
         return json(
           {
             message: "started",

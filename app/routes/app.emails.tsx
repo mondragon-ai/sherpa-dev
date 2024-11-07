@@ -32,6 +32,7 @@ export default function Emails() {
     handleDeleteEmail,
     handleRequestEmail,
     handleFetchNext,
+    handleSendEmail,
   } = useEmails();
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export default function Emails() {
         <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 6, xl: 6 }}>
           <Placeholder>
             <Chat
+              handleSendEmail={handleSendEmail}
               isLoading={isLoading}
               chat={email}
               resolve={handleResolve}

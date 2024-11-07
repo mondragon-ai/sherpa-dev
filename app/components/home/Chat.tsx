@@ -1,12 +1,3 @@
-import { Button, Icon, Text, TextField } from "@shopify/polaris";
-import {
-  DeleteIcon,
-  ReceiptRefundIcon,
-  NoteAddIcon,
-  SendIcon,
-} from "@shopify/polaris-icons";
-import { ChatDocument } from "app/lib/types/chats";
-import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
 import {
   Action,
   AgentChat,
@@ -14,27 +5,53 @@ import {
   Note,
   SuggestedEmail,
 } from "./Conversation";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import {
+  DeleteIcon,
+  ReceiptRefundIcon,
+  NoteAddIcon,
+  SendIcon,
+  EmailIcon,
+} from "@shopify/polaris-icons";
+import { useCallback, useState } from "react";
+import { ChatDocument } from "app/lib/types/chats";
 import { EmailDocument } from "app/lib/types/emails";
-import { capitalizeWords } from "app/lib/utils/converters/text";
+import { SkeletonConvo, SkeletonHdr } from "./Skeleton";
+import { capitalizeWords, isValidEmail } from "app/lib/utils/converters/text";
+import {
+  ActionList,
+  Button,
+  Icon,
+  Popover,
+  Text,
+  TextField,
+} from "@shopify/polaris";
 
 export const Chat = ({
   chat,
+  isLoading,
   deleteChat,
   resolve,
   addNote,
-  isLoading,
+  handleSendEmail,
 }: {
   chat: null | ChatDocument | EmailDocument;
+  isLoading: boolean;
   deleteChat: (id: string) => Promise<void>;
   resolve: (id: string) => Promise<void>;
   addNote: (id: string, note: string) => Promise<void>;
-  isLoading: boolean;
+  handleSendEmail: (
+    email: string,
+    subject: string,
+    message: string,
+  ) => Promise<void>;
 }) => {
   const [loading, setLoading] = useState(false);
-  const [note, setNote] = useState("add note here....");
+  const [popoverActive, setPopoverActive] = useState(false);
+  const [note, setNote] = useState("");
+  const [type, setType] = useState<"email" | "note">("note");
   const handleChange = useCallback((newValue: string) => setNote(newValue), []);
 
+  // Submit note to be added
   const handleAddNote = useCallback(async () => {
     setLoading(true);
     if (!chat || !chat.id) {
@@ -51,6 +68,41 @@ export const Chat = ({
     setNote("");
     setLoading(false);
   }, [note, chat, loading]);
+
+  // Select Email to edit/send
+  const handleSelectEmail = (id: string) => {
+    const message = chat?.conversation.find((m) => `${m.time}` == id);
+    if (!message) return;
+
+    setType("email");
+    setNote(message.message);
+  };
+
+  // Popup Text
+  const handleSelectingType = (type: "email" | "note") => {
+    setPopoverActive(false);
+    setType(type);
+  };
+
+  // Send email
+  const handleEmailToBeSent = useCallback(async () => {
+    setLoading(true);
+    if (!chat || !chat.id || note == "" || !isValidEmail(chat.id)) {
+      setLoading(false);
+      return;
+    }
+
+    await handleSendEmail(chat.id, "Follow up from CS Ticket", note);
+
+    setNote("");
+    setLoading(false);
+  }, [note, chat, loading]);
+
+  const activator = (
+    <Button onClick={() => setPopoverActive(!popoverActive)} disclosure>
+      Choose
+    </Button>
+  );
 
   return (
     <>
@@ -250,6 +302,10 @@ export const Chat = ({
               border: none !important;
             }
 
+            .txtField textarea {
+              max-height: 100px;
+            }
+
             .txtContainerHdr {
               display: flex;
               flex-direction: row;
@@ -345,7 +401,9 @@ export const Chat = ({
                   return <Note chat={chat} />;
                 }
                 if (chat.sender == "email" && !chat.action && !chat.is_note) {
-                  return <SuggestedEmail chat={chat} />;
+                  return (
+                    <SuggestedEmail chat={chat} onCick={handleSelectEmail} />
+                  );
                 }
               })}
             {/* {loading && <div>Loading more chats...</div>} */}
@@ -357,14 +415,37 @@ export const Chat = ({
         <footer className="chatFooterWrapper">
           <div className="txtContainer">
             <div className="txtContainerHdr">
-              <Icon source={NoteAddIcon} />
+              <Popover
+                active={popoverActive}
+                activator={activator}
+                autofocusTarget="first-node"
+                onClose={() => setPopoverActive(false)}
+              >
+                <ActionList
+                  actionRole="menuitem"
+                  items={[
+                    {
+                      content: "Add Note",
+                      icon: NoteAddIcon,
+                      onAction: () => handleSelectingType("note"),
+                    },
+                    {
+                      content: "Write Email",
+                      icon: EmailIcon,
+                      onAction: () => handleSelectingType("email"),
+                    },
+                  ]}
+                />
+              </Popover>
+              <Icon source={type == "note" ? NoteAddIcon : EmailIcon} />
               <Text variant="bodySm" as={"p"} tone="subdued">
-                Add Note
+                {type == "note" ? "Add Note" : "Send Email"}
               </Text>
             </div>
             <div className="txtField">
               <TextField
                 label=""
+                placeholder="write here...."
                 value={note}
                 onChange={handleChange}
                 multiline={4}
@@ -372,15 +453,27 @@ export const Chat = ({
               />
             </div>
             <div className="txtContainerFooter">
-              <Button
-                disabled={loading || isLoading}
-                loading={loading || isLoading}
-                icon={SendIcon}
-                variant="primary"
-                onClick={handleAddNote}
-              >
-                Submit
-              </Button>
+              {type == "note" ? (
+                <Button
+                  disabled={loading || isLoading}
+                  loading={loading || isLoading}
+                  icon={SendIcon}
+                  variant="primary"
+                  onClick={handleAddNote}
+                >
+                  Submit Note
+                </Button>
+              ) : (
+                <Button
+                  disabled={loading || isLoading}
+                  loading={loading || isLoading}
+                  icon={SendIcon}
+                  variant="primary"
+                  onClick={handleEmailToBeSent}
+                >
+                  Send Email
+                </Button>
+              )}
             </div>
           </div>
         </footer>

@@ -63,9 +63,19 @@ export const Note = ({ chat }: { chat: Conversation }) => (
   </div>
 );
 
-export const SuggestedEmail = ({ chat }: { chat: Conversation }) => (
-  <div className="msgWrapper" style={{ alignItems: "flex-end" }}>
-    <div className="msg" style={{ background: "#D9E3F9" }}>
+export const SuggestedEmail = ({
+  chat,
+  onCick,
+}: {
+  chat: Conversation;
+  onCick: (id: string) => void;
+}) => (
+  <div
+    onClick={() => onCick(`${chat.time}`)}
+    className="msgWrapper"
+    style={{ alignItems: "flex-end", cursor: "pointer" }}
+  >
+    <div className="msg" style={{ background: "#e3cfff" }}>
       <div
         dangerouslySetInnerHTML={{
           __html: convertMarkdownToHtml(chat.message),

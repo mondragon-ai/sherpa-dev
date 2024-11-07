@@ -13,6 +13,7 @@ import {
   resolveChat,
   submitNote,
   fetchNext,
+  sendEmail,
 } from "app/routes/services/chats";
 
 export const useChats = () => {
@@ -87,6 +88,18 @@ export const useChats = () => {
                       action: null,
                     } as Conversation,
                   ],
+                },
+            );
+          }
+        }
+
+        case "send_email": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "send_email") {
+            setChat(
+              (p) =>
+                p && {
+                  ...p,
+                  email_sent: true,
                 },
             );
           }
@@ -182,6 +195,16 @@ export const useChats = () => {
     [chat, chats],
   );
 
+  // Send Email
+  const handleSendEmail = useCallback(
+    async (email: string, subject: string, message: string) => {
+      const payload = { to: email, subject, email: message };
+      console.log({ HOOK: payload });
+      await sendEmail(fetcher, payload);
+    },
+    [chat, chats],
+  );
+
   return {
     chat,
     chats,
@@ -197,5 +220,6 @@ export const useChats = () => {
     handleDeleteChat,
     handleRequestChat,
     handleFetchNext,
+    handleSendEmail,
   };
 };

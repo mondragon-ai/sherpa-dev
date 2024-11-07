@@ -44,7 +44,6 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
 
       case "filter": {
         const query = formData.get("query") as string;
-        console.log({ query });
         const { message, status, data } = await serverRequest(
           "GET",
           `/store/${shop}/chats/search?type=${query}`,
@@ -72,7 +71,6 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
 
       case "request": {
         const id = formData.get("id");
-        console.log({ id });
         const { message, status, data } = await serverRequest(
           "GET",
           `/store/${shop}/chat/${id}`,
@@ -87,7 +85,6 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
 
       case "next": {
         const time = formData.get("time");
-        console.log({ time });
         const { message, status, data } = await serverRequest(
           "GET",
           `/store/${shop}/chats/next/${time}`,
@@ -96,6 +93,21 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
 
         return json(
           { message: message, data: data, type: "next", status: status },
+          { status: status },
+        );
+      }
+
+      case "send_email": {
+        const payload = formData.get("payload") as string;
+        const { to, subject, email } = JSON.parse(payload as string);
+        const { message, status, data } = await serverRequest(
+          "POST",
+          `/apps/gmail/${shop}/email/send/chat`,
+          { to, subject, email },
+        );
+
+        return json(
+          { message: message, data: data, type: "send_email", status: status },
           { status: status },
         );
       }

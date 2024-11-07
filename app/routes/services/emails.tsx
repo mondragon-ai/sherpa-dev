@@ -116,3 +116,22 @@ export const fetchNext = async (
     console.error("Error request next chat list:", error);
   }
 };
+
+/**
+ * Send email to chat
+ * @param {FetcherWithComponents} fetcher - The fetcher to submit the request.
+ * @param {{ to: string; subject: string; email: string }} payload - Chat ID
+ */
+export const sendEmail = async (
+  fetcher: FetcherWithComponents<ActionFetcherType>,
+  payload: { to: string; subject: string; email: string },
+): Promise<void> => {
+  try {
+    const formData = new FormData();
+    formData.append("action", "send_email");
+    formData.append("payload", JSON.stringify(payload));
+    fetcher.submit(formData, { method: "POST" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};

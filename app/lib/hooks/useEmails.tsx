@@ -4,6 +4,7 @@ import {
   fetchNext,
   filterEmail,
   resolveEmail,
+  sendEmail,
   submitNote,
 } from "app/routes/services/emails";
 import { useFetcher } from "@remix-run/react";
@@ -104,6 +105,18 @@ export const useEmails = () => {
           }
         }
 
+        case "send_email": {
+          if (fetcher.data.status < 300 && fetcher.data.type == "send_email") {
+            setEmail(
+              (p) =>
+                p && {
+                  ...p,
+                  email_sent: true,
+                },
+            );
+          }
+        }
+
         case "filter": {
           if (fetcher.data.status < 300 && fetcher.data.type == "filter") {
             setEmails(fetcher.data.data as unknown as EmailDocument[]);
@@ -194,6 +207,16 @@ export const useEmails = () => {
     [email, emails],
   );
 
+  // Send Email
+  const handleSendEmail = useCallback(
+    async (email: string, subject: string, message: string) => {
+      const payload = { to: email, subject, email: message };
+      console.log({ HOOK: payload });
+      await sendEmail(fetcher, payload);
+    },
+    [email, emails],
+  );
+
   return {
     email,
     emails,
@@ -209,5 +232,6 @@ export const useEmails = () => {
     handleDeleteEmail,
     handleRequestEmail,
     handleFetchNext,
+    handleSendEmail,
   };
 };

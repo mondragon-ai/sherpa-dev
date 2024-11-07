@@ -11,7 +11,6 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 
   try {
     await navigator.clipboard.writeText(text);
-    console.log("Text copied to clipboard");
     shopify.toast.show("Copied");
     return true;
   } catch (err) {

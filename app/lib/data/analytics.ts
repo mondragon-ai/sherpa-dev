@@ -168,10 +168,7 @@ const aggregateTime = (
       const timeParts = time.split(":");
       let hours = parseInt(timeParts[0]);
 
-      console.log({ wd, month, day, year, time, ampm });
-
       if (ln >= 60) {
-        // const day = `${hours} ${ampm}`;
         hourCounts[month] = (hourCounts[month] || 0) + item.value;
       } else if (ln >= 7) {
         const d = `${wd} ${day.replace(",", "")}`;

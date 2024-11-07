@@ -35,7 +35,6 @@ export const useAnalytics = () => {
 
   const handleSearch = useCallback(
     (tf: TimeFrameTypes) => {
-      console.log(tf);
       fetchSearchedAnalytics(fetcher, tf);
     },
     [analytics],

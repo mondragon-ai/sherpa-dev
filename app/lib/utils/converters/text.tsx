@@ -39,3 +39,7 @@ export const toUrlHandle = (
 export const filterNumber = (str: string) => {
   return str.replace(/[^0-9]/g, "");
 };
+
+export const isValidEmail = (email: string) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
