@@ -27,14 +27,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     onFailure: async () => billing.request({ plan: USAGE_PLAN, isTest: true }),
   });
 
-  // const subscription = billingCheck.appSubscriptions[0];
+  // const billingCheck = await billing.require({
+  //   plans: [USAGE_PLAN],
+  //   isTest: false,
+  //   onFailure: async () => billing.request({ plan: USAGE_PLAN, isTest: false }),
+  // });
 
-  await fetch(
-    `${SERVER_BASE_URL}/store/${session.shop}/install/${session.accessToken}`,
-    {
-      method: "POST",
-    },
-  );
+  // await fetch(
+  //   `${SERVER_BASE_URL}/store/${session.shop}/install/${session.accessToken}`,
+  //   {
+  //     method: "POST",
+  //   },
+  // );
 
   return json({ apiKey: process.env.SHOPIFY_API_KEY || "" });
 };

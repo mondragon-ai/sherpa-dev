@@ -3,11 +3,13 @@ import {
   ApiVersion,
   AppDistribution,
   BillingInterval,
+  DeliveryMethod,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import { restResources } from "@shopify/shopify-api/rest/admin/2024-07";
 import prisma from "./db.server";
+import { SERVER_BASE_URL } from "./lib/constants";
 
 export const USAGE_PLAN =
   "Charged $1.00 per chat or email to be fully automated.";
@@ -36,6 +38,26 @@ const shopify = shopifyApp({
   },
   future: {
     unstable_newEmbeddedAuthStrategy: true,
+  },
+  webhooks: {
+    APP_SUBSCRIPTIONS_UPDATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/app/uninstalled",
+    },
+  },
+  hooks: {
+    afterAuth: async ({ session }) => {
+      shopify.registerWebhooks({ session });
+      console.log("AUTH");
+      // console.log({ session });
+
+      await fetch(
+        `${SERVER_BASE_URL}/store/${session.shop}/install/${session.accessToken}`,
+        {
+          method: "POST",
+        },
+      );
+    },
   },
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }

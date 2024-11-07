@@ -3,7 +3,7 @@
 client_id = "9cfd56536d8d2e89ca61c351d6dc97db"
 name = "sherpa-dev"
 handle = "sherpa-dev-1"
-application_url = "https://vitamins-valley-recreational-rogers.trycloudflare.com"
+application_url = "https://import-museums-speaking-look.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_customers,read_orders,read_products,write_customers,write_discoun
 
 [auth]
 redirect_urls = [
-  "https://vitamins-valley-recreational-rogers.trycloudflare.com/auth/callback",
-  "https://vitamins-valley-recreational-rogers.trycloudflare.com/auth/shopify/callback",
-  "https://vitamins-valley-recreational-rogers.trycloudflare.com/api/auth/callback"
+  "https://import-museums-speaking-look.trycloudflare.com/auth/callback",
+  "https://import-museums-speaking-look.trycloudflare.com/auth/shopify/callback",
+  "https://import-museums-speaking-look.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -36,6 +36,10 @@ api_version = "2024-10"
   [[webhooks.subscriptions]]
   uri = "/webhooks/shop/redact"
   compliance_topics = [ "shop/redact" ]
+
+  [[webhooks.subscriptions]]
+  topics = [ "app_subscriptions/update" ]
+  uri = "/webhooks/app/billing"
 
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled" ]
