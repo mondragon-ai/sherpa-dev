@@ -37,13 +37,19 @@ export const Chat = ({
 
   const handleAddNote = useCallback(async () => {
     setLoading(true);
-    if (!chat || !chat.id) return;
-    if (note == "") return;
+    if (!chat || !chat.id) {
+      setLoading(false);
+      return;
+    }
+    if (note == "") {
+      setLoading(false);
+      return;
+    }
 
     await addNote(String(chat?.id || ""), note);
 
     setNote("");
-    // setLoading(false);
+    setLoading(false);
   }, [note, chat, loading]);
 
   return (
@@ -51,97 +57,121 @@ export const Chat = ({
       <style>
         {`
             .chatWrapper {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                height: 100%;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 0px;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: center;
+              height: 100%;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 0px;
             }
             
             .chatWrapper > header {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                height: 50px;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 10px;
-                border-bottom: 1px solid var(--p-color-bg-surface-tertiary-hover);
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+              height: 50px;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 10px;
+              border-bottom: 1px solid var(--p-color-bg-surface-tertiary-hover);
             }
 
             .chatWrapper > header > .hdrRigt {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                height: auto;
-                width: auto;
-                position: relative;
-                margin: 0;
-                padding: 10px;
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+              height: auto;
+              width: auto;
+              position: relative;
+              margin: 0;
+              padding: 10px;
             }
 
             .chatWrapper > header > .hdrRigt > button {
-                margin-left: 5px;
+              margin-left: 5px;
             }
 
 
             .convoWrapper {
-                flex-grow: 1; 
-                overflow-y: auto;
-                height: auto;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                overflow-y: scroll;
-                padding: 10px;
+              flex-grow: 1; 
+              overflow-y: auto;
+              height: auto;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              overflow-y: scroll;
+              padding: 10px;
             }
 
             .msgWrapper {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: flex-start;
-                height: auto;
-                width: 100%;
-                position: relative;
-                margin: 20px 0;
-                padding: 0;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              height: auto;
+              width: 100%;
+              position: relative;
+              margin: 20px 0;
+              padding: 0;
             }
 
             .actionText {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                height: auto;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 0;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: center;
+              height: auto;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 0;
             }
 
             .msg {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: flex-start;
-                height: auto;
-                width: fit-content;
-                max-width: 80%;
-                width: content-fit;
-                position: relative;
-                overflow: hidden;
-                margin: 0;
-                padding: 10px;
-                border-radius: var(--p-border-radius-300);
-                background: #EEF1F1;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              height: auto;
+              width: fit-content;
+              max-width: 80%;
+              width: content-fit;
+              position: relative;
+              overflow: hidden;
+              margin: 0;
+              padding: 10px;
+              border-radius: var(--p-border-radius-300);
+              background: #EEF1F1;
+            }
+
+            .img-msg {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              height: auto;
+              width: fit-content;
+              max-width: 80%;
+              width: content-fit;
+              position: relative;
+              overflow: hidden;
+              margin: 10px 0 0 0;
+              padding: 10px;
+              border-radius: var(--p-border-radius-300);
+              background: #EEF1F1;
+            }
+
+            .img-msg > img {
+              border-radius: 5px;
+              object-fit: contain;
+              max-width: 100%;
+              max-height: 400px;
             }
             
             .msg > div {
@@ -151,22 +181,22 @@ export const Chat = ({
             
             .msg > div a,
             .msg > div p {
-                margin-bottom: 20px;
-                width: 100%;
-                display: block;
-                overflow: hidden;
-                /* text-decoration: double; */
-                text-overflow: ellipsis;
+              margin-bottom: 20px;
+              width: 100%;
+              display: block;
+              overflow: hidden;
+              /* text-decoration: double; */
+              text-overflow: ellipsis;
             }
 
             .msg > div a:last-of-type,
             .msg > div p:last-of-type {
-                margin-bottom: 5px;
+              margin-bottom: 5px;
             }
 
 
             .msgWrapper > p {
-                margin-top: 5px;
+              margin-top: 5px;
             }
 
             .msg pre, .msg p, .msg a, .msg code {
@@ -184,71 +214,71 @@ export const Chat = ({
             }
 
             .chatFooterWrapper {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-start;
-                height: 200px;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 10px;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: flex-start;
+              height: 200px;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 10px;
             }
 
             .txtContainer {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-start;
-                height: auto;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 10px;
-                background: var(--p-color-bg-surface);
-                border-radius: var(--p-border-radius-300);
-                box-shadow: 0rem 0 1rem 0rem rgb(26 26 26 / 17%);
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: flex-start;
+              height: auto;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 10px;
+              background: var(--p-color-bg-surface);
+              border-radius: var(--p-border-radius-300);
+              box-shadow: 0rem 0 1rem 0rem rgb(26 26 26 / 17%);
             }
 
             .txtContainer > div {
-                width: 100%;
+              width: 100%;
             }
             .txtField {
-                width: 100%;
+              width: 100%;
             }
             .txtField div {
-                border: none !important;
+              border: none !important;
             }
 
             .txtContainerHdr {
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: center;
-                height: auto;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 0px;
-                margin-bottom: 10px
+              display: flex;
+              flex-direction: row;
+              justify-content: flex-start;
+              align-items: center;
+              height: auto;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 0px;
+              margin-bottom: 10px
             }
 
             .txtContainerHdr > span {
-                margin: 0;
-                margin-right: 5px;
+              margin: 0;
+              margin-right: 5px;
             }
 
             .txtContainerFooter {
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-end;
-                align-items: center;
-                height: auto;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                padding: 0px;
-                margin-top: 10px
+              display: flex;
+              flex-direction: row;
+              justify-content: flex-end;
+              align-items: center;
+              height: auto;
+              width: 100%;
+              position: relative;
+              margin: 0;
+              padding: 0px;
+              margin-top: 10px
             }
 
         `}
@@ -257,7 +287,7 @@ export const Chat = ({
       <div className={"chatWrapper"}>
         {chat ? (
           <header>
-            <Text variant="headingLg" as={"strong"}>
+            <Text variant="headingLg" as={"strong"} truncate={true}>
               {chat.customer
                 ? capitalizeWords(
                     `${chat.customer.first_name} ${chat.customer.last_name}`,
@@ -304,7 +334,7 @@ export const Chat = ({
                   !chat.action &&
                   !chat.is_note
                 ) {
-                  return <CustomerChat chat={chat} />;
+                  return <CustomerChat chat={chat as any} />;
                 }
 
                 if (chat.action) {

@@ -51,7 +51,7 @@ export async function emailAction({ request, params }: ActionFunctionArgs) {
           null,
         );
         return json(
-          { message: message, data: "note", type: "resolve", status: status },
+          { message: message, data: null, type: "resolve", status: status },
           { status: status },
         );
       }

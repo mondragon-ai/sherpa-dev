@@ -31,7 +31,7 @@ export const useChats = () => {
     if (fetcher.data) {
       switch (fetcher.data.type) {
         case "delete": {
-          if (fetcher.data.status < 300) {
+          if (fetcher.data.status < 300 && fetcher.data.type == "delete") {
             const filtered = chats.filter((c) => c.id !== fetcher.data?.data);
             setChats(filtered);
             setChat(null);
@@ -40,7 +40,7 @@ export const useChats = () => {
         }
 
         case "resolve": {
-          if (fetcher.data.status < 300) {
+          if (fetcher.data.status < 300 && fetcher.data.type == "resolve") {
             setChat(
               (p) =>
                 p && {
@@ -72,7 +72,7 @@ export const useChats = () => {
         }
 
         case "note": {
-          if (fetcher.data.status < 300) {
+          if (fetcher.data.status < 300 && fetcher.data.type == "note") {
             setChat(
               (p) =>
                 p && {

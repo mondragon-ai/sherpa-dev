@@ -1,5 +1,5 @@
-import { Text } from "@shopify/polaris";
-import { Conversation } from "app/lib/types/shared";
+import { Image, Text } from "@shopify/polaris";
+import { Conversation, EmailConversation } from "app/lib/types/shared";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 import { marked } from "marked";
 
@@ -22,7 +22,7 @@ export const AgentChat = ({ chat }: { chat: Conversation }) => (
   </div>
 );
 
-export const CustomerChat = ({ chat }: { chat: Conversation }) => (
+export const CustomerChat = ({ chat }: { chat: EmailConversation }) => (
   <div className="msgWrapper">
     <div className="msg">
       <div
@@ -31,6 +31,17 @@ export const CustomerChat = ({ chat }: { chat: Conversation }) => (
         }}
       />
     </div>
+
+    {chat.attachments && chat.attachments.length
+      ? chat.attachments.map((i) => {
+          if (i == "") return null;
+          return (
+            <div className="img-msg">
+              <Image alt={"attachment"} source={i} />
+            </div>
+          );
+        })
+      : null}
     <Text variant="bodySm" as={"p"} tone="subdued">
       Customer - {getHoursDifference(chat.time)}
     </Text>

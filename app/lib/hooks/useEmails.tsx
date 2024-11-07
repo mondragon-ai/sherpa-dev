@@ -31,7 +31,7 @@ export const useEmails = () => {
     if (fetcher.data) {
       switch (fetcher.data.type) {
         case "delete": {
-          if (fetcher.data.status < 300) {
+          if (fetcher.data.status < 300 && fetcher.data.type == "delete") {
             const filtered = emails.filter((c) => c.id !== fetcher.data?.data);
             setEmails(filtered);
             setEmail(null);
@@ -40,7 +40,7 @@ export const useEmails = () => {
         }
 
         case "resolve": {
-          if (fetcher.data.status < 300) {
+          if (fetcher.data.status < 300 && fetcher.data.type == "resolve") {
             setEmail(
               (p) =>
                 p && {
@@ -64,11 +64,21 @@ export const useEmails = () => {
                   ],
                 },
             );
+            const map = emails.map((c) => {
+              if (c.id == email?.id) {
+                return {
+                  ...c,
+                  status: "resolved" as any,
+                };
+              }
+              return c;
+            });
+            setEmails(map);
           }
         }
 
         case "note": {
-          if (fetcher.data.status < 300) {
+          if (fetcher.data.status < 300 && fetcher.data.type == "note") {
             setEmail(
               (p) =>
                 p && {
@@ -115,6 +125,7 @@ export const useEmails = () => {
             }
           }
         }
+
         default:
           break;
       }

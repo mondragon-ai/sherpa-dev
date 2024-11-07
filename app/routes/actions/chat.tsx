@@ -65,7 +65,7 @@ export async function chatAction({ request, params }: ActionFunctionArgs) {
           null,
         );
         return json(
-          { message: message, data: "", type: "resolve", status: status },
+          { message: message, data: null, type: "resolve", status: status },
           { status: status },
         );
       }

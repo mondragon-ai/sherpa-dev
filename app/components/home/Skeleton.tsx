@@ -13,6 +13,7 @@ export const SkeletonDetail = () => (
     <SkeletonRow />
     <SkeletonRow title="Customer Summary" />
     <SkeletonRow title="Order Summary" />
+    <SkeletonRow title="Recent Summary" />
   </section>
 );
 
