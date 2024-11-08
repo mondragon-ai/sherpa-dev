@@ -1,5 +1,6 @@
 import { Image, Text } from "@shopify/polaris";
 import { Conversation, EmailConversation } from "app/lib/types/shared";
+import { cleanHTMLContent } from "app/lib/utils/converters/text";
 import { getHoursDifference } from "app/lib/utils/converters/time";
 import { marked } from "marked";
 
@@ -78,7 +79,7 @@ export const SuggestedEmail = ({
     <div className="msg" style={{ background: "#e3cfff" }}>
       <div
         dangerouslySetInnerHTML={{
-          __html: convertMarkdownToHtml(chat.message),
+          __html: convertMarkdownToHtml(cleanHTMLContent(chat.message)),
         }}
       />
     </div>

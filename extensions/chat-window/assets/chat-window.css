@@ -867,7 +867,7 @@ textarea:focus-visible {
   justify-content: center;
   height: 20px;
   margin-bottom: 10px;
-  padding: 10px 7px !;
+  padding: 10px 7px;
 }
 
 .typing-indicator-dot {

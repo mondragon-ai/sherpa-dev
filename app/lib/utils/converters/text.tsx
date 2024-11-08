@@ -43,3 +43,17 @@ export const filterNumber = (str: string) => {
 export const isValidEmail = (email: string) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
+
+export const cleanHTMLContent = (html: string): string => {
+  // Create a temporary DOM parser to work with the HTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  // Extract all paragraph text without styles
+  const paragraphs = Array.from(doc.querySelectorAll("p")).map(
+    (p) => p.textContent?.trim() || "",
+  );
+
+  // Join the paragraphs with double line breaks for readability
+  return paragraphs.join("\n\n");
+};

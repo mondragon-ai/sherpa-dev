@@ -6,10 +6,10 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { action } from "app/routes/app.configurations";
+import { ConfigurationsType } from "../types/config";
 import { handleResponse } from "../utils/shared";
 import { useFetcher } from "@remix-run/react";
 import { FetcherProp } from "../types/shared";
-import { ConfigurationsType } from "../types/config";
 
 export const useConfigurations = (initialState: ConfigurationsType | null) => {
   const shopify = useAppBridge();

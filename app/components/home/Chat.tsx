@@ -78,10 +78,11 @@ export const Chat = ({
     setNote(message.message);
   };
 
-  // Popup Text
+  // Popup Text Type Selector
   const handleSelectingType = (type: "email" | "note") => {
     setPopoverActive(false);
     setType(type);
+    setNote("");
   };
 
   // Send email
@@ -303,7 +304,7 @@ export const Chat = ({
             }
 
             .txtField textarea {
-              max-height: 100px;
+              max-height: 90px;
             }
 
             .txtContainerHdr {

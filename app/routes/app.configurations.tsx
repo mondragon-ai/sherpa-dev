@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { SaveIcon } from "@shopify/polaris-icons";
 import { configAction } from "./actions/configurations";
-import { Page, BlockStack, Box, Banner, Text } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { ConfigurationsType } from "app/lib/types/config";
 import { configurationsLoader } from "./loaders/configurations";
@@ -10,9 +9,11 @@ import { useConfigurations } from "app/lib/hooks/configurations";
 import { Discounts } from "app/components/configurations/Discounts";
 import { Knowledge } from "app/components/configurations/Knowledge";
 import { Automation } from "app/components/configurations/Automation";
+import { Page, BlockStack, Box, Banner, Text } from "@shopify/polaris";
 import { Personalize } from "app/components/configurations/Personalize";
 import { SpecialCases } from "app/components/configurations/SpecialCases";
 import { StorePolicies } from "app/components/configurations/StorePolicies";
+import { EmailSignature } from "app/components/configurations/EmailSignature";
 
 export const loader = configurationsLoader;
 export const action = configAction;
@@ -85,6 +86,9 @@ export default function AdditionalPage() {
 
         {/* PERSONALIZE SETTINGS */}
         <Personalize config={config} setConfig={setConfig} />
+
+        {/* EMAIL SGINATURE SETTINGS */}
+        <EmailSignature config={config} setConfig={setConfig} />
 
         <Box paddingBlockStart="200"></Box>
       </BlockStack>
