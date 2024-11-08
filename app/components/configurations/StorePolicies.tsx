@@ -23,13 +23,13 @@ export const StorePolicies = ({
       v: string,
       t: "contact_email" | "return" | "exception" | "shipping" | "store",
     ) => setConfig((p) => ({ ...p, [t]: v })),
-    [],
+    [config],
   );
 
   const handleChange = useCallback(
     (v: boolean, t: "refund" | "damged_items" | "exchanges") =>
       setConfig((p) => ({ ...p, [t]: v })),
-    [],
+    [config],
   );
 
   return (

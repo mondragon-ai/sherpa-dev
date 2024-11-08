@@ -171,7 +171,7 @@ export const ChatList = ({
             }
             
             .listWrapper {
-                height: calc(100% - 80px);
+                height: calc(100% - 100px);
                 width: 100%;
                 position: relative;
                 margin: 0;

@@ -12,7 +12,7 @@ export const Automation = ({
   const handleChange = useCallback(
     (v: boolean, t: "automate_actions" | "automate_emails") =>
       setConfig((p) => ({ ...p, [t]: v })),
-    [],
+    [config],
   );
 
   return (

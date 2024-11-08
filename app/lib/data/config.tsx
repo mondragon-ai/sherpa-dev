@@ -41,4 +41,14 @@ export const config_state: ConfigurationsType = {
   tone: "custom",
   custom_tone: "",
   links: [],
+  email_signature: {
+    logo: "",
+    facebook: "",
+    twitter: "",
+    tiktok: "",
+    youtube: "",
+    instagram: "",
+    name: "",
+    company: "",
+  },
 };

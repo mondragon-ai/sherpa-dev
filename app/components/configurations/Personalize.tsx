@@ -28,7 +28,7 @@ export const Personalize = ({
   );
   const handleChange = useCallback(
     (v: string) => setConfig((p) => ({ ...p, custom_tone: v })),
-    [tone],
+    [tone, config],
   );
 
   const handleToneSelect = useCallback(
@@ -36,7 +36,7 @@ export const Personalize = ({
       setTone(v);
       setConfig((p) => ({ ...p, tone: v }));
     },
-    [tone],
+    [tone, config],
   );
 
   return (

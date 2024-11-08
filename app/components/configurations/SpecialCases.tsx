@@ -34,7 +34,7 @@ export const SpecialCases = ({
         special_cases: cases,
       }));
     },
-    [special],
+    [special, config],
   );
 
   return (

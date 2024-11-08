@@ -28,7 +28,7 @@ export const Discounts = ({
   const handleTextChange = useCallback(
     (v: string) =>
       setConfig((p) => ({ ...p, price_rules: { ...p.price_rules, value: v } })),
-    [],
+    [config],
   );
 
   return (

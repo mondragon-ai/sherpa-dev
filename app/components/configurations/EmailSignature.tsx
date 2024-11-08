@@ -26,7 +26,7 @@ export const EmailSignature = ({
         ...p,
         email_signature: { ...p.email_signature, [t]: v },
       })),
-    [],
+    [config],
   );
   return (
     <>
