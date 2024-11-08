@@ -56,7 +56,7 @@ export const Discounts = ({
               <Box paddingBlockStart="200">
                 <TextField
                   label="Discount Off (percentage)"
-                  value={String(config.price_rules.value)}
+                  value={String(config?.price_rules?.value)}
                   onChange={handleTextChange}
                   error=""
                   type="number"
@@ -74,7 +74,7 @@ export const Discounts = ({
                   loading={loading}
                   variant="primary"
                   icon={DiscountIcon}
-                  onClick={() => create(config.price_rules.value)}
+                  onClick={() => create(config?.price_rules?.value)}
                 >
                   Add
                 </Button>
