@@ -51,7 +51,7 @@ export const Discounts = ({
           <Text as="h2" variant="headingSm">
             Price Rule
           </Text>
-          {!config.price_rules.id ? (
+          {!config?.price_rules?.id ? (
             <BlockStack gap="200">
               <Box paddingBlockStart="200">
                 <TextField
@@ -88,7 +88,7 @@ export const Discounts = ({
                 </Text>
                 <Box paddingBlockStart="200">
                   <Text as="h3" variant="bodyMd" tone="base">
-                    Discount ID: {filterNumber(config.price_rules.id)}
+                    Discount ID: {filterNumber(config?.price_rules?.id)}
                   </Text>
                 </Box>
                 <Text as="p" variant="bodyXs" tone="magic-subdued">
@@ -104,7 +104,7 @@ export const Discounts = ({
                   variant="primary"
                   tone="critical"
                   icon={DeleteIcon}
-                  onClick={() => deleteDiscount(config.price_rules.id)}
+                  onClick={() => deleteDiscount(config?.price_rules?.id)}
                 >
                   Delete
                 </Button>
