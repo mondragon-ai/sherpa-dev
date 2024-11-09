@@ -1031,5 +1031,6 @@ textarea:focus-visible {
     bottom: 0 !important;
     top: -5px !important;
     right: 7px !important;
+    box-shadow: none !important;
   }
 }
