@@ -76,7 +76,7 @@ export const cleanIncomingAnalytics = (
     }
   }
 
-  cleaned.ratio = 1 - Number(sherpa / (human || 1));
+  cleaned.ratio = 100 * Number(human / (Number(human + sherpa) || 1));
 
   cleaned.resolution_ratio.push({
     name: "sherpa",

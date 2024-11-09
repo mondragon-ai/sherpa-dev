@@ -7,8 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var chat_window = document.getElementById("chat-window");
   var close_btn = document.getElementById("minimize-btn");
-  // var domain = chat_window.getAttribute("data-shopify-domain");
-  // console.log({ domain });
 
   // storeString("domain", domain);
   var p = getItems("payload");
@@ -55,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
           addCustomerMessage(c.message);
         }
       }
+      document.getElementById("chat_window").style.display = "block";
       return 200;
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -63,9 +62,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (p && p.email) {
-    fetchChat();
     hideAllWindows();
-    document.getElementById("chat_window").style.display = "block";
+    fetchChat();
   } else {
     hideAllWindows();
     document.getElementById("pre_check").style.display = "block";
@@ -302,9 +300,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     var stock_level =
-      product.stock_level <= 0
+      product.stock_level <= 0 && product.track_inventory
         ? "out of stock"
-        : `stock level x ${product.stock_level}`;
+        : product.stock_level < 0 || !product.track_inventory
+          ? "1,284"
+          : `stock level x ${product.stock_level}`;
 
     var status =
       product.status.toLocaleLowerCase() == "active"
@@ -422,11 +422,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var rowDiv1 = document.createElement("div");
     rowDiv1.classList.add("row", "row-order");
-    rowDiv1.innerHTML = `<span>${order.order_number}</span><span style="color: ${statusColor.text}; background: ${statusColor.bg}; padding: 3px 5px; border-radius: 4px;">${capitalizeWords(order.fulfillment_status.toLocaleLowerCase())}</span>`;
+    rowDiv1.innerHTML = `<span>Order: ${order.order_number}</span><span style="color: ${statusColor.text}; background: ${statusColor.bg}; padding: 3px 5px; border-radius: 4px;">${capitalizeWords(order.fulfillment_status.toLocaleLowerCase())}</span>`;
 
     var rowDiv2 = document.createElement("div");
     rowDiv2.classList.add("row", "row-order");
-    rowDiv2.innerHTML = `<span>Tracking: <a href="${order.tracking_url || "#"}">${order.tracking_url ? extractNumbers(order.tracking_url) : "no tracking"}</a></span><span>$${order.current_total_price}</span>`;
+    rowDiv2.innerHTML = `<span>Tracking: <a style="color: #acacac;" href="${order.tracking_url || "#"}">${order.tracking_url ? extractNumbers(order.tracking_url) : "no tracking"}</a></span><span>$${order.current_total_price}</span>`;
 
     colDiv.appendChild(rowDiv1);
     colDiv.appendChild(rowDiv2);

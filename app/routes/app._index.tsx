@@ -47,7 +47,7 @@ export default function Index() {
     <Page
       fullWidth
       title="Customer Chats"
-      subtitle="Last Updated: Oct 21, 24 2:00 PM"
+      subtitle={`Last Updated: ${new Date().toLocaleTimeString()}`}
     >
       {error.message && (
         <Banner

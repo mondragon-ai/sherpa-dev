@@ -346,7 +346,7 @@ const renderHalfShape = (props: any, completed: number, text: string) => {
         fontWeight="bold"
         letterSpacing="0px"
       >
-        {`${(completed * 100).toFixed(0)}%`}
+        {`${completed.toFixed(1)}%`}
       </text>
       <text
         x={"50%"}

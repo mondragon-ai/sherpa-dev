@@ -3,16 +3,22 @@ import {
   filterNumber,
   truncateString,
 } from "app/lib/utils/converters/text";
-import { CaretDownIcon, CaretUpIcon, ChatIcon } from "@shopify/polaris-icons";
+import {
+  CaretDownIcon,
+  CaretUpIcon,
+  ChatIcon,
+  OrderRepeatIcon,
+} from "@shopify/polaris-icons";
 import { formatNumber } from "app/lib/utils/converters/numbers";
 import { formatTimestamp } from "app/lib/utils/converters/time";
 import { convertMarkdownToHtml } from "./Conversation";
 import { copyToClipboard } from "app/lib/utils/shared";
-import { Badge, Icon, Text } from "@shopify/polaris";
+import { Badge, Icon, Image, Text } from "@shopify/polaris";
 import { EmailDocument } from "app/lib/types/emails";
 import { ChatDocument } from "app/lib/types/chats";
 import { SkeletonDetail } from "./Skeleton";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { LineItem } from "app/lib/types/shared";
 
 interface ChatProps {
   chat: null | ChatDocument | EmailDocument;
@@ -24,101 +30,146 @@ export const ChatDetail = ({ chat }: ChatProps) => {
       <style>
         {`
         .detailWrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          height: 100%;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          padding: 0px;
         }
         
         .detailWrapper > header {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            height: 50px;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 10px;
-            border-bottom: 1px solid var(--p-color-bg-surface-tertiary-hover);
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          height: 50px;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          padding: 10px;
+          border-bottom: 1px solid var(--p-color-bg-surface-tertiary-hover);
         }
 
         .detailWrapper > .detailMain {
-            flex-grow: 1; 
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            overflow-y: scroll;
-            padding: 0px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            position: relative;
+          flex-grow: 1; 
+          height: auto;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          overflow-y: scroll;
+          padding: 0px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          height: 100%;
+          width: 100%;
+          position: relative;
         }
         
         .detailWrapper > .detailMain > section {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 10px;
-            border-bottom: 1px solid var(--p-color-bg-surface-tertiary-hover);
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: flex-start;
+          height: auto;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          padding: 10px;
+          border-bottom: 1px solid var(--p-color-bg-surface-tertiary-hover);
         }
 
 
         .detail {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 0;
-            padding: 0px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: flex-start;
+          height: auto;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          padding: 0px;
         }
 
         .detailWrapper > .detailMain > section > .row,
         .detailWrapper > .detailMain > section > .detail > .row {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: flex-start;
-            height: auto;
-            width: 100%;
-            position: relative;
-            margin: 5px 0;
-            padding: 0px;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: flex-start;
+          height: auto;
+          width: 100%;
+          position: relative;
+          margin: 5px 0;
+          padding: 0px;
+        }
+
+        .detailWrapper > .detailMain > section > .detail > .row {
+          min-height: 20px
         }
 
         .detailWrapper > .detailMain > section > .row > span,
         .detailWrapper > .detailMain > section > .detail > .row > span {
-            margin: 0;
-            cursor: pointer;
+          margin: 0;
+          cursor: pointer;
         }
         
         .detailWrapper > .detailMain > section > .row > span:hover,
         .detailWrapper > .detailMain > section > .detail > .row > span:hover {
-            color: var(--p-color-bg-surface-tertiary-hover);
+          color: var(--p-color-bg-surface-tertiary-hover);
         }
 
         
         .detailWrapper > .detailMain > section > .row > p,
         .detailWrapper > .detailMain > section > .detail > .row > p  {
-            width: 50%
+          width: 50%
+        }
+
+        .tagRow {
+          width: 50%;
+          display: flex;
+          overflow-x: scroll;
+          scrollbar-width: none;
+        }
+
+        .tagRow > span {
+          margin-right: 5px;
+          width: min-content;
+        }
+        .tagRow > span > span{
+          width: max-content;
+        }
+
+        .tagRow > img {
+          width: 50px;
+          height: 50px;
+          border-radius: 3px;
+          border: 0.5px solid #d5d5d5;
+          cursor: pointer;
+          margin-right: 10px
+        }
+
+        .tagRow > img:hover {
+          border: 0.5px solid #686868;
+          box-shadow: 0 0 10px #c8c8c8;
+        }
+
+        .tagRow > header {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: flex-start;
+          height: auto;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          padding: 5px;
         }
 
         `}
@@ -285,6 +336,22 @@ const CustomerDetail = ({ chat }: ChatProps) => {
             value={`$${formatNumber(Number(total_spent))}`}
           />
           <DetailRow label="Total Orders" value={total_orders.toString()} />
+          <div className="row">
+            <Text variant="bodySm" as={"p"} tone="subdued">
+              Tags
+            </Text>
+            <div className="tagRow">
+              {chat.customer.tags
+                ? chat.customer.tags.split(",").map((t) => {
+                    return (
+                      <Badge tone="new" size="small">
+                        {capitalizeWords(t.toLocaleLowerCase() || "")}
+                      </Badge>
+                    );
+                  })
+                : "-"}
+            </div>
+          </div>
         </div>
       )}
     </section>
@@ -322,6 +389,16 @@ const OrderDetail = ({ chat }: ChatProps) => {
     tracking_url,
   } = chat.order;
   const [open, toggleOpen] = useState(false);
+  const [item, setItem] = useState<null | LineItem>(line_items[0] || null);
+  const handleLineItem = useCallback(
+    (id: string) => {
+      if (!id) return setItem(null);
+      const line = chat.order?.line_items.find((l) => l.variant_id == id);
+      if (!line) return setItem(null);
+      setItem(line);
+    },
+    [line_items],
+  );
 
   return (
     <section>
@@ -372,18 +449,65 @@ const OrderDetail = ({ chat }: ChatProps) => {
             <Text variant="bodySm" as={"p"} tone="subdued">
               Line Items
             </Text>
-            <Text variant="bodySm" as={"p"} tone="base" breakWord>
-              {line_items &&
-                line_items.map((l) => {
-                  return (
-                    <>
-                      {`${truncateString(l.title, 5)} x ${l.quantity} - ${l.options}`}
-                      <br />
-                    </>
-                  );
-                })}
-            </Text>
           </div>
+          <div className="tagRow" style={{ padding: "10px", width: "100%" }}>
+            {chat.order.line_items.map((l) => {
+              if (!l.image) {
+                return (
+                  <Image
+                    onClick={() => {
+                      handleLineItem(l.variant_id);
+                    }}
+                    alt={"placeholder"}
+                    source={
+                      "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081"
+                    }
+                  />
+                );
+              } else {
+                return (
+                  <Image
+                    onClick={() => {
+                      handleLineItem(l.variant_id);
+                    }}
+                    alt={"product"}
+                    source={l.image}
+                  />
+                );
+              }
+            })}
+          </div>
+          {item && (
+            <div
+              className="tagRow"
+              style={{ width: "100%", flexDirection: "column" }}
+            >
+              <header>
+                <Text variant="bodySm" as={"p"} tone="subdued" truncate={true}>
+                  {item.title}
+                </Text>
+                {item.selling_plan ? (
+                  <Badge tone={"magic"} size="small" icon={OrderRepeatIcon}>
+                    Recurring
+                  </Badge>
+                ) : (
+                  <Text variant="bodySm" as={"p"} tone="subdued">
+                    x {item.quantity}
+                  </Text>
+                )}
+              </header>
+              <header>
+                <Text variant="bodySm" as={"p"} tone="subdued">
+                  {item.options}
+                </Text>
+                {item.selling_plan ? (
+                  <Text variant="bodySm" as={"p"} tone="subdued">
+                    x {item.quantity}
+                  </Text>
+                ) : null}
+              </header>
+            </div>
+          )}
         </div>
       )}
     </section>

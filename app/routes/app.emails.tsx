@@ -47,7 +47,7 @@ export default function Emails() {
     <Page
       fullWidth
       title="Customer Emails"
-      subtitle="Last Updated: Oct 21, 24 2:00 PM"
+      subtitle={`Last Updated: ${new Date().toLocaleTimeString()}`}
     >
       {error.message && (
         <Banner

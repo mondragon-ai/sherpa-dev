@@ -126,6 +126,10 @@ export type LineItem = {
   quantity: number;
   options: string;
   title: string;
+  variant_id: string;
+  product_id: string;
+  image: string;
+  selling_plan?: null | any;
 };
 
 export type ShopInfoResponse = {

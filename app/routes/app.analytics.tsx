@@ -15,79 +15,6 @@ import { CalendarIcon } from "@shopify/polaris-icons";
 import { cleanIncomingAnalytics } from "app/lib/data/analytics";
 import { analyticsAction } from "./actions/analytics";
 
-const line_chart = [
-  {
-    date: "m",
-    value: 1,
-  },
-  {
-    date: "t",
-    value: 3,
-  },
-  {
-    date: "w",
-    value: 2,
-  },
-  {
-    date: "t",
-    value: 2,
-  },
-  {
-    date: "f",
-    value: 1,
-  },
-  {
-    date: "s",
-    value: 4,
-  },
-];
-
-const bar_chart = [
-  {
-    name: "Order Status",
-    value: 4,
-  },
-  {
-    name: "Refund",
-    value: 2,
-  },
-  {
-    name: "Exchange",
-    value: 1,
-  },
-  {
-    name: "Cancel Order",
-    value: 2,
-  },
-  {
-    name: "Cancel Subscription",
-    value: 2,
-  },
-  {
-    name: "Giveaway",
-    value: 1,
-  },
-  {
-    name: "General",
-    value: 3,
-  },
-  {
-    name: "Product",
-    value: 1,
-  },
-];
-
-[
-  {
-    name: "completed",
-    value: 86.7 / 100,
-  },
-  {
-    name: "needed",
-    value: 1 - 86.7 / 100,
-  },
-];
-
 export const loader = analyticsLoader;
 export const action = analyticsAction;
 
@@ -191,7 +118,7 @@ const TopAnalytics = ({ analytics }: { analytics: CleanedAnalytics }) => {
       <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 4, xl: 4 }}>
         <AnalyticsCard
           title={"Resolution Ratio"}
-          main_value={`${ratio * 100}`}
+          main_value={`${ratio}`}
           metric={"%"}
           fixed={1}
           tip="Ratio of inbound requests resolved without human intervention required"

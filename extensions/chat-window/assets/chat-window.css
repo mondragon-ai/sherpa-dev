@@ -1021,7 +1021,7 @@ textarea:focus-visible {
     box-shadow: 0 0 8px 1px #cccccc;
   }
   .closed-chat-btn {
-    background: url("./chat_icon.png") no-repeat center / contain;
+    background: url("./chat_icon.png") no-repeat center / contain !important;
     width: 120px;
     height: 30px !important;
     margin: 0;
