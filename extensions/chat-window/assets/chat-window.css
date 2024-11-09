@@ -1018,6 +1018,7 @@ textarea:focus-visible {
     z-index: 100;
     transform: translateY(-50%) rotate(270deg);
     background: white;
+    box-shadow: 0 0 8px 1px #cccccc;
   }
   .closed-chat-btn {
     background: url("./chat_icon.png") no-repeat center / contain;
@@ -1028,6 +1029,7 @@ textarea:focus-visible {
     border: 0;
     position: absolute;
     bottom: 0 !important;
-    top: auto;
+    top: -5px !important;
+    right: 7px !important;
   }
 }

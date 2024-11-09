@@ -25,6 +25,7 @@ export default function Integrate() {
   const {
     apps,
     error,
+    isLoading,
     setApps,
     setError,
     handleRecahrgeSave,
@@ -70,6 +71,7 @@ export default function Integrate() {
                 </Text>
                 <Grid columns={{ sm: 3 }}>
                   <App
+                    isLoading={isLoading}
                     title={"Gmail"}
                     text={
                       "Connect your customer service inbox to Sherpa for auto-completion"
@@ -83,6 +85,7 @@ export default function Integrate() {
                     remove={handleGmailRemove}
                   />
                   <App
+                    isLoading={isLoading}
                     title={"Outlook"}
                     text={
                       "Connect your customer service inbox to Sherpa for auto-completion"
@@ -96,6 +99,7 @@ export default function Integrate() {
                     remove={handleRecahrgeRemove}
                   />
                   <App
+                    isLoading={isLoading}
                     title={"Stripe"}
                     text={
                       "Subscription can be searched and modified via Sherpa"
@@ -109,6 +113,7 @@ export default function Integrate() {
                     remove={handleRecahrgeRemove}
                   />
                   <App
+                    isLoading={isLoading}
                     title={"Recharge"}
                     text={
                       "Subscription can be searched and modified via Sherpa"
@@ -143,6 +148,7 @@ interface AppProps {
   connect: (v: string) => void;
   remove: () => void;
   token?: string;
+  isLoading: boolean;
 }
 
 const App = ({
@@ -152,6 +158,7 @@ const App = ({
   pending,
   connected,
   token,
+  isLoading,
   connect,
   remove,
 }: AppProps) => {
@@ -219,6 +226,7 @@ const App = ({
           ) : null}
           {!connected ? (
             <Button
+              loading={isLoading}
               variant="primary"
               disabled={pending || connected}
               onClick={() => connect(v)}
@@ -227,6 +235,7 @@ const App = ({
             </Button>
           ) : (
             <Button
+              loading={isLoading}
               variant="primary"
               disabled={!connected}
               onClick={() => remove()}

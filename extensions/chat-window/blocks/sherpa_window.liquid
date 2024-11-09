@@ -325,12 +325,16 @@
     .closed-chat-btn {
       background:url("{{ 'chat_icon.png' | asset_img_url: '1200x1200' }}") no-repeat center / contain;
       width: 100px;
-      height: 30px;
+      background-position: top;
+      height: 29px;
       margin: 0;
       padding: 0;
       border: 0;
       position: absolute;
-      top: 30px;
+      top: 31px;
+      right: 0px;
+      box-shadow: 0 0 6px 2px #e7e7e7;
+      border-radius: 5px;
     }
     .header-ava {
       {% if block.settings.avatar_image %} 

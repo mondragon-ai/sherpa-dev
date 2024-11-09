@@ -2,7 +2,7 @@
 
 client_id = "58928b5d71d8f97ebd905e289c151269"
 name = "Sherpa"
-handle = "sherpa-chatbot-production"
+handle = "sherpa-cs"
 application_url = "https://sherpa-prod-8bafaab678a7.herokuapp.com"
 embedded = true
 
