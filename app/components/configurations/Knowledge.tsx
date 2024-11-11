@@ -136,17 +136,28 @@ const FaqTabs = ({
   const handleAddSpecialCase = useCallback(() => {
     setConfig((p) => ({
       ...p,
-      [type]: { ...p[type], faqs: [...p[type].faqs, faq] },
+      [type]: {
+        ...p[type],
+        faqs: [...p[type].faqs, faq],
+      },
     }));
     setFaq({ q: "", a: "" });
   }, [faq, configs]);
 
   const handleDeleteSpecialCase = useCallback(
-    (a: string) => {
-      const faqs = configs[type].faqs.filter((s) => s.a !== a);
-      setConfig((p) => ({ ...p, [type]: { ...p[type], faqs: faqs } }));
+    (q: string) => {
+      console.log(configs[type].faqs);
+      const faqs = configs[type].faqs.filter((s) => s.q !== q);
+      console.log(faqs);
+      setConfig((p) => ({
+        ...p,
+        [type]: {
+          ...p[type],
+          faqs: faqs,
+        },
+      }));
     },
-    [faq, configs],
+    [faq, configs, type],
   );
 
   return (
