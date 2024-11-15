@@ -380,7 +380,9 @@ const ChatItem = ({
             ? "😊 "
             : chat.rating == "negative"
               ? "🙁 "
-              : "😐 "}
+              : chat.rating == "neutral"
+                ? "😐 "
+                : null}
           {chat.sentiment == "positive"
             ? "👍🏻 "
             : chat.rating == "negative"
