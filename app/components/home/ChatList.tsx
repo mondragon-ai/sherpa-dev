@@ -375,6 +375,17 @@ const ChatItem = ({
         </Text>
 
         <Text variant="bodySm" as={"p"} tone="subdued" truncate>
+          {chat.email_sent ? "📧 " : null}
+          {chat.rating == "positive"
+            ? "😊 "
+            : chat.rating == "negative"
+              ? "🙁 "
+              : "😐 "}
+          {chat.sentiment == "positive"
+            ? "👍🏻 "
+            : chat.rating == "negative"
+              ? "👎🏻 "
+              : null}
           {capitalizeWords(chat.suggested_action || "")}
         </Text>
       </div>
